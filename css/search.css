@@ -1,0 +1,95 @@
+/* ============================================================
+   CineVerse - search.css
+   Styles for the Search page: search input, filters and the
+   results grid (movie-grid layout is shared with movie.css
+   list pages, filters/input styles live here).
+   ============================================================ */
+
+.search-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px 40px 60px;
+}
+
+.search-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.search-header .page-heading {
+  margin-bottom: 24px;
+}
+
+.search-input-wrap {
+  position: relative;
+  max-width: 640px;
+  margin: 0 auto 24px;
+}
+
+.search-input-wrap i.fa-magnifying-glass {
+  position: absolute;
+  left: 22px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+  font-size: 1.1rem;
+}
+
+.search-input-large {
+  width: 100%;
+  padding: 18px 50px;
+  border-radius: 50px;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  color: #fff;
+  font-size: 1.05rem;
+  box-shadow: var(--shadow-card);
+  transition: border var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.search-input-large:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.2);
+}
+
+.clear-icon {
+  position: absolute;
+  right: 22px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.clear-icon:hover {
+  color: var(--color-accent);
+}
+
+/* ---------------- FILTERS ---------------- */
+.search-filters {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.filter-select {
+  padding: 10px 18px;
+  border-radius: 50px;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  color: #fff;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: border var(--transition-fast);
+}
+
+.filter-select:focus {
+  border-color: var(--color-accent);
+}
+
+.filter-select option {
+  background: var(--color-card);
+  color: #fff;
+}

@@ -1,0 +1,76 @@
+<!-- ============================================================
+     VIEW: search.html
+     Search page - live search input, genre/sort filters,
+     results grid and a "no results" empty state.
+     ============================================================ -->
+<div class="search-page">
+
+  <!-- ================= SEARCH HEADER ================= -->
+  <section class="search-header">
+    <h1 class="page-heading">Find Your Next Movie</h1>
+
+    <div class="search-input-wrap">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input
+        type="text"
+        class="search-input-large"
+        placeholder="Search by title, e.g. Inception..."
+        ng-model="searchCtrl.query"
+        ng-change="searchCtrl.onQueryChange()"
+        autofocus />
+      <i class="fa-solid fa-xmark clear-icon" ng-if="searchCtrl.query" ng-click="searchCtrl.query=''; searchCtrl.onQueryChange()"></i>
+    </div>
+
+    <!-- ================= FILTERS ================= -->
+    <div class="search-filters">
+      <select class="filter-select" ng-model="searchCtrl.selectedGenre">
+        <option value="">All Genres</option>
+        <option ng-repeat="genre in searchCtrl.genres" value="{{ genre.id }}">{{ genre.name }}</option>
+      </select>
+
+      <select class="filter-select" ng-model="searchCtrl.sortOption">
+        <option value="relevance">Sort: Relevance</option>
+        <option value="rating">Sort: Highest Rated</option>
+        <option value="newest">Sort: Newest First</option>
+        <option value="title">Sort: A - Z</option>
+      </select>
+
+      <button class="btn btn-secondary btn-small" ng-click="searchCtrl.resetFilters()">
+        <i class="fa-solid fa-rotate-left"></i> Reset
+      </button>
+    </div>
+  </section>
+
+  <!-- ================= LOADING SPINNER ================= -->
+  <div class="inline-loader" ng-if="searchCtrl.isLoading">
+    <div class="spinner"></div>
+    <p>Searching movies...</p>
+  </div>
+
+  <!-- ================= ERROR MESSAGE ================= -->
+  <div class="error-banner" ng-if="searchCtrl.errorMessage">
+    <i class="fa-solid fa-triangle-exclamation"></i> {{ searchCtrl.errorMessage }}
+  </div>
+
+  <!-- ================= NO RESULTS STATE ================= -->
+  <div class="no-results-state" ng-if="!searchCtrl.isLoading && searchCtrl.hasSearched && searchCtrl.filteredResults().length === 0">
+    <i class="fa-solid fa-ghost"></i>
+    <h2>No Movies Found</h2>
+    <p>We couldn't find anything matching "{{ searchCtrl.query }}". Try a different title or adjust your filters.</p>
+  </div>
+
+  <!-- ================= EMPTY / PROMPT STATE (before first search) ================= -->
+  <div class="no-results-state" ng-if="!searchCtrl.isLoading && !searchCtrl.hasSearched">
+    <i class="fa-solid fa-clapperboard"></i>
+    <h2>Start Typing to Search</h2>
+    <p>Discover thousands of movies. Just type a title above to get started.</p>
+  </div>
+
+  <!-- ================= RESULTS GRID ================= -->
+  <section class="movie-grid" ng-if="!searchCtrl.isLoading && searchCtrl.filteredResults().length > 0">
+    <div class="grid-item" ng-repeat="movie in searchCtrl.filteredResults() track by movie.id">
+      <movie-card movie="movie"></movie-card>
+    </div>
+  </section>
+
+</div>

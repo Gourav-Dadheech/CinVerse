@@ -1,0 +1,162 @@
+/* ============================================================
+   CineVerse - responsive.css
+   Media queries to ensure a fully responsive layout across
+   desktop, tablet and mobile breakpoints. Loaded last so it
+   can safely override the base styles.
+   ============================================================ */
+
+/* ---------------- TABLET (<= 1024px) ---------------- */
+@media (max-width: 1024px) {
+  .footer-container {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .movie-header-content {
+    gap: 26px;
+  }
+
+  .movie-poster-large {
+    width: 200px;
+  }
+
+  .hero-title {
+    font-size: 2.8rem;
+  }
+}
+
+/* ---------------- SMALL TABLET / LARGE MOBILE (<= 768px) ---------------- */
+@media (max-width: 768px) {
+  .navbar-container {
+    padding: 0 20px;
+  }
+
+  .hero-banner {
+    padding: 0 24px 40px;
+    height: 65vh;
+  }
+
+  .hero-title {
+    font-size: 2.1rem;
+  }
+
+  .hero-overview {
+    font-size: 0.9rem;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .movie-slider-section,
+  .genre-section,
+  .movie-section,
+  .list-page,
+  .search-page {
+    padding: 0 20px;
+  }
+
+  .movie-header-content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .movie-poster-large {
+    width: 180px;
+  }
+
+  .movie-meta-row,
+  .genre-badges,
+  .movie-actions {
+    justify-content: center;
+  }
+
+  .movie-title {
+    font-size: 2.2rem;
+  }
+
+  .footer-container {
+    grid-template-columns: 1fr;
+    padding: 40px 24px;
+  }
+
+  .slider-item {
+    width: 150px;
+  }
+
+  .movie-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 16px;
+  }
+}
+
+/* ---------------- MOBILE (<= 480px) ---------------- */
+@media (max-width: 480px) {
+  main {
+    padding-top: 70px;
+  }
+
+  .navbar-brand {
+    font-size: 1.2rem;
+  }
+
+  .hero-banner {
+    height: 60vh;
+    min-height: 380px;
+  }
+
+  .hero-title {
+    font-size: 1.7rem;
+  }
+
+  .hero-tag {
+    font-size: 0.65rem;
+    padding: 5px 12px;
+  }
+
+  .section-title {
+    font-size: 1.4rem;
+  }
+
+  .slider-item {
+    width: 130px;
+  }
+
+  .search-input-large {
+    padding: 14px 42px;
+    font-size: 0.9rem;
+  }
+
+  .search-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-select, .search-filters .btn {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+
+  .list-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .movie-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+  }
+
+  .cast-card {
+    width: 110px;
+  }
+
+  .back-to-top {
+    bottom: 20px;
+    right: 20px;
+    width: 44px;
+    height: 44px;
+  }
+}

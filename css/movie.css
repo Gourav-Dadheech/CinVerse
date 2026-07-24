@@ -1,0 +1,239 @@
+/* ============================================================
+   CineVerse - movie.css
+   Styles for the Movie Details page (backdrop header, cast,
+   trailer, sliders) and the Favorites / Watchlist saved-card
+   list styles.
+   ============================================================ */
+
+/* ---------------- BACKDROP HEADER ---------------- */
+.movie-backdrop {
+  width: 100%;
+  min-height: 90vh;
+  background-size: cover;
+  background-position: top center;
+  display: flex;
+  align-items: flex-end;
+  padding: 60px 40px;
+}
+
+.movie-header-content {
+  display: flex;
+  gap: 40px;
+  max-width: 1300px;
+  margin: 0 auto;
+  align-items: flex-end;
+  width: 100%;
+}
+
+.movie-poster-large {
+  width: 260px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  flex-shrink: 0;
+  border: 2px solid rgba(255, 255, 255, 0.08);
+}
+
+.movie-header-info {
+  flex: 1;
+}
+
+.movie-title {
+  font-family: var(--font-heading);
+  font-size: 3rem;
+  letter-spacing: 1px;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+}
+
+.movie-tagline {
+  color: var(--color-text-muted);
+  font-style: italic;
+  margin: 8px 0 16px;
+}
+
+.movie-meta-row {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.meta-pill {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--color-border);
+  padding: 6px 14px;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.movie-overview {
+  max-width: 750px;
+  margin: 16px 0 24px;
+  color: #E2E8F0;
+}
+
+.movie-actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.movie-actions .btn i {
+  color: #fff;
+}
+
+/* ---------------- GENERIC MOVIE SECTION ---------------- */
+.movie-section {
+  max-width: 1300px;
+  margin: 50px auto;
+  padding: 0 40px;
+}
+
+/* ---------------- TRAILER ---------------- */
+.trailer-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.trailer-wrap iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* ---------------- CAST ---------------- */
+.cast-row {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+}
+
+.cast-card {
+  flex: 0 0 auto;
+  width: 140px;
+  text-align: center;
+  background: var(--color-card);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  transition: transform var(--transition-fast);
+}
+
+.cast-card:hover {
+  transform: translateY(-6px);
+}
+
+.cast-photo {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-bottom: 10px;
+  background: var(--color-card-light);
+}
+
+.cast-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cast-character {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+/* ---------------- DETAILS LOADING / ERROR ---------------- */
+.details-skeleton {
+  min-height: 60vh;
+  justify-content: center;
+}
+
+/* ---------------- FAVORITES / WATCHLIST LIST PAGES ---------------- */
+.list-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px 40px 60px;
+}
+
+.list-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
+
+.list-header .page-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.list-header .page-heading i {
+  color: var(--color-accent);
+}
+
+.movie-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 24px;
+}
+
+.saved-card {
+  background: var(--color-card);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  transition: transform var(--transition-medium);
+}
+
+.saved-card:hover {
+  transform: translateY(-6px);
+}
+
+.saved-card-poster {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+}
+
+.saved-card-info {
+  padding: 12px 14px 6px;
+}
+
+.saved-card-info h4 {
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.remove-btn {
+  width: 100%;
+  padding: 10px;
+  background: rgba(229, 9, 20, 0.12);
+  color: #FCA5A5;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.remove-btn:hover {
+  background: var(--color-accent);
+  color: #fff;
+}

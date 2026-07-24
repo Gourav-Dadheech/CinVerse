@@ -1,0 +1,156 @@
+<!-- ============================================================
+     VIEW: home.html
+     Home page - Hero Banner, Trending / Popular / Top Rated /
+     Upcoming sliders, and genre category badges.
+     ============================================================ -->
+<div class="home-page">
+
+  <!-- ================= HERO BANNER ================= -->
+  <section class="hero-banner" ng-if="homeCtrl.heroMovie"
+           ng-style="{ 'background-image': 'linear-gradient(180deg, rgba(15,23,42,0.2) 0%, rgba(15,23,42,0.85) 65%, #0F172A 100%), url(' + homeCtrl.getBackdropUrl(homeCtrl.heroMovie.backdrop_path) + ')' }">
+    <div class="hero-content scroll-reveal">
+      <span class="hero-tag"><i class="fa-solid fa-fire"></i> Trending Now</span>
+      <h1 class="hero-title">{{ homeCtrl.heroMovie.title }}</h1>
+      <div class="hero-meta">
+        <span class="hero-rating"><i class="fa-solid fa-star"></i> {{ homeCtrl.heroMovie.vote_average.toFixed(1) }}</span>
+        <span class="hero-year">{{ homeCtrl.heroMovie.release_date.substring(0,4) }}</span>
+      </div>
+      <p class="hero-overview">{{ homeCtrl.heroMovie.overview | limitTo: 220 }}{{ homeCtrl.heroMovie.overview.length > 220 ? '...' : '' }}</p>
+      <div class="hero-actions">
+        <a href="#!/movie/{{ homeCtrl.heroMovie.id }}" class="btn btn-primary">
+          <i class="fa-solid fa-circle-play"></i> View Details
+        </a>
+        <a href="#!/search" class="btn btn-secondary">
+          <i class="fa-solid fa-magnifying-glass"></i> Explore Movies
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Hero skeleton while loading -->
+  <div class="hero-skeleton" ng-if="homeCtrl.isLoadingHero"></div>
+
+  <!-- ================= GLOBAL ERROR MESSAGE ================= -->
+  <div class="error-banner" ng-if="homeCtrl.errorMessage">
+    <i class="fa-solid fa-triangle-exclamation"></i> {{ homeCtrl.errorMessage }}
+  </div>
+
+  <!-- ================= GENRE CATEGORY BADGES ================= -->
+  <section class="genre-section scroll-reveal" ng-if="homeCtrl.genres.length">
+    <h2 class="section-title">Browse by Category</h2>
+    <div class="genre-badges">
+      <a class="genre-badge"
+         ng-repeat="genre in homeCtrl.genres"
+         href="#!/search?genre={{ genre.id }}">
+        {{ genre.name }}
+      </a>
+    </div>
+  </section>
+
+  <!-- ================= TRENDING SLIDER ================= -->
+  <section class="movie-slider-section">
+    <div class="section-header">
+      <h2 class="section-title"><i class="fa-solid fa-fire"></i> Trending This Week</h2>
+      <div class="slider-controls">
+        <button ng-click="homeCtrl.scrollSlider('trending-slider', -1)" aria-label="Scroll left"><i class="fa-solid fa-chevron-left"></i></button>
+        <button ng-click="homeCtrl.scrollSlider('trending-slider', 1)" aria-label="Scroll right"><i class="fa-solid fa-chevron-right"></i></button>
+      </div>
+    </div>
+
+    <!-- Skeleton loaders -->
+    <div class="slider-track skeleton-track" ng-if="homeCtrl.isLoadingTrending">
+      <div class="skeleton-card" ng-repeat="s in [1,2,3,4,5,6]"></div>
+    </div>
+
+    <div class="slider-track" id="trending-slider" ng-if="!homeCtrl.isLoadingTrending">
+      <div class="slider-item" ng-repeat="movie in homeCtrl.trending track by movie.id">
+        <movie-card movie="movie"></movie-card>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= INDIAN CINEMA SLIDER ================= -->
+  <section class="movie-slider-section">
+    <div class="section-header">
+      <h2 class="section-title"><i class="fa-solid fa-flag"></i> Indian Cinema For You</h2>
+      <div class="slider-controls">
+        <button ng-click="homeCtrl.scrollSlider('indian-slider', -1)" aria-label="Scroll left"><i class="fa-solid fa-chevron-left"></i></button>
+        <button ng-click="homeCtrl.scrollSlider('indian-slider', 1)" aria-label="Scroll right"><i class="fa-solid fa-chevron-right"></i></button>
+      </div>
+    </div>
+
+    <div class="slider-track skeleton-track" ng-if="homeCtrl.isLoadingIndian">
+      <div class="skeleton-card" ng-repeat="s in [1,2,3,4,5,6]"></div>
+    </div>
+
+    <div class="slider-track" id="indian-slider" ng-if="!homeCtrl.isLoadingIndian">
+      <div class="slider-item" ng-repeat="movie in homeCtrl.indianMovies track by movie.id">
+        <movie-card movie="movie"></movie-card>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= POPULAR SLIDER ================= -->
+  <section class="movie-slider-section">
+    <div class="section-header">
+      <h2 class="section-title"><i class="fa-solid fa-bolt"></i> Popular Movies</h2>
+      <div class="slider-controls">
+        <button ng-click="homeCtrl.scrollSlider('popular-slider', -1)" aria-label="Scroll left"><i class="fa-solid fa-chevron-left"></i></button>
+        <button ng-click="homeCtrl.scrollSlider('popular-slider', 1)" aria-label="Scroll right"><i class="fa-solid fa-chevron-right"></i></button>
+      </div>
+    </div>
+
+    <div class="slider-track skeleton-track" ng-if="homeCtrl.isLoadingPopular">
+      <div class="skeleton-card" ng-repeat="s in [1,2,3,4,5,6]"></div>
+    </div>
+
+    <div class="slider-track" id="popular-slider" ng-if="!homeCtrl.isLoadingPopular">
+      <div class="slider-item" ng-repeat="movie in homeCtrl.popular track by movie.id">
+        <movie-card movie="movie"></movie-card>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TOP RATED SLIDER ================= -->
+  <section class="movie-slider-section">
+    <div class="section-header">
+      <h2 class="section-title"><i class="fa-solid fa-crown"></i> Top Rated</h2>
+      <div class="slider-controls">
+        <button ng-click="homeCtrl.scrollSlider('toprated-slider', -1)" aria-label="Scroll left"><i class="fa-solid fa-chevron-left"></i></button>
+        <button ng-click="homeCtrl.scrollSlider('toprated-slider', 1)" aria-label="Scroll right"><i class="fa-solid fa-chevron-right"></i></button>
+      </div>
+    </div>
+
+    <div class="slider-track skeleton-track" ng-if="homeCtrl.isLoadingTopRated">
+      <div class="skeleton-card" ng-repeat="s in [1,2,3,4,5,6]"></div>
+    </div>
+
+    <div class="slider-track" id="toprated-slider" ng-if="!homeCtrl.isLoadingTopRated">
+      <div class="slider-item" ng-repeat="movie in homeCtrl.topRated track by movie.id">
+        <movie-card movie="movie"></movie-card>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= UPCOMING SLIDER ================= -->
+  <section class="movie-slider-section">
+    <div class="section-header">
+      <h2 class="section-title"><i class="fa-solid fa-calendar-days"></i> Upcoming Releases</h2>
+      <div class="slider-controls">
+        <button ng-click="homeCtrl.scrollSlider('upcoming-slider', -1)" aria-label="Scroll left"><i class="fa-solid fa-chevron-left"></i></button>
+        <button ng-click="homeCtrl.scrollSlider('upcoming-slider', 1)" aria-label="Scroll right"><i class="fa-solid fa-chevron-right"></i></button>
+      </div>
+    </div>
+
+    <div class="slider-track skeleton-track" ng-if="homeCtrl.isLoadingUpcoming">
+      <div class="skeleton-card" ng-repeat="s in [1,2,3,4,5,6]"></div>
+    </div>
+
+    <div class="slider-track" id="upcoming-slider" ng-if="!homeCtrl.isLoadingUpcoming">
+      <div class="slider-item" ng-repeat="movie in homeCtrl.upcoming track by movie.id">
+        <movie-card movie="movie"></movie-card>
+      </div>
+    </div>
+  </section>
+
+</div>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="cineVerseApp">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CineVerse | Discover Your Next Favorite Movie</title>
+  <meta name="description" content="CineVerse - A Netflix + IMDb inspired movie discovery app built with AngularJS" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Bebas+Neue&display=swap" rel="stylesheet">
+
+  <!-- Icon Font (Font Awesome via CDN - no jQuery dependency) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- App Styles -->
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/navbar.css" />
+  <link rel="stylesheet" href="css/home.css" />
+  <link rel="stylesheet" href="css/movie.css" />
+  <link rel="stylesheet" href="css/search.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+  <link rel="stylesheet" href="css/movie-match.css">
+
+  <link rel="icon" type="image/png" href="assets/icons/favicon.png" />
+</head>
+<body>
+
+  <!-- ============================= -->
+  <!-- NAVIGATION BAR (Always Visible) -->
+  <!-- ============================= -->
+  <header class="navbar" ng-controller="NavbarController as navCtrl" ng-class="{'navbar-scrolled': navCtrl.isScrolled}">
+    <div class="navbar-container">
+
+      <!-- Brand Logo -->
+      <a href="#!/home" class="navbar-brand">
+        <span class="brand-cine">Cine</span><span class="brand-verse">Verse</span>
+      </a>
+
+      <!-- Nav Links -->
+      <nav class="navbar-links" ng-class="{'nav-open': navCtrl.menuOpen}">
+        <a href="#!/home" class="nav-link">Home</a>
+        <a href="#!/search" class="nav-link">Search</a>
+        <a href="#!/movie-match" class="nav-link">
+    <i class="fa-solid fa-wand-magic-sparkles"></i>
+    Movie Match
+</a>
+        <a href="#!/favorites" class="nav-link">
+          <i class="fa-solid fa-heart"></i> Favorites
+        </a>
+        <a href="#!/watchlist" class="nav-link">
+          <i class="fa-solid fa-bookmark"></i> Watchlist
+        </a>
+      </nav>
+
+      <!-- Quick Search -->
+      <form class="navbar-search" ng-submit="navCtrl.goToSearch()">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input
+          type="text"
+          placeholder="Search movies..."
+          ng-model="navCtrl.quickQuery"
+          aria-label="Search movies" />
+      </form>
+
+      <!-- Hamburger for mobile -->
+      <button class="hamburger-btn" ng-click="navCtrl.toggleMenu()" aria-label="Toggle Menu">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- ============================= -->
+  <!-- MAIN VIEW CONTAINER (Routed Views Load Here) -->
+  <!-- ============================= -->
+  <main>
+    <div ng-view class="route-view"></div>
+  </main>
+
+  <!-- ============================= -->
+  <!-- GLOBAL LOADING SPINNER -->
+  <!-- ============================= -->
+  <div class="global-loader" ng-if="appLoading">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- ============================= -->
+  <!-- BACK TO TOP BUTTON -->
+  <!-- ============================= -->
+  <button class="back-to-top" ng-controller="ScrollController as scrollCtrl"
+          ng-click="scrollCtrl.scrollToTop()"
+          ng-show="scrollCtrl.showButton"
+          aria-label="Back to top">
+    <i class="fa-solid fa-arrow-up"></i>
+  </button>
+
+  <!-- ============================= -->
+  <!-- FOOTER -->
+  <!-- ============================= -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <span class="brand-cine">Cine</span><span class="brand-verse">Verse</span>
+        <p>Your ultimate destination for movie discovery. Powered by TMDB.</p>
+      </div>
+      <div class="footer-links">
+        <h4>Explore</h4>
+        <a href="#!/home">Home</a>
+        <a href="#!/search">Search</a>
+        <a href="#!/favorites">Favorites</a>
+        <a href="#!/watchlist">Watchlist</a>
+      </div>
+      <div class="footer-social">
+        <h4>Connect</h4>
+        <div class="social-icons">
+          <a href="#!" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
+          <a href="#!" aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
+          <a href="#!" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#!" aria-label="Github"><i class="fa-brands fa-github"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 CineVerse. This product uses the TMDB API but is not endorsed or certified by TMDB.</p>
+    </div>
+  </footer>
+
+  <!-- ============================= -->
+  <!-- SCRIPTS -->
+  <!-- ============================= -->
+
+  <!-- AngularJS 1.8.3 Core + ngRoute + ngAnimate -->
+  <!-- Bundled locally (js/lib) instead of a CDN so the app works
+       even if a network/firewall/ad-blocker blocks external CDNs. -->
+  <script src="js/lib/angular.min.js"></script>
+  <script src="js/lib/angular-route.min.js"></script>
+  <script src="js/lib/angular-animate.min.js"></script>
+
+  <!-- App Core -->
+  <script src="app.js"></script>
+  <script src="routes.js"></script>
+
+  <!-- Services -->
+  <script src="js/services/movieService.js"></script>
+  <script src="js/services/storageService.js"></script>
+
+  <!-- Directives -->
+  <script src="js/directives/movieCard.js"></script>
+
+  <!-- Controllers -->
+  <script src="js/controllers/homeController.js"></script>
+  <script src="js/controllers/movieController.js"></script>
+  <script src="js/controllers/searchController.js"></script>
+  <script src="js/controllers/favoriteController.js"></script>
+  <script src="js/controllers/watchlistController.js"></script>
+  <script src="js/controllers/movieMatchController.js"></script>
+
+</body>
+</html>

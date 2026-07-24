@@ -1,0 +1,331 @@
+/* ============================================================
+   CineVerse - home.css
+   Styles for the Home page: hero banner, genre section,
+   horizontal movie sliders, and the shared movie-card look.
+   ============================================================ */
+
+/* ---------------- HERO BANNER ---------------- */
+.hero-banner {
+  height: 75vh;
+  min-height: 480px;
+  width: 100%;
+  background-size: cover;
+  background-position: top center;
+  display: flex;
+  align-items: flex-end;
+  padding: 0 60px 60px;
+  position: relative;
+}
+
+.hero-content {
+  max-width: 640px;
+}
+
+.hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(229, 9, 20, 0.15);
+  border: 1px solid rgba(229, 9, 20, 0.5);
+  color: #FCA5A5;
+  padding: 6px 16px;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 16px;
+}
+
+.hero-title {
+  font-family: var(--font-heading);
+  font-size: 3.6rem;
+  letter-spacing: 1px;
+  line-height: 1.05;
+  margin-bottom: 14px;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+}
+
+.hero-meta {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 14px;
+  font-weight: 600;
+}
+
+.hero-rating {
+  color: #FBBF24;
+}
+
+.hero-rating i {
+  margin-right: 4px;
+}
+
+.hero-year {
+  color: var(--color-text-muted);
+}
+
+.hero-overview {
+  color: #E2E8F0;
+  margin-bottom: 24px;
+  font-size: 1rem;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 16px;
+}
+
+/* ---------------- GENRE SECTION ---------------- */
+.genre-section {
+  max-width: 1400px;
+  margin: 40px auto 0;
+  padding: 0 40px;
+}
+
+/* ---------------- MOVIE SLIDER SECTIONS ---------------- */
+.movie-slider-section {
+  max-width: 1400px;
+  margin: 50px auto;
+  padding: 0 40px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.slider-controls {
+  display: flex;
+  gap: 10px;
+}
+
+.slider-controls button {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--color-border);
+  color: #fff;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+
+.slider-controls button:hover {
+  background: var(--color-accent);
+  transform: scale(1.08);
+}
+
+.slider-track {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 10px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-accent) transparent;
+}
+
+.slider-track::-webkit-scrollbar {
+  height: 6px;
+}
+
+.slider-track::-webkit-scrollbar-thumb {
+  background: var(--color-accent);
+  border-radius: 10px;
+}
+
+.slider-item {
+  flex: 0 0 auto;
+  width: 190px;
+  scroll-snap-align: start;
+}
+
+/* ---------------- MOVIE CARD (used by <movie-card> directive) ---------------- */
+.movie-card {
+  display: block;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-card);
+  box-shadow: var(--shadow-card);
+  transition: transform var(--transition-medium), box-shadow var(--transition-medium);
+}
+
+.movie-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: var(--shadow-hover);
+}
+
+.movie-card-poster-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  background: var(--color-card-light);
+}
+
+.movie-card-poster {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transition-medium);
+}
+
+.movie-card:hover .movie-card-poster {
+  transform: scale(1.08);
+}
+
+.movie-card-rating {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(15, 23, 42, 0.85);
+  color: #FBBF24;
+  padding: 4px 10px;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  backdrop-filter: blur(4px);
+}
+
+.movie-card-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.1) 0%, rgba(15, 23, 42, 0.95) 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 16px 12px;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  gap: 10px;
+}
+
+.movie-card:hover .movie-card-overlay {
+  opacity: 1;
+}
+
+.card-action-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+
+.card-action-btn:hover {
+  transform: scale(1.1);
+}
+
+.card-action-btn.heart-btn.active {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.card-action-btn.bookmark-btn.active {
+  background: #2563EB;
+  color: #fff;
+}
+
+.card-action-btn.pulse {
+  animation: heartPulse 0.4s ease;
+}
+
+.card-view-details {
+  font-size: 0.75rem;
+  color: #cbd5e1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.movie-card-info {
+  padding: 12px 14px;
+}
+
+.movie-card-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.movie-card-year {
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+}
+
+.movie-card-rating-inline {
+  color: #FBBF24;
+  font-size: 0.8rem;
+  margin-left: 10px;
+}
+
+/* Card action buttons positioned absolute row so both heart + bookmark align */
+.movie-card-overlay .card-action-btn {
+  margin: 0 4px;
+}
+.movie-match-banner{
+
+padding:70px 0;
+
+}
+
+.match-card{
+
+text-align:center;
+
+background:linear-gradient(135deg,#ff3b30,#ff7b54);
+
+padding:60px;
+
+border-radius:20px;
+
+color:white;
+
+}
+
+.match-card h2{
+
+font-size:42px;
+
+margin-bottom:20px;
+
+}
+
+.match-card p{
+
+max-width:700px;
+
+margin:auto;
+
+margin-bottom:30px;
+
+font-size:18px;
+
+}
+
+.footer{
+
+padding:40px;
+
+text-align:center;
+
+background:#0d1117;
+
+margin-top:80px;
+
+color:#999;
+
+}

@@ -1,0 +1,119 @@
+<!-- ============================================================
+     VIEW: movie.html
+     Movie Details page - backdrop, poster, meta info, cast,
+     trailer, similar movies and recommendations.
+     ============================================================ -->
+<div class="movie-page">
+
+  <!-- ================= LOADING STATE ================= -->
+  <div class="details-skeleton" ng-if="movieCtrl.isLoading">
+    <div class="spinner"></div>
+    <p>Loading movie details...</p>
+  </div>
+
+  <!-- ================= ERROR / NOT FOUND STATE ================= -->
+  <div class="error-state" ng-if="!movieCtrl.isLoading && (movieCtrl.notFound || movieCtrl.errorMessage)">
+    <i class="fa-solid fa-film"></i>
+    <h2 ng-if="movieCtrl.notFound">Movie Not Found</h2>
+    <h2 ng-if="movieCtrl.errorMessage">Something Went Wrong</h2>
+    <p>{{ movieCtrl.errorMessage || 'The movie you are looking for does not exist.' }}</p>
+    <a href="#!/home" class="btn btn-primary">Back to Home</a>
+  </div>
+
+  <!-- ================= MOVIE CONTENT ================= -->
+  <div ng-if="!movieCtrl.isLoading && movieCtrl.movie && !movieCtrl.notFound">
+
+    <!-- ================= BACKDROP HEADER ================= -->
+    <section class="movie-backdrop"
+             ng-style="{ 'background-image': 'linear-gradient(180deg, rgba(15,23,42,0.3) 0%, #0F172A 90%), url(' + movieCtrl.getBackdropUrl(movieCtrl.movie.backdrop_path) + ')' }">
+
+      <div class="movie-header-content scroll-reveal">
+
+        <!-- Poster -->
+        <img class="movie-poster-large"
+             ng-src="{{ movieCtrl.getPosterUrl(movieCtrl.movie.poster_path) }}"
+             alt="{{ movieCtrl.movie.title }} poster" />
+
+        <!-- Core Info -->
+        <div class="movie-header-info">
+          <h1 class="movie-title">{{ movieCtrl.movie.title }}</h1>
+          <p class="movie-tagline" ng-if="movieCtrl.movie.tagline">{{ movieCtrl.movie.tagline }}</p>
+
+          <div class="movie-meta-row">
+            <span class="meta-pill"><i class="fa-solid fa-star"></i> {{ movieCtrl.movie.vote_average.toFixed(1) }} / 10</span>
+            <span class="meta-pill"><i class="fa-regular fa-clock"></i> {{ movieCtrl.formatRuntime(movieCtrl.movie.runtime) }}</span>
+            <span class="meta-pill"><i class="fa-regular fa-calendar"></i> {{ movieCtrl.movie.release_date }}</span>
+          </div>
+
+          <!-- Genre badges -->
+          <div class="genre-badges">
+            <span class="genre-badge" ng-repeat="genre in movieCtrl.movie.genres">{{ genre.name }}</span>
+          </div>
+
+          <p class="movie-overview">{{ movieCtrl.movie.overview }}</p>
+
+          <!-- Action buttons -->
+          <div class="movie-actions">
+            <button class="btn btn-favorite" ng-class="{ 'active': movieCtrl.isFavorite }" ng-click="movieCtrl.toggleFavorite()">
+              <i class="fa-solid fa-heart"></i>
+              {{ movieCtrl.isFavorite ? 'Remove Favorite' : 'Add to Favorites' }}
+            </button>
+            <button class="btn btn-watchlist" ng-class="{ 'active': movieCtrl.isWatchlisted }" ng-click="movieCtrl.toggleWatchlist()">
+              <i class="fa-solid fa-bookmark"></i>
+              {{ movieCtrl.isWatchlisted ? 'Remove from Watchlist' : 'Add to Watchlist' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= TRAILER ================= -->
+    <section class="movie-section scroll-reveal" ng-if="movieCtrl.trailerUrl">
+      <h2 class="section-title"><i class="fa-solid fa-clapperboard"></i> Official Trailer</h2>
+      <div class="trailer-wrap">
+        <iframe
+          ng-src="{{ movieCtrl.trailerUrl }}"
+          title="Movie Trailer"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+        </iframe>
+      </div>
+    </section>
+
+    <!-- ================= CAST ================= -->
+    <section class="movie-section scroll-reveal" ng-if="movieCtrl.cast.length">
+      <h2 class="section-title"><i class="fa-solid fa-users"></i> Top Cast</h2>
+      <div class="cast-row">
+        <div class="cast-card" ng-repeat="actor in movieCtrl.cast track by actor.id">
+          <img class="cast-photo"
+               ng-src="{{ movieCtrl.getPosterUrl(actor.profile_path, 'w185') }}"
+               alt="{{ actor.name }}" />
+          <h5 class="cast-name">{{ actor.name }}</h5>
+          <span class="cast-character">{{ actor.character }}</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SIMILAR MOVIES ================= -->
+    <section class="movie-section scroll-reveal" ng-if="movieCtrl.similarMovies.length">
+      <h2 class="section-title"><i class="fa-solid fa-clone"></i> Similar Movies</h2>
+      <div class="slider-track">
+        <div class="slider-item" ng-repeat="movie in movieCtrl.similarMovies track by movie.id">
+          <movie-card movie="movie"></movie-card>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= RECOMMENDATIONS ================= -->
+    <section class="movie-section scroll-reveal" ng-if="movieCtrl.recommendedMovies.length">
+      <h2 class="section-title"><i class="fa-solid fa-wand-magic-sparkles"></i> Recommended For You</h2>
+      <div class="slider-track">
+        <div class="slider-item" ng-repeat="movie in movieCtrl.recommendedMovies track by movie.id">
+          <movie-card movie="movie"></movie-card>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>

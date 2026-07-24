@@ -1,0 +1,45 @@
+<!-- ============================================================
+     VIEW: watchlist.html
+     Watchlist page - lists all movies the user plans to watch,
+     with a remove button per card and a clear-all option.
+     ============================================================ -->
+<div class="list-page watchlist-page">
+
+  <section class="list-header">
+    <h1 class="page-heading"><i class="fa-solid fa-bookmark"></i> My Watchlist</h1>
+    <p class="page-subheading" ng-if="!watchCtrl.isEmpty">
+      {{ watchCtrl.watchlist.length }} movie{{ watchCtrl.watchlist.length === 1 ? '' : 's' }} to watch
+    </p>
+    <button class="btn btn-secondary btn-small" ng-if="!watchCtrl.isEmpty" ng-click="watchCtrl.clearAllWatchlist()">
+      <i class="fa-solid fa-trash"></i> Clear All
+    </button>
+  </section>
+
+  <!-- ================= EMPTY STATE ================= -->
+  <div class="no-results-state" ng-if="watchCtrl.isEmpty">
+    <i class="fa-solid fa-bookmark"></i>
+    <h2>Your Watchlist is Empty</h2>
+    <p>Tap the bookmark icon on any movie to save it here for later.</p>
+    <a href="#!/home" class="btn btn-primary">Browse Movies</a>
+  </div>
+
+  <!-- ================= WATCHLIST GRID ================= -->
+  <section class="movie-grid" ng-if="!watchCtrl.isEmpty">
+    <div class="grid-item" ng-repeat="movie in watchCtrl.watchlist track by movie.id">
+      <div class="saved-card scroll-reveal">
+        <a href="#!/movie/{{ movie.id }}" class="saved-card-link">
+          <img class="saved-card-poster" ng-src="{{ watchCtrl.getPosterUrl(movie.poster_path) }}" alt="{{ movie.title }}" />
+          <div class="saved-card-info">
+            <h4>{{ movie.title }}</h4>
+            <span class="movie-card-year">{{ watchCtrl.releaseYear(movie.release_date) }}</span>
+            <span class="movie-card-rating-inline"><i class="fa-solid fa-star"></i> {{ movie.vote_average.toFixed ? movie.vote_average.toFixed(1) : movie.vote_average }}</span>
+          </div>
+        </a>
+        <button class="remove-btn" ng-click="watchCtrl.removeFromWatchlist(movie.id)" title="Remove from Watchlist">
+          <i class="fa-solid fa-trash"></i> Remove
+        </button>
+      </div>
+    </div>
+  </section>
+
+</div>

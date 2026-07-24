@@ -1,0 +1,45 @@
+<!-- ============================================================
+     VIEW: favorites.html
+     Favorites page - lists all movies the user has saved,
+     with a remove button per card and a clear-all option.
+     ============================================================ -->
+<div class="list-page favorites-page">
+
+  <section class="list-header">
+    <h1 class="page-heading"><i class="fa-solid fa-heart"></i> My Favorites</h1>
+    <p class="page-subheading" ng-if="!favCtrl.isEmpty">
+      {{ favCtrl.favorites.length }} movie{{ favCtrl.favorites.length === 1 ? '' : 's' }} saved
+    </p>
+    <button class="btn btn-secondary btn-small" ng-if="!favCtrl.isEmpty" ng-click="favCtrl.clearAllFavorites()">
+      <i class="fa-solid fa-trash"></i> Clear All
+    </button>
+  </section>
+
+  <!-- ================= EMPTY STATE ================= -->
+  <div class="no-results-state" ng-if="favCtrl.isEmpty">
+    <i class="fa-solid fa-heart-crack"></i>
+    <h2>No Favorites Yet</h2>
+    <p>Tap the heart icon on any movie to save it here for quick access.</p>
+    <a href="#!/home" class="btn btn-primary">Browse Movies</a>
+  </div>
+
+  <!-- ================= FAVORITES GRID ================= -->
+  <section class="movie-grid" ng-if="!favCtrl.isEmpty">
+    <div class="grid-item" ng-repeat="movie in favCtrl.favorites track by movie.id">
+      <div class="saved-card scroll-reveal">
+        <a href="#!/movie/{{ movie.id }}" class="saved-card-link">
+          <img class="saved-card-poster" ng-src="{{ favCtrl.getPosterUrl(movie.poster_path) }}" alt="{{ movie.title }}" />
+          <div class="saved-card-info">
+            <h4>{{ movie.title }}</h4>
+            <span class="movie-card-year">{{ favCtrl.releaseYear(movie.release_date) }}</span>
+            <span class="movie-card-rating-inline"><i class="fa-solid fa-star"></i> {{ movie.vote_average.toFixed ? movie.vote_average.toFixed(1) : movie.vote_average }}</span>
+          </div>
+        </a>
+        <button class="remove-btn" ng-click="favCtrl.removeFavorite(movie.id)" title="Remove from Favorites">
+          <i class="fa-solid fa-trash"></i> Remove
+        </button>
+      </div>
+    </div>
+  </section>
+
+</div>

@@ -1,0 +1,28 @@
+{
+  "name": "cineverse-movie-recommendation",
+  "version": "1.0.0",
+  "description": "CineVerse - A Netflix + IMDb inspired movie recommendation website built with AngularJS 1.8.x, ES6 JavaScript, HTML5 and CSS3, powered by the TMDB API.",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "start": "npx http-server -p 8080"
+  },
+  "dependencies": {
+    "angular": "1.8.3",
+    "angular-route": "1.8.3",
+    "angular-animate": "1.8.3"
+  },
+  "notes": [
+    "This project does NOT require running 'npm install' to work — the three AngularJS",
+    "packages above have already been downloaded from the npm registry and copied as",
+    "compiled .min.js files into js/lib/. index.html references them with plain relative",
+    "paths, so the site runs from js/lib/ with zero build step and zero CDN dependency.",
+    "This package.json exists purely to document, at a pinned version, exactly which",
+    "npm packages those local files came from.",
+    "",
+    "If you ever want to re-download fresh copies yourself, you CAN run:",
+    "  npm install",
+    "which will populate node_modules/angular, node_modules/angular-route and",
+    "node_modules/angular-animate with the same files already sitting in js/lib/."
+  ]
+}
