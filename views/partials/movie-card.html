@@ -14,23 +14,36 @@
 
     <!-- Hover overlay with quick actions -->
     <div class="movie-card-overlay">
-      <button class="card-action-btn heart-btn"
-              ng-class="{ 'active': isFavorite, 'pulse': heartPulse }"
-              ng-click="toggleFavorite($event)"
-              title="Add to Favorites">
-        <i class="fa-solid fa-heart"></i>
+      <div class="card-overlay-spacer"></div>
+
+      <!-- Prominent Red Play Button -->
+      <button class="card-play-btn"
+              ng-click="playMovie($event)"
+              title="Watch {{ movie.title }} Now">
+        <i class="fa-solid fa-play"></i>
       </button>
 
-      <button class="card-action-btn bookmark-btn"
-              ng-class="{ 'active': isWatchlisted, 'pulse': bookmarkPulse }"
-              ng-click="toggleWatchlist($event)"
-              title="Add to Watchlist">
-        <i class="fa-solid fa-bookmark"></i>
-      </button>
+      <div class="card-overlay-bottom">
+        <div class="card-action-row">
+          <button class="card-action-btn heart-btn"
+                  ng-class="{ 'active': isFavorite, 'pulse': heartPulse }"
+                  ng-click="toggleFavorite($event)"
+                  title="Add to Favorites">
+            <i class="fa-solid fa-heart"></i>
+          </button>
 
-      <span class="card-view-details">
-        <i class="fa-solid fa-circle-info"></i> View Details
-      </span>
+          <button class="card-action-btn bookmark-btn"
+                  ng-class="{ 'active': isWatchlisted, 'pulse': bookmarkPulse }"
+                  ng-click="toggleWatchlist($event)"
+                  title="Add to Watchlist">
+            <i class="fa-solid fa-bookmark"></i>
+          </button>
+        </div>
+
+        <span class="card-view-details">
+          <i class="fa-solid fa-circle-info"></i> View Details
+        </span>
+      </div>
     </div>
   </div>
 

@@ -2,336 +2,227 @@
 
     <div class="wizard-container">
 
-        <!-- Progress -->
-
-        <div class="progress-wrapper">
-
+        <!-- Progress (Only shown during the 6 questions) -->
+        <div class="progress-wrapper" ng-if="vm.step <= 6 && !vm.loading">
             <div class="progress-bar">
-
                 <div class="progress-fill"
                      ng-style="{'width': vm.getProgress() + '%'}">
                 </div>
-
             </div>
-
             <div class="progress-text">
-
                 Question {{vm.step}} of 6
-
             </div>
-
         </div>
 
         <!-- ========================= -->
         <!-- STEP 1 : MOOD -->
         <!-- ========================= -->
-
-        <div class="question-page fade-in" ng-if="vm.step==1">
-
+        <div class="question-page fade-in" ng-if="vm.step == 1 && !vm.loading">
             <h1>😊 How are you feeling today?</h1>
-
             <p>Select your current mood</p>
-
             <div class="card-grid">
-
                 <div
                     class="choice-card"
                     ng-repeat="mood in vm.moods"
-                    ng-class="{'active':vm.answers.mood==mood}"
-                    ng-click="vm.answers.mood=mood">
-
+                    ng-class="{'active': vm.answers.mood == mood}"
+                    ng-click="vm.answers.mood = mood">
                     {{mood}}
-
                 </div>
-
             </div>
-
         </div>
 
         <!-- ========================= -->
         <!-- STEP 2 : GENRE -->
         <!-- ========================= -->
-
-        <div class="question-page fade-in" ng-if="vm.step==2">
-
+        <div class="question-page fade-in" ng-if="vm.step == 2 && !vm.loading">
             <h1>🎭 Choose Genre</h1>
-
             <p>Pick the genre you're in the mood for</p>
-
             <div class="card-grid">
-
                 <div
                     class="choice-card"
                     ng-repeat="genre in vm.genres"
-                    ng-class="{'active':vm.answers.genre==genre}"
-                    ng-click="vm.answers.genre=genre">
-
+                    ng-class="{'active': vm.answers.genre == genre}"
+                    ng-click="vm.answers.genre = genre">
                     {{genre}}
-
                 </div>
-
             </div>
-
         </div>
 
         <!-- ========================= -->
         <!-- STEP 3 : INDUSTRY -->
         <!-- ========================= -->
-
-        <div class="question-page fade-in" ng-if="vm.step==3">
-
+        <div class="question-page fade-in" ng-if="vm.step == 3 && !vm.loading">
             <h1>🌍 Which Industry?</h1>
-
             <p>Select your preferred movie industry</p>
-
             <div class="card-grid">
-
                 <div
                     class="choice-card"
                     ng-repeat="industry in vm.industries"
-                    ng-class="{'active':vm.answers.industry==industry}"
-                    ng-click="vm.answers.industry=industry">
-
+                    ng-class="{'active': vm.answers.industry == industry}"
+                    ng-click="vm.answers.industry = industry">
                     {{industry}}
-
                 </div>
-
             </div>
-
         </div>
-                <!-- ========================= -->
+
+        <!-- ========================= -->
         <!-- STEP 4 : LANGUAGE -->
         <!-- ========================= -->
-
-        <div class="question-page fade-in" ng-if="vm.step==4">
-
+        <div class="question-page fade-in" ng-if="vm.step == 4 && !vm.loading">
             <h1>🗣 Preferred Language</h1>
-
             <p>Select your preferred language</p>
-
             <div class="card-grid">
-
                 <div
                     class="choice-card"
                     ng-repeat="language in vm.languages"
-                    ng-class="{'active':vm.answers.language==language}"
-                    ng-click="vm.answers.language=language">
-
+                    ng-class="{'active': vm.answers.language == language}"
+                    ng-click="vm.answers.language = language">
                     {{language}}
-
                 </div>
-
             </div>
-
         </div>
 
         <!-- ========================= -->
         <!-- STEP 5 : TIMELINE -->
         <!-- ========================= -->
-
-        <div class="question-page fade-in" ng-if="vm.step==5">
-
+        <div class="question-page fade-in" ng-if="vm.step == 5 && !vm.loading">
             <h1>📅 Which Movie Era?</h1>
-
             <p>Choose your preferred release period</p>
-
             <div class="card-grid">
-
                 <div
                     class="choice-card"
                     ng-repeat="timeline in vm.timelines"
-                    ng-class="{'active':vm.answers.timeline.name==timeline.name}"
-                    ng-click="vm.answers.timeline=timeline">
-
+                    ng-class="{'active': vm.answers.timeline.name == timeline.name}"
+                    ng-click="vm.answers.timeline = timeline">
                     <strong>{{timeline.name}}</strong>
-
                 </div>
-
             </div>
-
         </div>
 
         <!-- ========================= -->
         <!-- STEP 6 : RATING -->
         <!-- ========================= -->
-
-        <div class="question-page fade-in" ng-if="vm.step==6">
-
+        <div class="question-page fade-in" ng-if="vm.step == 6 && !vm.loading">
             <h1>⭐ Minimum Rating</h1>
-
             <p>Choose the minimum TMDB rating</p>
-
             <div class="card-grid">
-
                 <div
                     class="choice-card"
                     ng-repeat="rate in vm.ratings"
-                    ng-class="{'active':vm.answers.rating==rate}"
-                    ng-click="vm.answers.rating=rate">
-
+                    ng-class="{'active': vm.answers.rating == rate}"
+                    ng-click="vm.answers.rating = rate">
                     {{rate}}
-
                 </div>
-
             </div>
-
         </div>
 
         <!-- ========================= -->
-        <!-- STEP 7 : LOADING -->
+        <!-- STEP 7 : LOADING ANIMATION -->
         <!-- ========================= -->
-
-        <div class="question-page fade-in"
-             ng-if="vm.loading">
-
+        <div class="question-page fade-in" ng-if="vm.loading">
             <h1>🤖 CineVerse AI</h1>
-
             <h2>Finding your perfect movies...</h2>
-
             <div class="loading-bar">
-
                 <div class="loading-fill"></div>
-
             </div>
-
             <ul class="loading-list">
-
-                <li>✔ Checking Mood</li>
-
-                <li>✔ Matching Genre</li>
-
-                <li>✔ Filtering Timeline</li>
-
-                <li>✔ Searching TMDB</li>
-
+                <li>✔ Analyzing Mood & Emotion</li>
+                <li>✔ Matching Genre & Era</li>
+                <li>✔ Filtering High-Rated Titles</li>
+                <li>✔ Searching TMDB Catalog</li>
             </ul>
-
         </div>
 
         <!-- ========================= -->
         <!-- RESULTS -->
         <!-- ========================= -->
-
-        <div
-            class="question-page fade-in"
-            ng-if="vm.step==7 && !vm.loading">
+        <div class="question-page fade-in" ng-if="vm.step == 7 && !vm.loading">
 
             <h1>🎬 Recommended Movies</h1>
+
             <div class="preference-card">
-
-<h2>Your Preferences</h2>
-
-<p>😊 {{vm.answers.mood}}</p>
-
-<p>🎭 {{vm.answers.genre}}</p>
-
-<p>🌍 {{vm.answers.industry}}</p>
-
-<p>🗣 {{vm.answers.language}}</p>
-
-<p>📅 {{vm.answers.timeline.name}}</p>
-
-<p>⭐ {{vm.answers.rating}}</p>
-
-</div>
+                <h2>Your Preferences</h2>
+                <p>😊 {{vm.answers.mood}}</p>
+                <p>🎭 {{vm.answers.genre}}</p>
+                <p>🌍 {{vm.answers.industry}}</p>
+                <p>🗣 {{vm.answers.language}}</p>
+                <p>📅 {{vm.answers.timeline.name}}</p>
+                <p>⭐ {{vm.answers.rating}}</p>
+            </div>
 
             <p>Based on your preferences</p>
 
-            <div class="movie-grid">
-
-    <div class="movie-card"
-         ng-repeat="movie in vm.results | limitTo:12">
-
-        <div class="match-badge">
-
-            🎯 {{95 - ($index*2)}}% Match
-
-        </div>
-
-        <img ng-src="{{'https://image.tmdb.org/t/p/w500'+movie.poster_path}}">
-
-        <div class="movie-details">
-
-            <h3>{{movie.title}}</h3>
-
-            <div class="movie-meta">
-
-                <span>⭐ {{movie.vote_average}}</span>
-
-                <span>📅 {{movie.release_date | date:'yyyy'}}</span>
-
+            <!-- Results Grid -->
+            <div class="movie-grid" ng-if="vm.results.length > 0">
+                <div class="movie-card" ng-repeat="movie in vm.results | limitTo:18">
+                    <div class="match-badge">
+                        🎯 {{ (96 - ($index * 2)) > 70 ? (96 - ($index * 2)) : 72 }}% Match
+                    </div>
+                    <img ng-src="{{ vm.getPosterUrl(movie.poster_path) }}" alt="{{ movie.title }} poster" loading="lazy">
+                    <div class="movie-details">
+                        <h3>{{movie.title}}</h3>
+                        <div class="movie-meta">
+                            <span><i class="fa-solid fa-star"></i> {{ vm.formatRating(movie.vote_average) }}</span>
+                            <span><i class="fa-solid fa-calendar"></i> {{ vm.formatYear(movie.release_date) }}</span>
+                        </div>
+                        <div class="movie-actions">
+                            <a class="btn btn-primary" href="#!/movie/{{movie.id}}">
+                                🎬 Details
+                            </a>
+                            <button
+                                class="btn btn-secondary"
+                                ng-class="{'btn-active-fav': vm.isFavorite(movie.id)}"
+                                ng-click="vm.toggleFavorite(movie)">
+                                <i class="fa-solid fa-heart"></i> {{ vm.isFavorite(movie.id) ? 'Favorited' : 'Favorite' }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="movie-actions">
-
-                <a class="btn btn-primary"
-                   href="#!/movie/{{movie.id}}">
-
-                    🎬 Details
-
-                </a>
-
-                <button
-                    class="btn btn-secondary"
-                    ng-click="vm.addFavorite(movie)">
-
-                    ❤️ Favorite
-
+            <!-- Zero Results Fallback -->
+            <div class="no-results-card" ng-if="vm.results.length === 0">
+                <i class="fa-solid fa-film"></i>
+                <h3>No Exact Matches Found</h3>
+                <p>We couldn't find movies matching all of your exact filters combined. Try picking a broader era or lower rating threshold!</p>
+                <button class="btn btn-primary" ng-click="vm.reset()">
+                    🔄 Try Different Options
                 </button>
+            </div>
 
+            <div style="margin-top: 35px;">
+                <button class="btn btn-secondary" ng-click="vm.reset()">
+                    🔄 Start Again
+                </button>
             </div>
 
         </div>
 
-    </div>
-
-</div>
-
+        <!-- Navigation Buttons -->
+        <div class="wizard-buttons" ng-if="vm.step <= 6 && !vm.loading">
             <button
                 class="btn btn-secondary"
-                ng-click="vm.step=1">
-
-                🔄 Start Again
-
-            </button>
-
-        </div>
-
-        <!-- Navigation -->
-
-        <div
-            class="wizard-buttons"
-            ng-if="vm.step<7 && !vm.loading">
-
-            <button
-                class="btn btn-secondary"
-                ng-if="vm.step>1"
+                ng-if="vm.step > 1"
                 ng-click="vm.back()">
-
                 ← Back
-
             </button>
+            <div ng-if="vm.step == 1"></div>
 
             <button
                 class="btn btn-primary"
-                ng-if="vm.step<6"
+                ng-if="vm.step < 6"
                 ng-disabled="!vm.canProceed()"
                 ng-click="vm.next()">
-
                 Next →
-
             </button>
 
             <button
                 class="btn btn-success"
-                ng-if="vm.step==6"
+                ng-if="vm.step == 6"
                 ng-disabled="!vm.canProceed()"
                 ng-click="vm.findMovies()">
-
                 🎬 Find Movies
-
             </button>
-
         </div>
 
     </div>

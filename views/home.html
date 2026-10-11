@@ -5,24 +5,101 @@
      ============================================================ -->
 <div class="home-page">
 
-  <!-- ================= HERO BANNER ================= -->
-  <section class="hero-banner" ng-if="homeCtrl.heroMovie"
-           ng-style="{ 'background-image': 'linear-gradient(180deg, rgba(15,23,42,0.2) 0%, rgba(15,23,42,0.85) 65%, #0F172A 100%), url(' + homeCtrl.getBackdropUrl(homeCtrl.heroMovie.backdrop_path) + ')' }">
+  <!-- ================= HERO BANNER CAROUSEL ================= -->
+  <section class="hero-banner" ng-if="homeCtrl.currentHero"
+           ng-style="{ 'background-image': 'linear-gradient(180deg, rgba(15,23,42,0.15) 0%, rgba(15,23,42,0.85) 65%, #0F172A 100%), url(' + homeCtrl.getBackdropUrl(homeCtrl.currentHero.backdrop_path) + ')' }">
+
+    <!-- Carousel Arrow Controls -->
+    <button class="hero-arrow hero-prev" ng-click="homeCtrl.prevHero()" aria-label="Previous Featured Movie" title="Previous Movie">
+      <i class="fa-solid fa-chevron-left"></i>
+    </button>
+    <button class="hero-arrow hero-next" ng-click="homeCtrl.nextHero()" aria-label="Next Featured Movie" title="Next Movie">
+      <i class="fa-solid fa-chevron-right"></i>
+    </button>
+
     <div class="hero-content scroll-reveal">
-      <span class="hero-tag"><i class="fa-solid fa-fire"></i> Trending Now</span>
-      <h1 class="hero-title">{{ homeCtrl.heroMovie.title }}</h1>
+      <span class="hero-tag">
+        <i class="fa-solid" ng-class="homeCtrl.currentHero.isIndian ? 'fa-film' : 'fa-fire'"></i>
+        {{ homeCtrl.currentHero.tag || 'Trending Now' }}
+      </span>
+      <h1 class="hero-title">{{ homeCtrl.currentHero.title }}</h1>
       <div class="hero-meta">
-        <span class="hero-rating"><i class="fa-solid fa-star"></i> {{ homeCtrl.heroMovie.vote_average.toFixed(1) }}</span>
-        <span class="hero-year">{{ homeCtrl.heroMovie.release_date.substring(0,4) }}</span>
+        <span class="hero-rating"><i class="fa-solid fa-star"></i> {{ homeCtrl.currentHero.vote_average ? homeCtrl.currentHero.vote_average.toFixed(1) : 'N/A' }}</span>
+        <span class="hero-year">{{ homeCtrl.currentHero.release_date ? homeCtrl.currentHero.release_date.substring(0,4) : 'TBA' }}</span>
+        <span class="hero-lang-badge" ng-if="homeCtrl.currentHero.original_language">{{ homeCtrl.currentHero.original_language.toUpperCase() }}</span>
       </div>
-      <p class="hero-overview">{{ homeCtrl.heroMovie.overview | limitTo: 220 }}{{ homeCtrl.heroMovie.overview.length > 220 ? '...' : '' }}</p>
+      <p class="hero-overview">{{ homeCtrl.currentHero.overview | limitTo: 220 }}{{ homeCtrl.currentHero.overview.length > 220 ? '...' : '' }}</p>
       <div class="hero-actions">
-        <a href="#!/movie/{{ homeCtrl.heroMovie.id }}" class="btn btn-primary">
-          <i class="fa-solid fa-circle-play"></i> View Details
+        <a href="#!/movie/{{ homeCtrl.currentHero.id }}?play=true" class="btn btn-primary btn-hero-watch">
+          <i class="fa-solid fa-play"></i> Watch Now
+        </a>
+        <a href="#!/movie/{{ homeCtrl.currentHero.id }}" class="btn btn-secondary">
+          <i class="fa-solid fa-circle-info"></i> View Details
         </a>
         <a href="#!/search" class="btn btn-secondary">
           <i class="fa-solid fa-magnifying-glass"></i> Explore Movies
         </a>
+      </div>
+    </div>
+
+    <!-- Carousel Slide Dots -->
+    <div class="hero-dots" ng-if="homeCtrl.heroMovies.length > 1">
+      <span class="hero-dot"
+            ng-repeat="m in homeCtrl.heroMovies track by m.id"
+            ng-class="{ 'active': homeCtrl.currentHeroIndex === $index }"
+            ng-click="homeCtrl.setHeroIndex($index)"
+            title="{{ m.title }}">
+      </span>
+    </div>
+  </section>
+
+  <!-- ================= CONTINUE WATCHING (OTT RESUME ROW) ================= -->
+  <section class="continue-watching-section scroll-reveal" id="continue-watching" ng-if="homeCtrl.watchHistory.length">
+    <div class="continue-header">
+      <div class="continue-title">
+        <i class="fa-solid fa-circle-play"></i>
+        <h2>Continue Watching</h2>
+        <span class="continue-count">{{ homeCtrl.watchHistory.length }} Titles</span>
+      </div>
+      <button class="btn-clear-history" ng-click="homeCtrl.clearHistory()" title="Clear your watch history">
+        <i class="fa-solid fa-trash-can"></i> Clear History
+      </button>
+    </div>
+
+    <div class="continue-track">
+      <div class="continue-card" ng-repeat="item in homeCtrl.watchHistory track by item.id">
+        <div class="continue-poster-wrap" ng-click="homeCtrl.resumeMovie(item)">
+          <img class="continue-poster"
+               ng-src="{{ homeCtrl.getBackdropUrl(item.backdrop_path) || homeCtrl.getPosterUrl(item.poster_path) }}"
+               alt="{{ item.title }}" />
+          <div class="continue-play-overlay">
+            <div class="continue-play-icon">
+              <i class="fa-solid fa-play"></i>
+            </div>
+          </div>
+          <!-- OTT Playback Progress Bar -->
+          <div class="continue-progress-bar">
+            <div class="continue-progress-fill" ng-style="{ 'width': item.progressPct + '%' }"></div>
+          </div>
+          <!-- Remove from continue watching button -->
+          <button class="continue-remove-btn" ng-click="homeCtrl.removeFromHistory($event, item.id)" title="Remove from list">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div class="continue-info">
+          <div class="continue-meta-top">
+            <h4 class="continue-movie-title" title="{{ item.title }}">{{ item.title }}</h4>
+            <span class="continue-pct">{{ item.progressPct }}%</span>
+          </div>
+          <div class="continue-details">
+            <span class="continue-audio-tag"><i class="fa-solid fa-headphones"></i> {{ item.audioTrack || 'English' }}</span>
+            <span class="continue-server-tag">{{ item.serverName || 'Server 1' }}</span>
+          </div>
+          <button class="btn-resume-now" ng-click="homeCtrl.resumeMovie(item)">
+            <i class="fa-solid fa-play"></i> Resume Playback
+          </button>
+        </div>
       </div>
     </div>
   </section>

@@ -75,12 +75,92 @@
   angular.module('cineVerseApp').controller('NavbarController', [
     '$location',
     '$window',
-    function ($location, $window) {
+    '$rootScope',
+    'StorageService',
+    function ($location, $window, $rootScope, StorageService) {
       var vm = this;
 
       vm.menuOpen = false;
       vm.isScrolled = false;
       vm.quickQuery = '';
+      vm.userDropdownOpen = false;
+      vm.showAuthModal = false;
+      vm.authTab = 'login';
+      vm.authError = '';
+
+      vm.currentUser = StorageService.getCurrentUser();
+
+      vm.loginForm = { email: '', password: '' };
+      vm.registerForm = { name: '', email: '', password: '', avatar: '🎬' };
+      vm.avatarChoices = ['🎬', '🍿', '⚡', '🔥', '👑', '🚀', '🧑‍💻', '🌟'];
+
+      vm.toggleUserDropdown = function () {
+        vm.userDropdownOpen = !vm.userDropdownOpen;
+      };
+
+      vm.openAuthModal = function (tab) {
+        vm.authTab = tab === 'register' ? 'register' : 'login';
+        vm.authError = '';
+        vm.userDropdownOpen = false;
+        vm.showAuthModal = true;
+      };
+
+      vm.closeAuthModal = function (e) {
+        if (!e || (e.target && (e.target.classList.contains('auth-modal-backdrop') || e.target.classList.contains('btn-close-modal') || e.target.closest('.btn-close-modal')))) {
+          vm.showAuthModal = false;
+          vm.authError = '';
+        }
+      };
+
+      vm.selectAvatar = function (avatar) {
+        vm.registerForm.avatar = avatar;
+      };
+
+      vm.submitLogin = function () {
+        vm.authError = '';
+        if (!vm.loginForm.email) {
+          vm.authError = 'Please enter your email.';
+          return;
+        }
+        var res = StorageService.login(vm.loginForm.email, vm.loginForm.password);
+        if (res.success) {
+          vm.currentUser = res.user;
+          vm.showAuthModal = false;
+          vm.loginForm = { email: '', password: '' };
+          $rootScope.$broadcast('userChanged', vm.currentUser);
+        } else {
+          vm.authError = res.message || 'Login failed.';
+        }
+      };
+
+      vm.submitRegister = function () {
+        vm.authError = '';
+        if (!vm.registerForm.name || !vm.registerForm.email) {
+          vm.authError = 'Please provide your name and email.';
+          return;
+        }
+        var res = StorageService.register(
+          vm.registerForm.name,
+          vm.registerForm.email,
+          vm.registerForm.password,
+          vm.registerForm.avatar
+        );
+        if (res.success) {
+          vm.currentUser = res.user;
+          vm.showAuthModal = false;
+          vm.registerForm = { name: '', email: '', password: '', avatar: '🎬' };
+          $rootScope.$broadcast('userChanged', vm.currentUser);
+        } else {
+          vm.authError = res.message || 'Registration failed.';
+        }
+      };
+
+      vm.logout = function () {
+        StorageService.logout();
+        vm.currentUser = null;
+        vm.userDropdownOpen = false;
+        $rootScope.$broadcast('userChanged', null);
+      };
 
       // Toggle hamburger menu (mobile)
       vm.toggleMenu = function () {
@@ -100,8 +180,6 @@
       // Shrink navbar background once user scrolls down
       angular.element($window).on('scroll', function () {
         vm.isScrolled = $window.pageYOffset > 40;
-        // $applyAsync avoids the "digest already in progress" issue
-        vm.isScrolled ? null : null;
       });
     }
   ]);

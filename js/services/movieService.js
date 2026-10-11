@@ -140,111 +140,90 @@
         return request('/discover/movie', { with_genres: genreId, page: page || 1 });
       };
       // Smart Movie Match
-// ======================================================
-// Smart Movie Match
-// ======================================================
+      // ======================================================
+      // Smart Movie Match
+      // ======================================================
 
-service.discoverMovies = function (filters) {
+      service.discoverMovies = function (filters) {
+        filters = filters || {};
+        var params = {
+          sort_by: "popularity.desc",
+          include_adult: false,
+          page: 1
+        };
 
-    var params = {
+        // ------------------------
+        // Genre & Anime Combination
+        // ------------------------
+        if (filters.industry === "Anime") {
+          // Keep Anime genre (16 = Animation) while preserving user-selected genre if any
+          params.with_genres = filters.genreId ? (filters.genreId + ",16") : "16";
+        } else if (filters.genreId) {
+          params.with_genres = filters.genreId;
+        }
 
-        sort_by: "popularity.desc",
+        // ------------------------
+        // Industry & Language synergy
+        // ------------------------
+        // If user explicitly picked a language (other than "Any"), prioritize it
+        if (filters.language) {
+          params.with_original_language = filters.language;
+        } else if (filters.industry) {
+          // If language was "Any", use industry default
+          switch (filters.industry) {
+            case "Hollywood":
+              params.with_original_language = "en";
+              break;
+            case "Bollywood":
+              params.with_origin_country = "IN";
+              params.with_original_language = "hi";
+              break;
+            case "Tollywood":
+              params.with_origin_country = "IN";
+              params.with_original_language = "te";
+              break;
+            case "Korean":
+              params.with_original_language = "ko";
+              break;
+            case "Anime":
+              params.with_original_language = "ja";
+              break;
+          }
+        }
 
-        include_adult: false,
+        // ------------------------
+        // Rating (requires vote_count threshold to avoid obscure 1-vote films)
+        // ------------------------
+        if (filters.rating && filters.rating > 0) {
+          params["vote_average.gte"] = filters.rating;
+          params["vote_count.gte"] = 30;
+        }
 
-        page: 1
+        // ------------------------
+        // Timeline
+        // ------------------------
+        if (filters.releaseFrom) {
+          params["primary_release_date.gte"] = filters.releaseFrom;
+        }
+        if (filters.releaseTo) {
+          params["primary_release_date.lte"] = filters.releaseTo;
+        }
 
-    };
-
-    // ------------------------
-    // Genre
-    // ------------------------
-
-    if (filters.genreId) {
-
-        params.with_genres = filters.genreId;
-
-    }
-
-    // ------------------------
-    // Language
-    // ------------------------
-
-    if (filters.language) {
-
-        params.with_original_language = filters.language;
-
-    }
-
-    // ------------------------
-    // Rating
-    // ------------------------
-
-    if (filters.rating > 0) {
-
-        params["vote_average.gte"] = filters.rating;
-
-    }
-
-    // ------------------------
-    // Timeline
-    // ------------------------
-
-    if (filters.releaseFrom) {
-
-        params["primary_release_date.gte"] = filters.releaseFrom;
-
-    }
-
-    if (filters.releaseTo) {
-
-        params["primary_release_date.lte"] = filters.releaseTo;
-
-    }
-
-    // ------------------------
-    // Industry
-    // ------------------------
-
-    switch (filters.industry) {
-
-        case "Hollywood":
-
-            params.with_original_language = "en";
-
-            break;
-
-        case "Bollywood":
-
-            params.with_original_language = "hi";
-
-            break;
-
-        case "Tollywood":
-
-            params.with_original_language = "te";
-
-            break;
-
-        case "Korean":
-
-            params.with_original_language = "ko";
-
-            break;
-
-        case "Anime":
-
-            params.with_original_language = "ja";
-
-            params.with_genres = "16";
-
-            break;
-
-    }
-
-    return request("/discover/movie", params);
-
-};
+        return request("/discover/movie", params)
+          .then(function (res) {
+            // If strict filters return 0 results, retry with relaxed rating/timeline
+            // so the user never encounters an empty void
+            if ((!res.results || res.results.length === 0) && (params["vote_average.gte"] || params["primary_release_date.gte"])) {
+              var relaxed = angular.copy(params);
+              delete relaxed["vote_average.gte"];
+              delete relaxed["vote_count.gte"];
+              delete relaxed["primary_release_date.gte"];
+              delete relaxed["primary_release_date.lte"];
+              return request("/discover/movie", relaxed);
+            }
+            return res;
+          });
+      };
       // ---------------------------------------------------------
       // INDIAN CINEMA (Bollywood + regional: Tamil, Telugu, etc.)
       // Uses TMDB's /discover endpoint filtered by country of

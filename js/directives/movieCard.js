@@ -15,9 +15,10 @@
   'use strict';
 
   angular.module('cineVerseApp').directive('movieCard', [
+    '$location',
     'MovieService',
     'StorageService',
-    function (MovieService, StorageService) {
+    function ($location, MovieService, StorageService) {
 
       return {
         restrict: 'E',
@@ -26,6 +27,15 @@
         },
         templateUrl: 'views/partials/movie-card.html',
         link: function (scope) {
+
+          // Direct play button handler (navigates to movie with ?play=true)
+          scope.playMovie = function ($event) {
+            $event.preventDefault();
+            $event.stopPropagation();
+            if (scope.movie && scope.movie.id) {
+              $location.path('/movie/' + scope.movie.id).search({ play: 'true' });
+            }
+          };
 
           // Poster image (falls back to placeholder inside the service)
           scope.posterUrl = MovieService.getPosterUrl(scope.movie.poster_path);

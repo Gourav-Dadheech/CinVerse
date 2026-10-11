@@ -23,6 +23,23 @@
   <link rel="stylesheet" href="css/movie-match.css">
 
   <link rel="icon" type="image/png" href="assets/icons/favicon.png" />
+
+  <!-- Global Ad-Free Shield Interceptor (Stops unwanted popups & redirect tabs) -->
+  <script>
+    (function () {
+      var _origOpen = window.open;
+      window.open = function (url, name, specs) {
+        if (!url) return null;
+        var allowed = ['google.com', 'themoviedb.org', 'youtube.com', 'tmdb.org'];
+        var isAllowed = allowed.some(function (d) { return url.indexOf(d) !== -1; });
+        if (isAllowed) {
+          return _origOpen.call(window, url, name, specs);
+        }
+        console.warn('[CineVerse Ad-Shield] Prevented unwanted popup window to:', url);
+        return null;
+      };
+    })();
+  </script>
 </head>
 <body>
 
@@ -63,10 +80,133 @@
           aria-label="Search movies" />
       </form>
 
+      <!-- User Profile / Netmirror Auth -->
+      <div class="navbar-user-area">
+        <div class="user-pill" ng-if="navCtrl.currentUser" ng-click="navCtrl.toggleUserDropdown()">
+          <span class="user-avatar">{{ navCtrl.currentUser.avatar }}</span>
+          <span class="user-name">{{ navCtrl.currentUser.name }}</span>
+          <i class="fa-solid fa-chevron-down caret-icon"></i>
+        </div>
+
+        <button class="btn-signin" ng-if="!navCtrl.currentUser" ng-click="navCtrl.openAuthModal('login')">
+          <i class="fa-solid fa-user"></i> Sign In
+        </button>
+
+        <!-- Profile Dropdown Menu -->
+        <div class="user-dropdown-menu" ng-if="navCtrl.userDropdownOpen && navCtrl.currentUser">
+          <div class="dropdown-header">
+            <span class="dropdown-avatar">{{ navCtrl.currentUser.avatar }}</span>
+            <div class="dropdown-user-info">
+              <strong class="user-display-name">{{ navCtrl.currentUser.name }}</strong>
+              <span class="user-membership-badge"><i class="fa-solid fa-crown"></i> {{ navCtrl.currentUser.membership }}</span>
+              <span class="user-email-text">{{ navCtrl.currentUser.email }}</span>
+            </div>
+          </div>
+          <div class="dropdown-divider"></div>
+          <a href="#!/home#continue-watching" class="dropdown-item" ng-click="navCtrl.userDropdownOpen = false">
+            <i class="fa-solid fa-clock-rotate-left"></i> Continue Watching
+          </a>
+          <a href="#!/favorites" class="dropdown-item" ng-click="navCtrl.userDropdownOpen = false">
+            <i class="fa-solid fa-heart"></i> My Favorites
+          </a>
+          <a href="#!/watchlist" class="dropdown-item" ng-click="navCtrl.userDropdownOpen = false">
+            <i class="fa-solid fa-bookmark"></i> My Watchlist
+          </a>
+          <div class="dropdown-divider"></div>
+          <button class="dropdown-item-btn" ng-click="navCtrl.openAuthModal('register')">
+            <i class="fa-solid fa-user-plus"></i> Switch / Add Profile
+          </button>
+          <button class="dropdown-item-btn text-danger" ng-click="navCtrl.logout()">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
+          </button>
+        </div>
+      </div>
+
       <!-- Hamburger for mobile -->
       <button class="hamburger-btn" ng-click="navCtrl.toggleMenu()" aria-label="Toggle Menu">
         <i class="fa-solid fa-bars"></i>
       </button>
+    </div>
+
+    <!-- ============================= -->
+    <!-- NETMIRROR STYLE AUTH MODAL -->
+    <!-- ============================= -->
+    <div class="auth-modal-backdrop" ng-if="navCtrl.showAuthModal" ng-click="navCtrl.closeAuthModal($event)">
+      <div class="auth-modal-card" ng-click="$event.stopPropagation()">
+        <div class="auth-modal-header">
+          <div class="auth-brand">
+            <span class="brand-cine">Cine</span><span class="brand-verse">Verse</span>
+            <span class="auth-tagline">Watch History & Cloud Sync</span>
+          </div>
+          <button class="btn-close-modal" ng-click="navCtrl.closeAuthModal()" aria-label="Close modal">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <!-- Auth Tabs -->
+        <div class="auth-tabs">
+          <button class="auth-tab" ng-class="{ 'active': navCtrl.authTab === 'login' }" ng-click="navCtrl.authTab = 'login'">
+            Sign In
+          </button>
+          <button class="auth-tab" ng-class="{ 'active': navCtrl.authTab === 'register' }" ng-click="navCtrl.authTab = 'register'">
+            Create Account
+          </button>
+        </div>
+
+        <div class="auth-alert" ng-if="navCtrl.authError">
+          <i class="fa-solid fa-triangle-exclamation"></i> {{ navCtrl.authError }}
+        </div>
+
+        <!-- Sign In Form -->
+        <form class="auth-form" ng-if="navCtrl.authTab === 'login'" ng-submit="navCtrl.submitLogin()">
+          <div class="form-group">
+            <label><i class="fa-solid fa-envelope"></i> Email Address</label>
+            <input type="email" placeholder="name@domain.com" ng-model="navCtrl.loginForm.email" required />
+          </div>
+          <div class="form-group">
+            <label><i class="fa-solid fa-lock"></i> Password</label>
+            <input type="password" placeholder="Enter your password" ng-model="navCtrl.loginForm.password" required />
+          </div>
+          <button type="submit" class="btn btn-primary btn-auth-submit">
+            <i class="fa-solid fa-right-to-bracket"></i> Sign In to CineVerse
+          </button>
+        </form>
+
+        <!-- Register Form -->
+        <form class="auth-form" ng-if="navCtrl.authTab === 'register'" ng-submit="navCtrl.submitRegister()">
+          <div class="form-group">
+            <label><i class="fa-solid fa-user"></i> Full Name</label>
+            <input type="text" placeholder="Enter your name" ng-model="navCtrl.registerForm.name" required />
+          </div>
+          <div class="form-group">
+            <label><i class="fa-solid fa-envelope"></i> Email Address</label>
+            <input type="email" placeholder="name@domain.com" ng-model="navCtrl.registerForm.email" required />
+          </div>
+          <div class="form-group">
+            <label><i class="fa-solid fa-lock"></i> Create Password</label>
+            <input type="password" placeholder="Min 6 characters" ng-model="navCtrl.registerForm.password" required />
+          </div>
+          <div class="form-group">
+            <label><i class="fa-solid fa-icons"></i> Choose Your Profile Avatar</label>
+            <div class="avatar-picker">
+              <span class="avatar-option"
+                    ng-repeat="av in navCtrl.avatarChoices"
+                    ng-class="{ 'selected': navCtrl.registerForm.avatar === av }"
+                    ng-click="navCtrl.selectAvatar(av)">
+                {{ av }}
+              </span>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-auth-submit">
+            <i class="fa-solid fa-user-plus"></i> Join CineVerse & Save History
+          </button>
+        </form>
+
+        <div class="auth-footer-notice">
+          <i class="fa-solid fa-shield-halved"></i>
+          <span>Saves your watch history, resumes videos where you left off, and syncs across all devices.</span>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -121,7 +261,7 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <p>&copy; 2026 CineVerse. Created by Gourav Dadheech. This product uses the TMDB API but is not endorsed or certified by TMDB.</p>
+      <p>&copy; 2026 CineVerse. Created by GD.</p>
     </div>
   </footer>
 
@@ -139,6 +279,7 @@
   <!-- App Core -->
   <script src="app.js"></script>
   <script src="routes.js"></script>
+  <script src="js/templates.js"></script>
 
   <!-- Services -->
   <script src="js/services/movieService.js"></script>

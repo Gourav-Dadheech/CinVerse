@@ -2,7 +2,8 @@
    CineVerse - homeController.js
    ------------------------------------------------------------
    Powers the Home page:
-     - Hero banner (random trending movie)
+     - Hero Billboard Carousel (auto-rotating across Hollywood,
+       Bollywood, Tollywood, and Latest Releases)
      - Trending, Popular, Top Rated, Upcoming sliders
      - Genre category badges
    ============================================================ */
@@ -11,12 +12,43 @@
   'use strict';
 
   angular.module('cineVerseApp').controller('HomeController', [
+    '$interval',
+    '$scope',
+    '$location',
     'MovieService',
-    function (MovieService) {
+    'StorageService',
+    function ($interval, $scope, $location, MovieService, StorageService) {
       var vm = this;
 
+      // ---------------- WATCH HISTORY / CONTINUE WATCHING ----------------
+      vm.watchHistory = StorageService.getWatchHistory();
+
+      vm.resumeMovie = function (item) {
+        if (!item || !item.id) return;
+        $location.path('/movie/' + item.id).search({
+          play: 'true',
+          server: item.serverId || 1,
+          track: item.trackId || 'en'
+        });
+      };
+
+      vm.removeFromHistory = function (e, movieId) {
+        if (e) {
+          e.stopPropagation();
+          e.preventDefault();
+        }
+        vm.watchHistory = StorageService.removeFromHistory(movieId);
+      };
+
+      vm.clearHistory = function () {
+        vm.watchHistory = StorageService.clearHistory();
+      };
+
       // ---------------- STATE ----------------
-      vm.heroMovie = null;
+      vm.heroMovies = [];
+      vm.currentHeroIndex = 0;
+      vm.currentHero = null;
+
       vm.trending = [];
       vm.popular = [];
       vm.topRated = [];
@@ -33,17 +65,9 @@
 
       vm.errorMessage = null;
 
+      var heroTimer = null;
+
       // ---------------- HELPERS ----------------
-
-      // Picks a random movie from a list to feature in the hero banner
-      function pickHeroMovie(list) {
-        if (!list || list.length === 0) {
-          return null;
-        }
-        var randomIndex = Math.floor(Math.random() * Math.min(list.length, 5));
-        return list[randomIndex];
-      }
-
       vm.getBackdropUrl = function (path) {
         return MovieService.getBackdropUrl(path);
       };
@@ -62,26 +86,140 @@
         track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
       };
 
+      // ---------------- HERO SLIDER CAROUSEL LOGIC ----------------
+
+      function updateCurrentHero() {
+        if (vm.heroMovies && vm.heroMovies.length > 0) {
+          vm.currentHero = vm.heroMovies[vm.currentHeroIndex];
+        }
+      }
+
+      function startHeroTimer() {
+        stopHeroTimer();
+        heroTimer = $interval(function () {
+          if (vm.heroMovies && vm.heroMovies.length > 1) {
+            vm.currentHeroIndex = (vm.currentHeroIndex + 1) % vm.heroMovies.length;
+            updateCurrentHero();
+          }
+        }, 5500);
+      }
+
+      function stopHeroTimer() {
+        if (heroTimer) {
+          $interval.cancel(heroTimer);
+          heroTimer = null;
+        }
+      }
+
+      function resetHeroTimer() {
+        startHeroTimer();
+      }
+
+      vm.nextHero = function () {
+        if (!vm.heroMovies || vm.heroMovies.length <= 1) return;
+        vm.currentHeroIndex = (vm.currentHeroIndex + 1) % vm.heroMovies.length;
+        updateCurrentHero();
+        resetHeroTimer();
+      };
+
+      vm.prevHero = function () {
+        if (!vm.heroMovies || vm.heroMovies.length <= 1) return;
+        vm.currentHeroIndex = (vm.currentHeroIndex - 1 + vm.heroMovies.length) % vm.heroMovies.length;
+        updateCurrentHero();
+        resetHeroTimer();
+      };
+
+      vm.setHeroIndex = function (index) {
+        if (index >= 0 && index < vm.heroMovies.length) {
+          vm.currentHeroIndex = index;
+          updateCurrentHero();
+          resetHeroTimer();
+        }
+      };
+
+      // Assembles a diverse hero carousel from Hollywood, Bollywood/Tollywood & Trending
+      function buildHeroCarousel() {
+        var carousel = [];
+
+        // 1. Top Hollywood / Global Trending titles
+        if (vm.trending && vm.trending.length > 0) {
+          var t1 = angular.copy(vm.trending[0]);
+          t1.tag = "🔥 Global Blockbuster";
+          carousel.push(t1);
+
+          if (vm.trending.length > 1) {
+            var t2 = angular.copy(vm.trending[1]);
+            t2.tag = "⚡ Trending This Week";
+            carousel.push(t2);
+          }
+        }
+
+        // 2. Top Indian Cinema (Bollywood / Tollywood) hits
+        if (vm.indianMovies && vm.indianMovies.length > 0) {
+          var in1 = angular.copy(vm.indianMovies[0]);
+          in1.tag = "🇮🇳 Bollywood / Tollywood Hit";
+          in1.isIndian = true;
+          carousel.push(in1);
+
+          if (vm.indianMovies.length > 1) {
+            var in2 = angular.copy(vm.indianMovies[1]);
+            in2.tag = "🎬 Indian Cinema Spotlight";
+            in2.isIndian = true;
+            carousel.push(in2);
+          }
+        }
+
+        // 3. Popular hit
+        if (vm.popular && vm.popular.length > 0) {
+          var p1 = angular.copy(vm.popular[0]);
+          if (!carousel.some(function (m) { return m.id === p1.id; })) {
+            p1.tag = "👑 Worldwide Favorite";
+            carousel.push(p1);
+          }
+        }
+
+        // 4. Latest upcoming release
+        if (vm.upcoming && vm.upcoming.length > 0) {
+          var u1 = angular.copy(vm.upcoming[0]);
+          if (!carousel.some(function (m) { return m.id === u1.id; })) {
+            u1.tag = "✨ Latest Release";
+            carousel.push(u1);
+          }
+        }
+
+        vm.heroMovies = carousel;
+        if (vm.heroMovies.length > 0) {
+          vm.currentHeroIndex = 0;
+          updateCurrentHero();
+          startHeroTimer();
+        }
+        vm.isLoadingHero = false;
+      }
+
+      $scope.$on('$destroy', function () {
+        stopHeroTimer();
+      });
+
       // ---------------- DATA LOADING ----------------
 
-      // Trending movies -> also feeds the hero banner
+      // 1. Trending movies
       MovieService.getTrending()
         .then(function (data) {
           vm.trending = data.results || [];
-          vm.heroMovie = pickHeroMovie(vm.trending);
+          buildHeroCarousel();
         })
         .catch(function (err) {
           vm.errorMessage = err.message;
         })
         .finally(function () {
           vm.isLoadingTrending = false;
-          vm.isLoadingHero = false;
         });
 
-      // Popular movies
+      // 2. Popular movies
       MovieService.getPopular()
         .then(function (data) {
           vm.popular = data.results || [];
+          buildHeroCarousel();
         })
         .catch(function (err) {
           vm.errorMessage = err.message;
@@ -90,7 +228,7 @@
           vm.isLoadingPopular = false;
         });
 
-      // Top rated movies
+      // 3. Top rated movies
       MovieService.getTopRated()
         .then(function (data) {
           vm.topRated = data.results || [];
@@ -102,10 +240,11 @@
           vm.isLoadingTopRated = false;
         });
 
-      // Upcoming movies
+      // 4. Upcoming movies
       MovieService.getUpcoming()
         .then(function (data) {
           vm.upcoming = data.results || [];
+          buildHeroCarousel();
         })
         .catch(function (err) {
           vm.errorMessage = err.message;
@@ -114,10 +253,11 @@
           vm.isLoadingUpcoming = false;
         });
 
-      // Popular Indian movies (Bollywood + regional cinema) - for Indian audiences
+      // 5. Popular Indian movies (Bollywood + Tollywood)
       MovieService.getIndianMovies()
         .then(function (data) {
           vm.indianMovies = data.results || [];
+          buildHeroCarousel();
         })
         .catch(function (err) {
           vm.errorMessage = err.message;
@@ -126,16 +266,15 @@
           vm.isLoadingIndian = false;
         });
 
-      // Genre badges (used as quick-filter shortcuts to the search page)
+      // 6. Genre badges
       MovieService.getGenres()
         .then(function (data) {
           vm.genres = data.genres || [];
         })
         .catch(function () {
-          // Non-critical - fail silently, badges just won't render
           vm.genres = [];
         });
+
     }
   ]);
-
 })();

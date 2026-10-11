@@ -221,25 +221,34 @@
 }
 
 /* ===============================
-   Animation
+   Animation & Zero Overlap
 ================================ */
 
 .fade-in{
-    animation:fade .4s ease;
+    animation:fade .25s ease-out;
 }
 
 @keyframes fade{
-
     from{
         opacity:0;
-        transform:translateY(20px);
+        transform:translateY(12px);
     }
-
     to{
         opacity:1;
         transform:translateY(0);
     }
+}
 
+/* Crucial: Prevent any leaving step from occupying layout space or lingering */
+.movie-match-page .question-page.ng-leave,
+.movie-match-page .question-page.ng-leave-active {
+    display:none !important;
+    position:absolute !important;
+    visibility:hidden !important;
+    height:0 !important;
+    opacity:0 !important;
+    pointer-events:none !important;
+    overflow:hidden !important;
 }
 
 /* ===============================
@@ -365,4 +374,40 @@ margin:10px 0;
 
 font-size:16px;
 
+}
+
+/* Active Favorite state */
+.btn-active-fav{
+    background:#ff3b30 !important;
+    color:#fff !important;
+    box-shadow:0 0 15px rgba(255,59,48,.4);
+}
+
+/* No Results Fallback Card */
+.no-results-card{
+    background:#1d2638;
+    border-radius:15px;
+    padding:50px 24px;
+    text-align:center;
+    margin:35px 0;
+    border:1px solid #2a354c;
+}
+
+.no-results-card i{
+    font-size:44px;
+    color:#ff3b30;
+    margin-bottom:16px;
+    display:block;
+}
+
+.no-results-card h3{
+    font-size:24px;
+    margin-bottom:10px;
+    color:#fff;
+}
+
+.no-results-card p{
+    color:#a8b3cf;
+    margin-bottom:24px;
+    font-size:16px;
 }
