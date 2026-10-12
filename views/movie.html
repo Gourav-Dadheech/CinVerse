@@ -173,8 +173,8 @@
           </div>
         </div>
 
-        <!-- Screen / Video Container with Ambient Shadow (No Restrictive Sandbox) -->
-        <div class="theater-screen-wrap" id="theater-screen-container" ng-class="'aspect-' + (movieCtrl.aspectRatioMode || 'fit')">
+        <!-- Screen / Video Container with Ambient Shadow (Direct Unblocked Native Playback) -->
+        <div class="theater-screen-wrap" id="theater-screen-container">
           <!-- CineBoost On-Screen HUD Overlay -->
           <div class="mx-player-osd" ng-class="{ 'visible': movieCtrl.showOsd, 'super-boost': movieCtrl.audioBoostLevel > 100 }">
             <div class="osd-icon">
@@ -192,9 +192,6 @@
             </div>
           </div>
 
-          <!-- Screen Brightness Tint Layer (Adjusted via Left-Side Vertical Swipe) -->
-          <div class="player-brightness-tint" ng-style="{ opacity: movieCtrl.getBrightnessTintOpacity() }"></div>
-
           <!-- Pure Native Playback Iframe without Sandbox Blocking -->
           <iframe
             ng-src="{{ movieCtrl.currentStreamUrl }}"
@@ -205,136 +202,6 @@
             mozallowfullscreen
             allowfullscreen>
           </iframe>
-
-          <!-- SMART GESTURE & TOUCH SHIELD OVERLAY (Anti-Accidental Pause, Double-Tap Seek, Slide Brightness & Volume) -->
-          <div class="player-smart-overlay"
-               ng-if="movieCtrl.gestureOverlayEnabled"
-               player-gestures="movieCtrl"
-               ng-class="{ 'hud-visible': movieCtrl.showPlayerHud }">
-
-            <!-- Vertical Slide Brightness Gauge (Left Screen Gesture) -->
-            <div class="player-gesture-gauge gauge-brightness" ng-if="movieCtrl.showBrightnessGauge">
-              <i class="fa-solid fa-sun gauge-icon"></i>
-              <div class="gauge-track">
-                <div class="gauge-fill" ng-style="{ height: movieCtrl.brightnessLevel + '%' }"></div>
-              </div>
-              <span class="gauge-pct">{{ movieCtrl.brightnessLevel }}%</span>
-              <span class="gauge-label">BRIGHT</span>
-            </div>
-
-            <!-- Vertical Slide Volume Gauge (Right Screen Gesture) -->
-            <div class="player-gesture-gauge gauge-volume" ng-if="movieCtrl.showVolumeGauge" ng-class="{ 'super-boost': movieCtrl.volumeLevel > 100 }">
-              <i class="fa-solid gauge-icon" ng-class="movieCtrl.volumeLevel > 100 ? 'fa-fire-flame-curved' : (movieCtrl.volumeLevel == 0 ? 'fa-volume-xmark' : 'fa-volume-high')"></i>
-              <div class="gauge-track">
-                <div class="gauge-fill" ng-style="{ height: (movieCtrl.volumeLevel / 2) + '%' }"></div>
-              </div>
-              <span class="gauge-pct">{{ movieCtrl.volumeLevel }}%</span>
-              <span class="gauge-label">{{ movieCtrl.volumeLevel > 100 ? 'BOOST' : 'VOL' }}</span>
-            </div>
-
-            <!-- Double Tap Left Seek Ripple (-10s) -->
-            <div class="seek-ripple-indicator ripple-left" ng-if="movieCtrl.showRewindRipple">
-              <div class="ripple-glow"></div>
-              <div class="ripple-content">
-                <div class="ripple-icon-row">
-                  <i class="fa-solid fa-backward-step"></i>
-                  <i class="fa-solid fa-backward"></i>
-                </div>
-                <span class="ripple-seconds">-10s</span>
-                <span class="ripple-sub">REWIND</span>
-              </div>
-            </div>
-
-            <!-- Double Tap Right Seek Ripple (+10s) -->
-            <div class="seek-ripple-indicator ripple-right" ng-if="movieCtrl.showForwardRipple">
-              <div class="ripple-glow"></div>
-              <div class="ripple-content">
-                <div class="ripple-icon-row">
-                  <i class="fa-solid fa-forward"></i>
-                  <i class="fa-solid fa-forward-step"></i>
-                </div>
-                <span class="ripple-seconds">+10s</span>
-                <span class="ripple-sub">FORWARD</span>
-              </div>
-            </div>
-
-            <!-- Floating Heads-Up Display (Toggled on single tap, never accidentally pauses) -->
-            <div class="player-floating-hud" ng-class="{ 'visible': movieCtrl.showPlayerHud }" ng-click="$event.stopPropagation()">
-              <div class="hud-top-bar">
-                <div class="hud-title-box">
-                  <span class="hud-live-tag"><i class="fa-solid fa-shield-halved"></i> Anti-Accidental Pause Active</span>
-                  <span class="hud-server-info"><i class="fa-solid fa-server"></i> {{ movieCtrl.currentServer.name }}</span>
-                </div>
-                <button class="btn-unlock-embed" ng-click="movieCtrl.toggleGestureOverlay()" title="Tap to interact directly with native player gear, subtitles & tracks">
-                  <i class="fa-solid fa-arrow-pointer"></i>
-                  <span>Direct Player Mode</span>
-                </button>
-              </div>
-
-              <!-- Center Play / Seek Controls -->
-              <div class="hud-center-controls">
-                <button class="hud-btn hud-seek-btn" ng-click="movieCtrl.doubleTapSeek(-10)" title="Rewind 10 Seconds">
-                  <i class="fa-solid fa-rotate-left"></i>
-                  <span class="btn-caption">-10s</span>
-                </button>
-
-                <button class="hud-btn hud-play-pause-btn" ng-click="movieCtrl.togglePlayPause()" title="{{ movieCtrl.isPlaying ? 'Pause Video' : 'Play Video' }}">
-                  <i class="fa-solid" ng-class="movieCtrl.isPlaying ? 'fa-pause' : 'fa-play'"></i>
-                </button>
-
-                <button class="hud-btn hud-seek-btn" ng-click="movieCtrl.doubleTapSeek(10)" title="Fast Forward 10 Seconds">
-                  <i class="fa-solid fa-rotate-right"></i>
-                  <span class="btn-caption">+10s</span>
-                </button>
-              </div>
-
-              <!-- Bottom Bar -->
-              <div class="hud-bottom-bar">
-                <div class="hud-gesture-hint">
-                  <i class="fa-solid fa-hand-pointer"></i> Slide left: Brightness • Slide right: Volume • Double-tap: ±10s
-                </div>
-                <div class="hud-actions-group">
-                  <button class="hud-action-pill" ng-click="movieCtrl.toggleAspectRatio()" title="Aspect Ratio: Fit / Fill (No Black Bars) / Stretch">
-                    <i class="fa-solid fa-arrows-to-eye"></i> {{ movieCtrl.getAspectLabel() }}
-                  </button>
-                  <button class="hud-action-pill" ng-click="movieCtrl.togglePlaybackSpeed()" title="Playback Speed">
-                    <i class="fa-solid fa-gauge-high"></i> {{ movieCtrl.playbackSpeed }}x
-                  </button>
-                  <button class="hud-action-pill" ng-click="movieCtrl.toggleScreenLock()" title="Screen Lock (Avoid Accidental Touches)">
-                    <i class="fa-solid fa-lock"></i> Lock
-                  </button>
-                  <button class="hud-action-pill" ng-click="movieCtrl.nextServer()" title="Switch Server (Hotkey: N)">
-                    <i class="fa-solid fa-rotate"></i> Next Server
-                  </button>
-                  <button class="hud-action-pill" ng-click="movieCtrl.toggleFullscreen()" title="Fullscreen Player">
-                    <i class="fa-solid fa-expand"></i> Fullscreen
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Idle Floating Gestures Guide (Visible when HUD is closed) -->
-            <div class="player-gesture-guide-watermark" ng-if="!movieCtrl.showPlayerHud">
-              <span class="guide-zone guide-left"><i class="fa-solid fa-sun"></i> Slide Brightness</span>
-              <span class="guide-zone guide-center"><i class="fa-solid fa-fingerprint"></i> Tap for Controls</span>
-              <span class="guide-zone guide-right"><i class="fa-solid fa-volume-high"></i> Slide Volume</span>
-            </div>
-          </div>
-
-          <!-- Screen Lock Touch Barrier & Floating Unlock Pill -->
-          <div class="player-screen-locked-barrier" ng-if="movieCtrl.isScreenLocked">
-            <button type="button" class="btn-unlock-screen" ng-click="movieCtrl.toggleScreenLock()" title="Unlock Player">
-              <i class="fa-solid fa-lock-open"></i> Screen Locked • Tap to Unlock
-            </button>
-          </div>
-
-          <!-- Floating button to re-enable smart gestures if Direct Player Mode was turned on -->
-          <button class="btn-re-enable-gestures"
-                  ng-if="!movieCtrl.gestureOverlayEnabled"
-                  ng-click="movieCtrl.toggleGestureOverlay()"
-                  title="Turn on Anti-Accidental Pause & Double-Tap Seeking">
-            <i class="fa-solid fa-shield-halved"></i> Turn On Double-Tap & Anti-Pause
-          </button>
         </div>
 
         <!-- Theater Footer: Quick Keyboard Hints & Status -->
