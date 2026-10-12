@@ -17,6 +17,7 @@
        - ngAnimate -> for smooth enter/leave animations
      ------------------------------------------------------------ */
   angular.module('cineVerseApp', ['ngRoute', 'ngAnimate']);
+  angular.module('cinVerseApp', ['cineVerseApp']);
 
   /* ------------------------------------------------------------
      2. GLOBAL APP CONFIGURATION (CONSTANTS)

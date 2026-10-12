@@ -2,13 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <!-- CinVerse Home Page -->
   <url>
-    <loc>https://cineverse.onrender.com/</loc>
+    <loc>https://cinverse.onrender.com/</loc>
     <lastmod>2026-10-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://cineverse.onrender.com/#!/home</loc>
+    <loc>https://cinverse.onrender.com/#!/home</loc>
     <lastmod>2026-10-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
@@ -16,7 +16,7 @@
 
   <!-- TV & Web Series Showcase -->
   <url>
-    <loc>https://cineverse.onrender.com/#!/shows</loc>
+    <loc>https://cinverse.onrender.com/#!/shows</loc>
     <lastmod>2026-10-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
@@ -24,7 +24,7 @@
 
   <!-- K-Drama Hub -->
   <url>
-    <loc>https://cineverse.onrender.com/#!/kdrama</loc>
+    <loc>https://cinverse.onrender.com/#!/kdrama</loc>
     <lastmod>2026-10-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
@@ -32,7 +32,7 @@
 
   <!-- AI Movie Match Wizard -->
   <url>
-    <loc>https://cineverse.onrender.com/#!/movie-match</loc>
+    <loc>https://cinverse.onrender.com/#!/movie-match</loc>
     <lastmod>2026-10-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
@@ -40,7 +40,7 @@
 
   <!-- Search & Library -->
   <url>
-    <loc>https://cineverse.onrender.com/#!/search</loc>
+    <loc>https://cinverse.onrender.com/#!/search</loc>
     <lastmod>2026-10-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
@@ -48,25 +48,25 @@
 
   <!-- 4 Core Cinematic Universes -->
   <url>
-    <loc>https://cineverse.onrender.com/#!/franchise/marvel</loc>
+    <loc>https://cinverse.onrender.com/#!/franchise/marvel</loc>
     <lastmod>2026-10-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://cineverse.onrender.com/#!/franchise/dc</loc>
+    <loc>https://cinverse.onrender.com/#!/franchise/dc</loc>
     <lastmod>2026-10-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://cineverse.onrender.com/#!/franchise/starwars</loc>
+    <loc>https://cinverse.onrender.com/#!/franchise/starwars</loc>
     <lastmod>2026-10-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://cineverse.onrender.com/#!/franchise/pixar</loc>
+    <loc>https://cinverse.onrender.com/#!/franchise/pixar</loc>
     <lastmod>2026-10-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
@@ -74,37 +74,37 @@
 
   <!-- OTT Originals Hubs -->
   <url>
-    <loc>https://cineverse.onrender.com/#!/ott/netflix</loc>
+    <loc>https://cinverse.onrender.com/#!/ott/netflix</loc>
     <lastmod>2026-10-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://cineverse.onrender.com/#!/ott/prime</loc>
+    <loc>https://cinverse.onrender.com/#!/ott/prime</loc>
     <lastmod>2026-10-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://cineverse.onrender.com/#!/ott/hotstar</loc>
+    <loc>https://cinverse.onrender.com/#!/ott/hotstar</loc>
     <lastmod>2026-10-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://cineverse.onrender.com/#!/ott/hbomax</loc>
+    <loc>https://cinverse.onrender.com/#!/ott/hbomax</loc>
     <lastmod>2026-10-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://cineverse.onrender.com/#!/ott/appletv</loc>
+    <loc>https://cinverse.onrender.com/#!/ott/appletv</loc>
     <lastmod>2026-10-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://cineverse.onrender.com/#!/ott/jiocinema</loc>
+    <loc>https://cinverse.onrender.com/#!/ott/jiocinema</loc>
     <lastmod>2026-10-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
