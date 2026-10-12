@@ -31,12 +31,14 @@
 
 .navbar-container {
   max-width: 1520px;
+  width: 100%;
+  box-sizing: border-box;
   margin: 0 auto;
-  padding: 0 40px;
+  padding: 0 32px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: 16px;
   position: relative;
   transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: auto;
@@ -110,9 +112,9 @@
 .navbar-right-group {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   flex-shrink: 0;
-  max-width: 480px;
+  max-width: 580px;
   opacity: 1;
   visibility: visible;
   transform: translateX(0) scale(1);
@@ -120,7 +122,7 @@
               transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
               max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1),
               margin 0.35s ease;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .navbar-scrolled .navbar-right-group {
@@ -129,6 +131,7 @@
   transform: translateX(40px) scale(0.85);
   pointer-events: none;
   max-width: 0;
+  overflow: hidden;
   margin: 0;
   padding: 0;
 }
@@ -434,10 +437,79 @@
   color: #fff;
 }
 
-/* ---------------- MOBILE MENU ---------------- */
-/* ---------------- MOBILE MENU & DETACHED MOBILE SEARCH ---------------- */
-@media (max-width: 900px) {
-  /* Navbar right group must ALWAYS stay visible and clickable on mobile */
+/* ---------------- RESPONSIVE NAVBAR LAYOUT ---------------- */
+
+/* Desktop Laptops (1041px - 1440px): Prevent horizontal overflow & ensure Sign In is always visible */
+@media (max-width: 1440px) {
+  .navbar-container {
+    padding: 0 24px;
+    gap: 12px;
+  }
+  .nav-link {
+    padding: 5px 11px;
+    font-size: 0.82rem;
+  }
+  .navbar-search input {
+    width: 180px;
+  }
+  .navbar-search input:focus {
+    width: 235px;
+  }
+}
+
+@media (max-width: 1280px) {
+  .navbar-container {
+    padding: 0 16px;
+    gap: 10px;
+  }
+  .navbar-brand-img {
+    height: 32px;
+  }
+  .navbar-links {
+    gap: 2px;
+    padding: 4px 6px;
+  }
+  .nav-link {
+    padding: 5px 7px;
+    font-size: 0.77rem;
+  }
+  /* Redundant link: quick search input is right next to the menu in navbar-right-group */
+  .navbar-links .nav-link-search {
+    display: none;
+  }
+  .navbar-search input {
+    width: 150px;
+  }
+  .navbar-search input:focus {
+    width: 200px;
+  }
+  .navbar-app-pill-btn {
+    padding: 0 10px;
+    gap: 5px;
+  }
+  .navbar-app-pill-btn .app-pill-badge {
+    display: none;
+  }
+}
+
+@media (max-width: 1120px) {
+  .navbar-brand-img {
+    height: 30px;
+  }
+  .nav-link {
+    padding: 4px 6px;
+    font-size: 0.74rem;
+  }
+  .btn-signin {
+    padding: 0 12px;
+    font-size: 0.8rem;
+    gap: 5px;
+  }
+}
+
+/* ---------------- TABLET & MOBILE (<= 1040px) ---------------- */
+@media (max-width: 1040px) {
+  /* Navbar right group must ALWAYS stay visible, fully clickable and never clip */
   .navbar-right-group,
   .navbar-scrolled .navbar-right-group {
     opacity: 1 !important;
@@ -446,7 +518,12 @@
     pointer-events: auto !important;
     max-width: none !important;
     overflow: visible !important;
-    gap: 10px;
+    gap: 8px !important;
+  }
+
+  .navbar-container {
+    padding: 0 14px !important;
+    gap: 8px !important;
   }
 
   /* Navbar brand stays visible on mobile */
@@ -456,9 +533,14 @@
     visibility: visible !important;
     transform: none !important;
     pointer-events: auto !important;
-    max-width: 180px !important;
+    max-width: 150px !important;
   }
 
+  .navbar-brand-img {
+    height: 28px !important;
+  }
+
+  /* Desktop links hidden, opened in slide drawer */
   .navbar-links {
     display: none;
   }
@@ -467,13 +549,13 @@
     display: flex !important;
     align-items: center;
     justify-content: center;
-    width: 38px;
-    height: 38px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.14);
     color: #fff;
-    font-size: 1.15rem;
+    font-size: 1.05rem;
     cursor: pointer;
     flex-shrink: 0;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -484,14 +566,14 @@
     display: flex !important;
     align-items: center;
     justify-content: center;
-    width: 38px;
-    height: 38px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.14);
     color: #fff;
     cursor: pointer;
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     flex-shrink: 0;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
@@ -502,6 +584,64 @@
     border-color: rgba(139, 92, 246, 0.5);
     color: #c084fc;
     transform: scale(1.05);
+  }
+
+  /* Compact Circular App Button on Mobile */
+  .navbar-app-pill-btn {
+    width: 36px !important;
+    height: 36px !important;
+    padding: 0 !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+    background: rgba(16, 185, 129, 0.12) !important;
+    border: 1px solid rgba(52, 211, 153, 0.32) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+    flex-shrink: 0 !important;
+  }
+  .navbar-app-pill-btn .app-pill-text,
+  .navbar-app-pill-btn .app-pill-badge {
+    display: none !important;
+  }
+  .navbar-app-pill-btn i {
+    font-size: 1.1rem !important;
+    color: #34d399 !important;
+  }
+
+  /* Compact Circular Sign In Button on Mobile */
+  .btn-signin {
+    width: 36px !important;
+    height: 36px !important;
+    padding: 0 !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+    gap: 0 !important;
+    flex-shrink: 0 !important;
+  }
+  .btn-signin .signin-text {
+    display: none !important;
+  }
+  .btn-signin i {
+    font-size: 0.95rem !important;
+    color: #c084fc !important;
+  }
+
+  .user-pill-fliq {
+    width: 36px !important;
+    height: 36px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+  }
+  .user-display-name-pill,
+  .user-pill-caret {
+    display: none !important;
+  }
+
+  .user-avatar-guest {
+    width: 36px !important;
+    height: 36px !important;
+    flex-shrink: 0 !important;
   }
 
   /* Desktop search wrapper is hidden on mobile screens */
@@ -536,6 +676,10 @@
     padding: 10px 16px;
     font-size: 0.92rem;
     justify-content: flex-start;
+  }
+
+  .navbar-links.nav-open .nav-link-search {
+    display: inline-flex !important;
   }
 
   @keyframes drawerSlideIn {
@@ -712,44 +856,126 @@
   font-size: 0.95rem;
 }
 
-.user-pill-fliq {
-  width: 38px;
+.btn-signin {
   height: 38px;
+  padding: 0 16px;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.22) 0%, rgba(124, 58, 237, 0.38) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.45);
+  border-radius: 999px;
+  color: #ffffff;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  box-shadow: 0 2px 12px rgba(139, 92, 246, 0.25);
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  flex-shrink: 0;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  user-select: none;
+}
+
+.btn-signin:hover {
+  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+  border-color: #c084fc;
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.6), 0 0 14px rgba(192, 132, 252, 0.4);
+  color: #ffffff;
+}
+
+.btn-signin i {
+  font-size: 0.84rem;
+  color: #c084fc;
+  transition: color 0.2s ease;
+}
+
+.btn-signin:hover i {
+  color: #ffffff;
+}
+
+.btn-signin .signin-text {
+  letter-spacing: 0.2px;
+}
+
+.user-pill-fliq {
+  height: 38px;
+  padding: 0 12px 0 6px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.22) 0%, rgba(124, 58, 237, 0.35) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.45);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 12px rgba(139, 92, 246, 0.28);
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+  user-select: none;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.user-pill-fliq:hover {
+  transform: translateY(-1.5px);
+  border-color: #c084fc;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.35) 0%, rgba(124, 58, 237, 0.48) 100%);
+  box-shadow: 0 4px 18px rgba(139, 92, 246, 0.55);
+}
+
+.user-avatar-fliq {
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.15rem;
-  cursor: pointer;
-  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.45);
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
+  font-size: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-.user-pill-fliq:hover {
-  transform: scale(1.08);
-  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.65);
+.user-display-name-pill {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #fff;
+  max-width: 90px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-pill-caret {
+  font-size: 0.65rem;
+  color: #c084fc;
 }
 
 .user-avatar-guest {
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
-  color: #fff;
-  border: none;
-  font-size: 1.15rem;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.25) 0%, rgba(124, 58, 237, 0.38) 100%);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.45);
+  font-size: 1.05rem;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(56, 189, 248, 0.4);
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
+  box-shadow: 0 2px 12px rgba(139, 92, 246, 0.25);
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
 }
 
 .user-avatar-guest:hover {
-  transform: scale(1.08);
-  box-shadow: 0 6px 18px rgba(56, 189, 248, 0.65);
+  transform: translateY(-1.5px);
+  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+  border-color: #c084fc;
+  color: #fff;
+  box-shadow: 0 4px 18px rgba(139, 92, 246, 0.55);
 }
 
 .user-name {
@@ -762,28 +988,6 @@
   font-size: 0.7rem;
   color: #94a3b8;
   margin-left: 2px;
-}
-
-.btn-signin {
-  background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
-  color: #fff;
-  border: none;
-  padding: 8px 20px;
-  border-radius: 999px;
-  font-size: 0.86rem;
-  font-weight: 700;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.45);
-  transition: all 0.2s ease;
-}
-
-.btn-signin:hover {
-  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6);
 }
 
 /* ---------------- USER DROPDOWN MENU ---------------- */
@@ -1203,44 +1407,8 @@ body.is-native-app .btn-footer-download-apk {
   display: none !important;
 }
 
-/* Mobile Screen Adjustments (<= 900px) */
-@media (max-width: 900px) {
-  .navbar-app-pill-btn {
-    width: 38px !important;
-    height: 38px !important;
-    padding: 0 !important;
-    justify-content: center !important;
-    border-radius: 50% !important;
-    background: rgba(16, 185, 129, 0.12) !important;
-    border: 1px solid rgba(52, 211, 153, 0.32) !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
-  }
-  .navbar-app-pill-btn:hover {
-    background: rgba(16, 185, 129, 0.24) !important;
-    border-color: #34d399 !important;
-    box-shadow: 0 0 14px rgba(52, 211, 153, 0.4) !important;
-    transform: scale(1.05);
-  }
-  .navbar-app-pill-btn .app-pill-text,
-  .navbar-app-pill-btn .app-pill-badge {
-    display: none !important;
-  }
-  .navbar-app-pill-btn i {
-    font-size: 1.15rem !important;
-    color: #34d399 !important;
-  }
-  .navbar-app-pill-btn .mobile-app-dot {
-    display: block;
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: #10b981;
-    box-shadow: 0 0 6px #10b981;
-  }
-
+/* Mobile Screen Adjustments (<= 1040px) */
+@media (max-width: 1040px) {
   /* Show in mobile opened drawer */
   .navbar-links.nav-open .nav-link-app-drawer {
     display: flex !important;
@@ -1271,9 +1439,48 @@ body.is-native-app .btn-footer-download-apk {
 }
 
 @media (max-width: 420px) {
+  .navbar-container {
+    padding: 0 10px !important;
+  }
+  .navbar-brand-img {
+    height: 26px !important;
+  }
   .navbar-right-group,
   .navbar-scrolled .navbar-right-group {
-    gap: 7px !important;
+    gap: 6px !important;
+  }
+  .hamburger-btn,
+  .mobile-search-toggle,
+  .navbar-app-pill-btn,
+  .btn-signin,
+  .user-pill-fliq,
+  .user-avatar-guest {
+    width: 34px !important;
+    height: 34px !important;
+    font-size: 0.9rem !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .navbar-container {
+    padding: 0 6px !important;
+  }
+  .navbar-brand-img {
+    height: 24px !important;
+  }
+  .navbar-right-group,
+  .navbar-scrolled .navbar-right-group {
+    gap: 4px !important;
+  }
+  .hamburger-btn,
+  .mobile-search-toggle,
+  .navbar-app-pill-btn,
+  .btn-signin,
+  .user-pill-fliq,
+  .user-avatar-guest {
+    width: 31px !important;
+    height: 31px !important;
+    font-size: 0.82rem !important;
   }
 }
 

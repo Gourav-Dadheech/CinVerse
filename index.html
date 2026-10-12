@@ -115,7 +115,7 @@
           <a href="#!/home" class="nav-link" ng-click="navCtrl.closeMenu()" ng-class="{'active': navCtrl.isActive('/home')}">
             <i class="fa-solid fa-house"></i> Home
           </a>
-          <a href="#!/search" class="nav-link" ng-click="navCtrl.closeMenu()" ng-class="{'active': navCtrl.isActive('/search')}">
+          <a href="#!/search" class="nav-link nav-link-search" ng-click="navCtrl.closeMenu()" ng-class="{'active': navCtrl.isActive('/search')}">
             <i class="fa-solid fa-magnifying-glass"></i> Search
           </a>
           <a href="#!/shows" class="nav-link" ng-click="navCtrl.closeMenu()" ng-class="{'active': navCtrl.isActive('/shows')}">
@@ -226,16 +226,21 @@
             </div>
           </div>
 
-          <!-- User Profile Avatar Pill (FLIQ TV style circular avatar) -->
+          <!-- User Profile / Auth Area -->
           <div class="navbar-user-area">
+            <!-- Signed In: User Profile Pill -->
             <div class="user-pill-fliq" ng-if="navCtrl.currentUser" ng-click="navCtrl.toggleUserDropdown()"
               title="{{ navCtrl.currentUser.name }}">
               <span class="user-avatar-fliq">{{ navCtrl.currentUser.avatar }}</span>
+              <span class="user-display-name-pill">{{ navCtrl.currentUser.name }}</span>
+              <i class="fa-solid fa-chevron-down user-pill-caret"></i>
             </div>
 
-            <button class="user-avatar-guest" ng-if="!navCtrl.currentUser" ng-click="navCtrl.openAuthModal('login')"
-              title="Sign In">
-              <i class="fa-solid fa-face-smile"></i>
+            <!-- Signed Out: Sign In Button -->
+            <button type="button" class="btn-signin" ng-if="!navCtrl.currentUser" ng-click="navCtrl.openAuthModal('login')"
+              title="Sign In to CinVerse" aria-label="Sign In">
+              <i class="fa-solid fa-user"></i>
+              <span class="signin-text">Sign In</span>
             </button>
 
             <!-- Profile Dropdown Menu -->
