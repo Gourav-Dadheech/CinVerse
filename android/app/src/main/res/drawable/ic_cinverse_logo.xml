@@ -1,0 +1,36 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="64dp"
+    android:height="64dp"
+    android:viewportWidth="64"
+    android:viewportHeight="64">
+
+    <!-- Dark Cinema Capsule Frame -->
+    <path
+        android:fillColor="#0C101C"
+        android:strokeColor="#8B5CF6"
+        android:strokeWidth="1.5"
+        android:pathData="M 17,2 L 47,2 A 15,15 0 0,1 62,17 L 62,47 A 15,15 0 0,1 47,62 L 17,62 A 15,15 0 0,1 2,47 L 2,17 A 15,15 0 0,1 17,2 Z" />
+
+    <!-- Letter C -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 24,24 A 10,10 0 0,0 14,34 A 10,10 0 0,0 24,44 L 26,44 L 26,40 L 24,40 A 6,6 0 0,1 18,34 A 6,6 0 0,1 24,28 L 26,28 L 26,24 Z" />
+
+    <!-- Letter V -->
+    <path
+        android:fillColor="#C084FC"
+        android:pathData="M 33,24 L 38,39 L 43,24 L 47,24 L 40,44 L 36,44 L 29,24 Z" />
+
+    <!-- Twinkle Star Center -->
+    <path
+        android:fillColor="#38BDF8"
+        android:pathData="M 50,7 L 50,21 M 43,14 L 57,14"
+        android:strokeColor="#38BDF8"
+        android:strokeWidth="1.5" />
+
+    <!-- Bottom Accent Pill -->
+    <path
+        android:fillColor="#818CF8"
+        android:pathData="M 16,49 L 48,49 A 1.5,1.5 0 0,1 48,52 L 16,52 A 1.5,1.5 0 0,1 16,49 Z" />
+
+</vector>

@@ -147,10 +147,21 @@
             title="Watchlist">
             <i class="fa-solid fa-bookmark"></i>
           </a>
+          <a href="javascript:void(0)" class="nav-link nav-link-app" ng-click="navCtrl.openAppDownloadModal(); navCtrl.closeMenu()" title="Download CinVerse Android App (APK)">
+            <i class="fa-brands fa-android"></i> <span>Get App</span>
+            <span class="nav-app-badge">APK</span>
+          </a>
         </nav>
 
         <!-- Right Group: Search Pill + Profile (FLIQ style) -->
         <div class="navbar-right-group">
+          <!-- Download Android App Pill Button -->
+          <button type="button" class="btn-download-app-pill" ng-click="navCtrl.openAppDownloadModal()" title="Download CinVerse Android App (APK)">
+            <i class="fa-brands fa-android"></i>
+            <span class="btn-app-text">Get App</span>
+            <span class="badge-app-pill">APK</span>
+          </button>
+
           <!-- Mobile Search Trigger Button (Visible only on mobile/tablet screens <= 900px) -->
           <button type="button" class="mobile-search-toggle" ng-click="navCtrl.toggleMobileSearch()" aria-label="Search CinVerse" title="Search">
             <i class="fa-solid fa-magnifying-glass"></i>
@@ -430,6 +441,95 @@
         <i ng-if="!navCtrl.currentUser" class="fa-solid fa-user"></i>
       </button>
     </nav>
+
+    <!-- ============================= -->
+    <!-- CINVERSE ANDROID APP DOWNLOAD MODAL -->
+    <!-- ============================= -->
+    <div class="app-download-backdrop" ng-if="navCtrl.showAppModal" ng-click="navCtrl.closeAppDownloadModal()"></div>
+    <div class="app-download-modal" ng-if="navCtrl.showAppModal" ng-click="$event.stopPropagation()">
+      <div class="app-modal-header">
+        <div class="app-modal-brand">
+          <div class="app-modal-icon-badge">
+            <i class="fa-brands fa-android"></i>
+          </div>
+          <div class="app-modal-titles">
+            <h3 class="app-modal-title">CinVerse for Android</h3>
+            <span class="app-modal-version"><i class="fa-solid fa-circle-check"></i> v1.0.0 Official Release • No Ads</span>
+          </div>
+        </div>
+        <button type="button" class="app-modal-close" ng-click="navCtrl.closeAppDownloadModal()" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="app-modal-body">
+        <p class="app-modal-tagline">
+          Experience buffer-free cinema streaming directly on your Android phone or tablet. Fast, lightweight, and 100% free.
+        </p>
+
+        <!-- App Superpower Highlights -->
+        <div class="app-features-grid">
+          <div class="app-feature-card">
+            <div class="feature-icon-box"><i class="fa-solid fa-shield-halved"></i></div>
+            <div class="feature-text">
+              <strong>100% Ad &amp; Pop-Up Proof</strong>
+              <span>Built-in native blocker neutralizes all external redirect tabs.</span>
+            </div>
+          </div>
+          <div class="app-feature-card">
+            <div class="feature-icon-box"><i class="fa-solid fa-bolt"></i></div>
+            <div class="feature-text">
+              <strong>Buffer-Free 1080p &amp; 4K</strong>
+              <span>5 high-speed cloud servers with multi-audio &amp; subtitles.</span>
+            </div>
+          </div>
+          <div class="app-feature-card">
+            <div class="feature-icon-box"><i class="fa-solid fa-hand-pointer"></i></div>
+            <div class="feature-text">
+              <strong>Double-Tap Seek Gestures</strong>
+              <span>YouTube &amp; Netflix style ±10s seeking with touch safety.</span>
+            </div>
+          </div>
+          <div class="app-feature-card">
+            <div class="feature-icon-box"><i class="fa-solid fa-expand"></i></div>
+            <div class="feature-text">
+              <strong>Immersive Full-Screen Cinema</strong>
+              <span>No browser address bar or cluttered UI — pure screen enjoyment.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Download Action Box -->
+        <div class="app-download-action-box">
+          <a href="https://github.com/Gourav-Dadheech/CinVerse/releases/download/v1.0.0/CinVerse-v1.0.0.apk"
+             class="btn-primary-apk-download"
+             download="CinVerse-v1.0.0.apk">
+            <i class="fa-brands fa-android"></i>
+            <div class="btn-apk-label">
+              <span class="btn-apk-title">Download APK Directly</span>
+              <span class="btn-apk-meta">Version 1.0.0 • ~8 MB • Android 7.0+</span>
+            </div>
+            <span class="btn-apk-badge">FAST CDN</span>
+          </a>
+          <div class="app-download-mirror-row">
+            <span class="mirror-label"><i class="fa-solid fa-cloud"></i> Official GitHub Source:</span>
+            <a href="https://github.com/Gourav-Dadheech/CinVerse/releases" target="_blank" rel="noopener noreferrer" class="mirror-link">
+              <i class="fa-brands fa-github"></i> GitHub Releases Hub
+            </a>
+          </div>
+        </div>
+
+        <!-- Easy 3-Step Install Guide -->
+        <div class="app-install-steps">
+          <h4 class="steps-heading"><i class="fa-solid fa-circle-info"></i> How to Install on Android:</h4>
+          <ol class="steps-list">
+            <li><strong>Download:</strong> Tap the button above to download <code>CinVerse-v1.0.0.apk</code>.</li>
+            <li><strong>Allow:</strong> When prompted by Chrome, tap <em>"Download anyway"</em> and allow <em>"Install unknown apps"</em>.</li>
+            <li><strong>Stream:</strong> Open CinVerse and start enjoying your favorite movies &amp; series!</li>
+          </ol>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- ============================= -->
@@ -519,7 +619,21 @@
           <!-- Live Network Status Pill -->
           <div class="footer-status-pill">
             <span class="status-dot"></span>
-            <span class="status-text">3 Cloud Mirrors Online &bull; Ad-Shield Active</span>
+            <span class="status-text">5 Cloud Mirrors Online &bull; Ad-Shield Active</span>
+          </div>
+
+          <!-- Official Android App Download Card -->
+          <div class="footer-app-download-box">
+            <button type="button" class="btn-footer-download-apk" ng-click="navCtrl.openAppDownloadModal()" title="Download CinVerse Android App (APK)">
+              <div class="apk-icon-circle">
+                <i class="fa-brands fa-android"></i>
+              </div>
+              <div class="apk-btn-text">
+                <span class="apk-sub">ANDROID APPLICATION</span>
+                <strong class="apk-main">Get CinVerse for Android</strong>
+              </div>
+              <span class="apk-badge-free">APK v1.0</span>
+            </button>
           </div>
 
           <!-- Social Connect Icons -->

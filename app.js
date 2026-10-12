@@ -295,12 +295,22 @@
         $location.path('/search').search({ q: query });
       };
 
+      // Android App Download Modal State
+      vm.showAppModal = false;
+      vm.openAppDownloadModal = function () {
+        vm.showAppModal = true;
+      };
+      vm.closeAppDownloadModal = function () {
+        vm.showAppModal = false;
+      };
+
       // Automatically close mobile menu and overlays on route transitions
       $rootScope.$on('$routeChangeStart', function () {
         vm.menuOpen = false;
         vm.mobileSearchOpen = false;
         vm.showSuggestions = false;
         vm.userDropdownOpen = false;
+        vm.showAppModal = false;
       });
 
       vm.isActive = function (path) {

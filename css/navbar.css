@@ -1131,3 +1131,438 @@
   margin-top: 2px;
 }
 
+/* ============================================================
+   CINVERSE ANDROID APP DOWNLOAD BUTTONS & MODAL (PREMIUM CINEMA)
+   ============================================================ */
+
+/* Header App Download Pill Button */
+.btn-download-app-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 13px;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.16) 0%, rgba(124, 58, 237, 0.28) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.45);
+  border-radius: 999px;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(168, 85, 247, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  user-select: none;
+}
+
+.btn-download-app-pill:hover {
+  transform: translateY(-2px);
+  border-color: #c084fc;
+  box-shadow: 0 4px 18px rgba(168, 85, 247, 0.45);
+}
+
+.btn-download-app-pill i {
+  color: #34d399;
+  font-size: 0.95rem;
+}
+
+.badge-app-pill {
+  background: #10b981;
+  color: #042f2e;
+  font-size: 0.58rem;
+  font-weight: 900;
+  padding: 1px 5px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+/* Mobile Drawer App Link */
+.nav-link.nav-link-app {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.18) 0%, rgba(16, 185, 129, 0.14) 100%) !important;
+  border: 1px solid rgba(168, 85, 247, 0.4) !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  border-radius: 10px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-top: 4px;
+}
+
+.nav-link.nav-link-app i {
+  color: #34d399 !important;
+  font-size: 1.05rem;
+}
+
+.nav-app-badge {
+  background: #10b981;
+  color: #042f2e;
+  font-size: 0.62rem;
+  font-weight: 900;
+  padding: 2px 7px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+}
+
+/* Footer App Download Card */
+.footer-app-download-box {
+  margin: 14px 0 18px;
+}
+
+.btn-footer-download-apk {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 290px;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, rgba(20, 27, 45, 0.95) 0%, rgba(30, 26, 60, 0.95) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  border-radius: 14px;
+  cursor: pointer;
+  text-align: left;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45), 0 0 15px rgba(168, 85, 247, 0.15);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-footer-download-apk:hover {
+  transform: translateY(-2px);
+  border-color: #c084fc;
+  box-shadow: 0 6px 25px rgba(168, 85, 247, 0.35);
+}
+
+.apk-icon-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(16, 185, 129, 0.18);
+  border: 1px solid rgba(16, 185, 129, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #34d399;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.apk-btn-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.apk-sub {
+  font-size: 0.62rem;
+  color: #94a3b8;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+}
+
+.apk-main {
+  font-size: 0.84rem;
+  color: #fff;
+  font-weight: 700;
+}
+
+.apk-badge-free {
+  background: rgba(168, 85, 247, 0.25);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 3px 7px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+}
+
+/* ============================================================
+   CINVERSE APP DOWNLOAD MODAL STYLING
+   ============================================================ */
+.app-download-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 999990;
+  animation: fadeIn 0.2s ease;
+}
+
+.app-download-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 92%;
+  max-width: 530px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: linear-gradient(165deg, rgba(18, 24, 38, 0.98) 0%, rgba(13, 16, 28, 0.98) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  border-radius: 20px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95), 0 0 40px rgba(168, 85, 247, 0.25);
+  z-index: 999995;
+  padding: 24px;
+  box-sizing: border-box;
+  animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.app-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.app-modal-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.app-modal-icon-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.22) 0%, rgba(5, 150, 105, 0.3) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #34d399;
+  font-size: 1.5rem;
+}
+
+.app-modal-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #fff;
+  font-family: 'Outfit', sans-serif;
+}
+
+.app-modal-version {
+  font-size: 0.72rem;
+  color: #10b981;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.app-modal-close {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #94a3b8;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.app-modal-close:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.app-modal-body {
+  padding-top: 16px;
+}
+
+.app-modal-tagline {
+  font-size: 0.88rem;
+  color: #cbd5e1;
+  line-height: 1.5;
+  margin: 0 0 18px;
+}
+
+/* Feature Cards Grid */
+.app-features-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 500px) {
+  .app-features-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.app-feature-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.feature-icon-box {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: rgba(168, 85, 247, 0.18);
+  color: #c084fc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.88rem;
+  flex-shrink: 0;
+}
+
+.feature-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.feature-text strong {
+  font-size: 0.78rem;
+  color: #fff;
+  line-height: 1.3;
+}
+
+.feature-text span {
+  font-size: 0.68rem;
+  color: #94a3b8;
+  line-height: 1.3;
+}
+
+/* Download Action Box */
+.app-download-action-box {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.btn-primary-apk-download {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #fff;
+  padding: 14px 18px;
+  border-radius: 12px;
+  text-decoration: none;
+  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.45);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-primary-apk-download:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 28px rgba(16, 185, 129, 0.65);
+}
+
+.btn-primary-apk-download > i {
+  font-size: 1.8rem;
+}
+
+.btn-apk-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.btn-apk-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  font-family: 'Outfit', sans-serif;
+  letter-spacing: 0.3px;
+}
+
+.btn-apk-meta {
+  font-size: 0.7rem;
+  color: #d1fae5;
+  font-weight: 500;
+}
+
+.btn-apk-badge {
+  background: rgba(0, 0, 0, 0.3);
+  color: #a7f3d0;
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 4px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+}
+
+.app-download-mirror-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.74rem;
+  color: #94a3b8;
+  padding-top: 4px;
+}
+
+.mirror-link {
+  color: #c084fc;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 600;
+}
+
+.mirror-link:hover {
+  text-decoration: underline;
+  color: #e9d5ff;
+}
+
+/* Install Steps */
+.app-install-steps {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 12px 16px;
+}
+
+.steps-heading {
+  margin: 0 0 8px;
+  font-size: 0.78rem;
+  color: #cbd5e1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.steps-heading i {
+  color: #38bdf8;
+}
+
+.steps-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 0.72rem;
+  color: #94a3b8;
+  line-height: 1.6;
+}
+
+.steps-list strong {
+  color: #e2e8f0;
+}
+
+.steps-list code {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 1px 4px;
+  border-radius: 4px;
+  color: #34d399;
+}
+
+
