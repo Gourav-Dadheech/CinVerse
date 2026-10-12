@@ -1132,75 +1132,8 @@
 }
 
 /* ============================================================
-   CINVERSE ANDROID APP DOWNLOAD BUTTONS & MODAL (PREMIUM CINEMA)
+   CINVERSE ANDROID APP DOWNLOAD FOOTER CARD & MODAL
    ============================================================ */
-
-/* Header App Download Pill Button */
-.btn-download-app-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 6px 13px;
-  background: linear-gradient(135deg, rgba(168, 85, 247, 0.16) 0%, rgba(124, 58, 237, 0.28) 100%);
-  border: 1px solid rgba(168, 85, 247, 0.45);
-  border-radius: 999px;
-  color: #fff;
-  font-size: 0.78rem;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 2px 10px rgba(168, 85, 247, 0.2);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-  user-select: none;
-}
-
-.btn-download-app-pill:hover {
-  transform: translateY(-2px);
-  border-color: #c084fc;
-  box-shadow: 0 4px 18px rgba(168, 85, 247, 0.45);
-}
-
-.btn-download-app-pill i {
-  color: #34d399;
-  font-size: 0.95rem;
-}
-
-.badge-app-pill {
-  background: #10b981;
-  color: #042f2e;
-  font-size: 0.58rem;
-  font-weight: 900;
-  padding: 1px 5px;
-  border-radius: 4px;
-  letter-spacing: 0.5px;
-}
-
-/* Mobile Drawer App Link */
-.nav-link.nav-link-app {
-  background: linear-gradient(135deg, rgba(168, 85, 247, 0.18) 0%, rgba(16, 185, 129, 0.14) 100%) !important;
-  border: 1px solid rgba(168, 85, 247, 0.4) !important;
-  color: #fff !important;
-  font-weight: 700 !important;
-  border-radius: 10px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  margin-top: 4px;
-}
-
-.nav-link.nav-link-app i {
-  color: #34d399 !important;
-  font-size: 1.05rem;
-}
-
-.nav-app-badge {
-  background: #10b981;
-  color: #042f2e;
-  font-size: 0.62rem;
-  font-weight: 900;
-  padding: 2px 7px;
-  border-radius: 6px;
-  letter-spacing: 0.5px;
-}
 
 /* Footer App Download Card */
 .footer-app-download-box {
