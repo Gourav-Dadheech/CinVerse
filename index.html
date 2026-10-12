@@ -1,14 +1,63 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="cineVerseApp">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CineVerse | Discover Your Next Favorite Movie</title>
-  <meta name="description" content="CineVerse - A Netflix + IMDb inspired movie discovery app built with AngularJS" />
+  
+  <!-- Primary Google SEO Meta Tags -->
+  <title>CinVerse - Watch Movies &amp; TV Series Free Online | HD Cinema Streaming</title>
+  <meta name="title" content="CinVerse - Watch Movies &amp; TV Series Free Online | HD Cinema Streaming" />
+  <meta name="description" content="CinVerse is your premier destination for next-generation cinema discovery &amp; buffer-free streaming. Stream trending movies, TV shows, K-dramas, Marvel, DC, Star Wars, and Pixar in crystal 1080p &amp; 4K HD with dual audio." />
+  <meta name="keywords" content="CinVerse, cinverse movie, cinverse watch movies, stream movies online free, watch movies hd, cinverse series, netflix alternatives, cinverse ai, dual audio movies, cinverse official site" />
+  <meta name="author" content="CinVerse" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <link rel="canonical" href="https://cineverse.onrender.com/" />
 
-  <!-- Google Fonts -->
+  <!-- Open Graph / Facebook / WhatsApp Preview -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://cineverse.onrender.com/" />
+  <meta property="og:site_name" content="CinVerse" />
+  <meta property="og:title" content="CinVerse - Watch Movies &amp; TV Series Free Online | HD Cinema" />
+  <meta property="og:description" content="Explore and stream millions of movies, web series, and cinematic universes in Ultra HD on CinVerse. Fast, bufferless, and ad-protected streaming." />
+  <meta property="og:image" content="https://cineverse.onrender.com/assets/icons/cineverse-brand.svg" />
+
+  <!-- Twitter Cards -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://cineverse.onrender.com/" />
+  <meta name="twitter:title" content="CinVerse - Watch Movies &amp; TV Series Free Online" />
+  <meta name="twitter:description" content="Stream movies, web series, and iconic universes in Ultra HD on CinVerse." />
+  <meta name="twitter:image" content="https://cineverse.onrender.com/assets/icons/cineverse-brand.svg" />
+
+  <!-- Google Search Console & Schema.org Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "CinVerse",
+    "alternateName": ["CinVerse 4K", "CinVerse Movie Platform", "cinverse.onrender.com"],
+    "url": "https://cineverse.onrender.com/",
+    "description": "Next-generation cinema discovery & buffer-free HD movie streaming.",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://cineverse.onrender.com/#!/search?q={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+
+  <meta name="theme-color" content="#07090E" />
+  <meta name="color-scheme" content="dark" />
+
+  <!-- Google Fonts: Outfit (luxury modern cinema font) + Poppins + Bebas Neue -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&family=Bebas+Neue&display=swap"
+    rel="stylesheet">
 
   <!-- Icon Font (Font Awesome via CDN - no jQuery dependency) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -19,9 +68,11 @@
   <link rel="stylesheet" href="css/home.css" />
   <link rel="stylesheet" href="css/movie.css" />
   <link rel="stylesheet" href="css/search.css" />
+  <link rel="stylesheet" href="css/catalog.css" />
   <link rel="stylesheet" href="css/responsive.css" />
   <link rel="stylesheet" href="css/movie-match.css">
 
+  <link rel="icon" type="image/svg+xml" href="assets/icons/cineverse-icon.svg" />
   <link rel="icon" type="image/png" href="assets/icons/favicon.png" />
 
   <!-- Global Ad-Free Shield Interceptor (Stops unwanted popups & redirect tabs) -->
@@ -35,108 +86,181 @@
         if (isAllowed) {
           return _origOpen.call(window, url, name, specs);
         }
-        console.warn('[CineVerse Ad-Shield] Prevented unwanted popup window to:', url);
+        console.warn('[CinVerse Ad-Shield] Prevented unwanted popup window to:', url);
         return null;
       };
     })();
   </script>
 </head>
+
 <body>
 
   <!-- ============================= -->
-  <!-- NAVIGATION BAR (Always Visible) -->
+  <!-- NAVIGATION & AUTH WRAPPER -->
   <!-- ============================= -->
-  <header class="navbar" ng-controller="NavbarController as navCtrl" ng-class="{'navbar-scrolled': navCtrl.isScrolled}">
-    <div class="navbar-container">
+  <div id="navbar-app-wrapper" ng-controller="NavbarController as navCtrl">
+    <header class="navbar" ng-class="{'navbar-scrolled': navCtrl.isScrolled}">
+      <div class="navbar-container">
 
-      <!-- Brand Logo -->
-      <a href="#!/home" class="navbar-brand">
-        <span class="brand-cine">Cine</span><span class="brand-verse">Verse</span>
-      </a>
-
-      <!-- Nav Links -->
-      <nav class="navbar-links" ng-class="{'nav-open': navCtrl.menuOpen}">
-        <a href="#!/home" class="nav-link">Home</a>
-        <a href="#!/search" class="nav-link">Search</a>
-        <a href="#!/movie-match" class="nav-link">
-    <i class="fa-solid fa-wand-magic-sparkles"></i>
-    Movie Match
-</a>
-        <a href="#!/favorites" class="nav-link">
-          <i class="fa-solid fa-heart"></i> Favorites
+        <!-- Brand Logo (FLIQ TV 1080p/4K Vector Mark) -->
+        <a href="#!/home" class="navbar-brand fliq-brand" title="CinVerse - Home">
+          <img src="assets/icons/cineverse-brand.svg" alt="CinVerse 4K" class="navbar-brand-img" />
         </a>
-        <a href="#!/watchlist" class="nav-link">
-          <i class="fa-solid fa-bookmark"></i> Watchlist
-        </a>
-      </nav>
 
-      <!-- Quick Search -->
-      <form class="navbar-search" ng-submit="navCtrl.goToSearch()">
-        <i class="fa-solid fa-magnifying-glass search-icon"></i>
-        <input
-          type="text"
-          placeholder="Search movies..."
-          ng-model="navCtrl.quickQuery"
-          aria-label="Search movies" />
-      </form>
+        <!-- Nav Links (FLIQ TV Floating Pill Nav) -->
+        <nav class="navbar-links" ng-class="{'nav-open': navCtrl.menuOpen}">
+          <a href="#!/home" class="nav-link" ng-class="{'active': navCtrl.isActive('/home')}">
+            <i class="fa-solid fa-house"></i> Home
+          </a>
+          <a href="#!/search" class="nav-link" ng-class="{'active': navCtrl.isActive('/search')}">
+            Movies
+          </a>
+          <a href="#!/shows" class="nav-link" ng-class="{'active': navCtrl.isActive('/shows')}">
+            TV Shows
+          </a>
+          <a href="#!/anime" class="nav-link" ng-class="{'active': navCtrl.isActive('/anime')}">
+            Anime
+          </a>
+          <a href="#!/kdrama" class="nav-link" ng-class="{'active': navCtrl.isActive('/kdrama')}">
+            K-Drama
+          </a>
+          <a href="#!/home#trending" class="nav-link">
+            Trending
+          </a>
+          <a href="#!/ott/netflix" class="nav-link" ng-class="{'active': navCtrl.isActive('/ott')}">
+            OTT Hub
+          </a>
+          <a href="#!/franchise/marvel" class="nav-link" ng-class="{'active': navCtrl.isActive('/franchise')}">
+            Universes
+          </a>
+          <a href="#!/movie-match" class="nav-link" ng-class="{'active': navCtrl.isActive('/movie-match')}">
+            Match
+          </a>
+          <a href="#!/favorites" class="nav-link" ng-class="{'active': navCtrl.isActive('/favorites')}"
+            title="Favorites">
+            <i class="fa-solid fa-heart"></i>
+          </a>
+          <a href="#!/watchlist" class="nav-link" ng-class="{'active': navCtrl.isActive('/watchlist')}"
+            title="Watchlist">
+            <i class="fa-solid fa-bookmark"></i>
+          </a>
+        </nav>
 
-      <!-- User Profile / Netmirror Auth -->
-      <div class="navbar-user-area">
-        <div class="user-pill" ng-if="navCtrl.currentUser" ng-click="navCtrl.toggleUserDropdown()">
-          <span class="user-avatar">{{ navCtrl.currentUser.avatar }}</span>
-          <span class="user-name">{{ navCtrl.currentUser.name }}</span>
-          <i class="fa-solid fa-chevron-down caret-icon"></i>
-        </div>
+        <!-- Right Group: Search Pill + Profile (FLIQ style) -->
+        <div class="navbar-right-group">
+          <!-- Quick Search with Instant Suggestions Dropdown (FLIQ TV style) -->
+          <div class="navbar-search-wrapper" id="navbarSearchWrapper">
+            <form class="navbar-search" ng-submit="navCtrl.goToSearch()">
+              <i class="fa-solid fa-magnifying-glass search-icon"></i>
+              <input type="text" placeholder="Search..." ng-model="navCtrl.quickQuery"
+                ng-change="navCtrl.onSearchInput()" ng-focus="navCtrl.onSearchInput()"
+                ng-blur="navCtrl.closeSuggestions()" aria-label="Search movies" autocomplete="off" />
+              <button type="button" class="btn-clear-search" ng-if="navCtrl.quickQuery"
+                ng-click="navCtrl.clearQuickSearch()" title="Clear">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </form>
 
-        <button class="btn-signin" ng-if="!navCtrl.currentUser" ng-click="navCtrl.openAuthModal('login')">
-          <i class="fa-solid fa-user"></i> Sign In
-        </button>
+            <!-- Live Instant Suggestions Dropdown -->
+            <div class="navbar-search-suggestions" ng-if="navCtrl.showSuggestions">
+              <div class="suggestions-loading" ng-if="navCtrl.isLoadingSuggestions">
+                <i class="fa-solid fa-circle-notch fa-spin"></i> Searching CinVerse...
+              </div>
 
-        <!-- Profile Dropdown Menu -->
-        <div class="user-dropdown-menu" ng-if="navCtrl.userDropdownOpen && navCtrl.currentUser">
-          <div class="dropdown-header">
-            <span class="dropdown-avatar">{{ navCtrl.currentUser.avatar }}</span>
-            <div class="dropdown-user-info">
-              <strong class="user-display-name">{{ navCtrl.currentUser.name }}</strong>
-              <span class="user-membership-badge"><i class="fa-solid fa-crown"></i> {{ navCtrl.currentUser.membership }}</span>
-              <span class="user-email-text">{{ navCtrl.currentUser.email }}</span>
+              <div class="suggestions-list" ng-if="!navCtrl.isLoadingSuggestions && navCtrl.suggestions.length > 0">
+                <a class="suggestion-item" ng-repeat="item in navCtrl.suggestions track by item.id"
+                  ng-href="{{ item.targetUrl }}" ng-click="navCtrl.clearQuickSearch()">
+                  <img class="suggestion-poster" ng-src="{{ navCtrl.getPosterUrl(item.poster_path) }}"
+                    alt="{{ item.displayTitle }}" />
+                  <div class="suggestion-info">
+                    <span class="suggestion-title">
+                      {{ item.displayTitle }}
+                      <span class="suggestion-tag-series" ng-if="item.isTv">SERIES</span>
+                    </span>
+                    <div class="suggestion-meta">
+                      <span class="suggestion-year">{{ item.displayDate ? item.displayDate.slice(0,4) : 'TBA' }}</span>
+                      <span class="suggestion-rating" ng-if="item.vote_average">
+                        <i class="fa-solid fa-star"></i> {{ item.vote_average.toFixed(1) }}
+                      </span>
+                      <span class="suggestion-lang" ng-if="item.original_language">{{
+                        item.original_language.toUpperCase() }}</span>
+                    </div>
+                  </div>
+                  <i class="fa-solid fa-chevron-right suggestion-arrow"></i>
+                </a>
+
+                <div class="suggestion-footer" ng-click="navCtrl.goToSearch()">
+                  <span>View all results for "<strong>{{ navCtrl.quickQuery }}</strong>"</span>
+                  <i class="fa-solid fa-arrow-right"></i>
+                </div>
+              </div>
+
+              <div class="suggestions-empty"
+                ng-if="!navCtrl.isLoadingSuggestions && navCtrl.suggestions.length === 0 && navCtrl.quickQuery.length >= 2">
+                <i class="fa-solid fa-film"></i> No movies found for "{{ navCtrl.quickQuery }}"
+              </div>
             </div>
           </div>
-          <div class="dropdown-divider"></div>
-          <a href="#!/home#continue-watching" class="dropdown-item" ng-click="navCtrl.userDropdownOpen = false">
-            <i class="fa-solid fa-clock-rotate-left"></i> Continue Watching
-          </a>
-          <a href="#!/favorites" class="dropdown-item" ng-click="navCtrl.userDropdownOpen = false">
-            <i class="fa-solid fa-heart"></i> My Favorites
-          </a>
-          <a href="#!/watchlist" class="dropdown-item" ng-click="navCtrl.userDropdownOpen = false">
-            <i class="fa-solid fa-bookmark"></i> My Watchlist
-          </a>
-          <div class="dropdown-divider"></div>
-          <button class="dropdown-item-btn" ng-click="navCtrl.openAuthModal('register')">
-            <i class="fa-solid fa-user-plus"></i> Switch / Add Profile
-          </button>
-          <button class="dropdown-item-btn text-danger" ng-click="navCtrl.logout()">
-            <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
+
+          <!-- User Profile Avatar Pill (FLIQ TV style circular avatar) -->
+          <div class="navbar-user-area">
+            <div class="user-pill-fliq" ng-if="navCtrl.currentUser" ng-click="navCtrl.toggleUserDropdown()"
+              title="{{ navCtrl.currentUser.name }}">
+              <span class="user-avatar-fliq">{{ navCtrl.currentUser.avatar }}</span>
+            </div>
+
+            <button class="user-avatar-guest" ng-if="!navCtrl.currentUser" ng-click="navCtrl.openAuthModal('login')"
+              title="Sign In">
+              <i class="fa-solid fa-face-smile"></i>
+            </button>
+
+            <!-- Profile Dropdown Menu -->
+            <div class="user-dropdown-menu" ng-if="navCtrl.userDropdownOpen && navCtrl.currentUser">
+              <div class="dropdown-header">
+                <span class="dropdown-avatar">{{ navCtrl.currentUser.avatar }}</span>
+                <div class="dropdown-user-info">
+                  <strong class="user-display-name">{{ navCtrl.currentUser.name }}</strong>
+                  <span class="user-membership-badge"><i class="fa-solid fa-crown"></i> {{
+                    navCtrl.currentUser.membership }}</span>
+                  <span class="user-email-text">{{ navCtrl.currentUser.email }}</span>
+                </div>
+              </div>
+              <div class="dropdown-divider"></div>
+              <a href="#!/home#continue-watching" class="dropdown-item" ng-click="navCtrl.userDropdownOpen = false">
+                <i class="fa-solid fa-clock-rotate-left"></i> Continue Watching
+              </a>
+              <a href="#!/favorites" class="dropdown-item" ng-click="navCtrl.userDropdownOpen = false">
+                <i class="fa-solid fa-heart"></i> My Favorites
+              </a>
+              <a href="#!/watchlist" class="dropdown-item" ng-click="navCtrl.userDropdownOpen = false">
+                <i class="fa-solid fa-bookmark"></i> My Watchlist
+              </a>
+              <div class="dropdown-divider"></div>
+              <button class="dropdown-item-btn" ng-click="navCtrl.openAuthModal('register')">
+                <i class="fa-solid fa-user-plus"></i> Switch / Add Profile
+              </button>
+              <button class="dropdown-item-btn text-danger" ng-click="navCtrl.logout()">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
+              </button>
+            </div>
+          </div>
+
+          <!-- Hamburger for mobile -->
+          <button class="hamburger-btn" ng-click="navCtrl.toggleMenu()" aria-label="Toggle Menu">
+            <i class="fa-solid fa-bars"></i>
           </button>
         </div>
-      </div>
-
-      <!-- Hamburger for mobile -->
-      <button class="hamburger-btn" ng-click="navCtrl.toggleMenu()" aria-label="Toggle Menu">
-        <i class="fa-solid fa-bars"></i>
-      </button>
-    </div>
+    </header>
 
     <!-- ============================= -->
-    <!-- NETMIRROR STYLE AUTH MODAL -->
+    <!-- AUTH MODAL (DETACHED FROM NAVBAR TO PREVENT CLIPPING GLITCH) -->
     <!-- ============================= -->
     <div class="auth-modal-backdrop" ng-if="navCtrl.showAuthModal" ng-click="navCtrl.closeAuthModal($event)">
       <div class="auth-modal-card" ng-click="$event.stopPropagation()">
         <div class="auth-modal-header">
           <div class="auth-brand">
-            <span class="brand-cine">Cine</span><span class="brand-verse">Verse</span>
-            <span class="auth-tagline">Watch History & Cloud Sync</span>
+            <img src="assets/icons/cineverse-brand.svg" alt="CinVerse 4K" class="auth-brand-logo" />
+            <span class="auth-tagline">Watch History &amp; Cloud Sync</span>
           </div>
           <button class="btn-close-modal" ng-click="navCtrl.closeAuthModal()" aria-label="Close modal">
             <i class="fa-solid fa-xmark"></i>
@@ -145,10 +269,12 @@
 
         <!-- Auth Tabs -->
         <div class="auth-tabs">
-          <button class="auth-tab" ng-class="{ 'active': navCtrl.authTab === 'login' }" ng-click="navCtrl.authTab = 'login'">
+          <button class="auth-tab" ng-class="{ 'active': navCtrl.authTab === 'login' }"
+            ng-click="navCtrl.authTab = 'login'">
             Sign In
           </button>
-          <button class="auth-tab" ng-class="{ 'active': navCtrl.authTab === 'register' }" ng-click="navCtrl.authTab = 'register'">
+          <button class="auth-tab" ng-class="{ 'active': navCtrl.authTab === 'register' }"
+            ng-click="navCtrl.authTab = 'register'">
             Create Account
           </button>
         </div>
@@ -167,8 +293,8 @@
             <label><i class="fa-solid fa-lock"></i> Password</label>
             <input type="password" placeholder="Enter your password" ng-model="navCtrl.loginForm.password" required />
           </div>
-          <button type="submit" class="btn btn-primary btn-auth-submit">
-            <i class="fa-solid fa-right-to-bracket"></i> Sign In to CineVerse
+          <button type="submit" class="btn btn-auth-submit">
+            <i class="fa-solid fa-right-to-bracket"></i> Sign In to CinVerse
           </button>
         </form>
 
@@ -189,16 +315,14 @@
           <div class="form-group">
             <label><i class="fa-solid fa-icons"></i> Choose Your Profile Avatar</label>
             <div class="avatar-picker">
-              <span class="avatar-option"
-                    ng-repeat="av in navCtrl.avatarChoices"
-                    ng-class="{ 'selected': navCtrl.registerForm.avatar === av }"
-                    ng-click="navCtrl.selectAvatar(av)">
+              <span class="avatar-option" ng-repeat="av in navCtrl.avatarChoices"
+                ng-class="{ 'selected': navCtrl.registerForm.avatar === av }" ng-click="navCtrl.selectAvatar(av)">
                 {{ av }}
               </span>
             </div>
           </div>
-          <button type="submit" class="btn btn-primary btn-auth-submit">
-            <i class="fa-solid fa-user-plus"></i> Join CineVerse & Save History
+          <button type="submit" class="btn btn-auth-submit">
+            <i class="fa-solid fa-user-plus"></i> Join CinVerse &amp; Save History
           </button>
         </form>
 
@@ -208,7 +332,29 @@
         </div>
       </div>
     </div>
-  </header>
+
+    <!-- ============================= -->
+    <!-- FLIQ TV STYLE MOBILE BOTTOM FLOATING DOCK -->
+    <!-- ============================= -->
+    <nav class="mobile-bottom-dock" aria-label="Mobile Navigation">
+      <a href="#!/home" class="dock-item" ng-class="{'active': navCtrl.isActive('/home')}" title="Home">
+        <i class="fa-solid fa-house"></i>
+      </a>
+      <a href="#!/shows" class="dock-item" ng-class="{'active': navCtrl.isActive('/shows')}" title="TV Shows & Movies">
+        <i class="fa-solid fa-clapperboard"></i>
+      </a>
+      <a href="#!/watchlist" class="dock-item" ng-class="{'active': navCtrl.isActive('/watchlist')}" title="Watchlist">
+        <i class="fa-solid fa-bookmark"></i>
+      </a>
+      <a href="#!/search" class="dock-item" ng-class="{'active': navCtrl.isActive('/search')}" title="Search">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </a>
+      <button type="button" class="dock-item dock-profile-btn" ng-click="navCtrl.currentUser ? navCtrl.toggleUserDropdown() : navCtrl.openAuthModal('login')" title="Profile">
+        <span ng-if="navCtrl.currentUser" class="dock-avatar-text">{{ navCtrl.currentUser.avatar }}</span>
+        <i ng-if="!navCtrl.currentUser" class="fa-solid fa-user"></i>
+      </button>
+    </nav>
+  </div>
 
   <!-- ============================= -->
   <!-- MAIN VIEW CONTAINER (Routed Views Load Here) -->
@@ -227,42 +373,202 @@
   <!-- ============================= -->
   <!-- BACK TO TOP BUTTON -->
   <!-- ============================= -->
-  <button class="back-to-top" ng-controller="ScrollController as scrollCtrl"
-          ng-click="scrollCtrl.scrollToTop()"
-          ng-show="scrollCtrl.showButton"
-          aria-label="Back to top">
+  <button class="back-to-top" ng-controller="ScrollController as scrollCtrl" ng-click="scrollCtrl.scrollToTop()"
+    ng-show="scrollCtrl.showButton" aria-label="Back to top">
     <i class="fa-solid fa-arrow-up"></i>
   </button>
 
   <!-- ============================= -->
   <!-- FOOTER -->
   <!-- ============================= -->
-  <footer class="site-footer">
-    <div class="footer-container">
-      <div class="footer-brand">
-        <span class="brand-cine">Cine</span><span class="brand-verse">Verse</span>
-        <p>Your ultimate destination for movie discovery. Powered by TMDB.</p>
-      </div>
-      <div class="footer-links">
-        <h4>Explore</h4>
-        <a href="#!/home">Home</a>
-        <a href="#!/search">Search</a>
-        <a href="#!/favorites">Favorites</a>
-        <a href="#!/watchlist">Watchlist</a>
-      </div>
-      <div class="footer-social">
-        <h4>Connect</h4>
-        <div class="social-icons">
-          <a href="#!" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
-          <a href="#!" aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
-          <a href="#!" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-          <a href="#!" aria-label="Github"><i class="fa-brands fa-github"></i></a>
+  <!-- ============================================================ -->
+  <!-- ULTIMATE CINEMA FOOTER (CinVerse Clean Luxury Design) -->
+  <!-- ============================================================ -->
+  <footer class="site-footer" ng-controller="ScrollController as scrollCtrl">
+
+    <!-- Ambient Top Gradient Border Glow -->
+    <div class="footer-ambient-glow"></div>
+
+    <!-- Feature Highlights Ribbon (4 Pillar Cards) -->
+    <div class="footer-ribbon">
+      <div class="footer-ribbon-container">
+        <div class="ribbon-card">
+          <div class="ribbon-icon"><i class="fa-solid fa-bolt"></i></div>
+          <div class="ribbon-info">
+            <h4>Ultra 4K Streaming</h4>
+            <p>Multi-audio tracks &amp; crisp subtitles built-in</p>
+          </div>
+        </div>
+
+        <div class="ribbon-card">
+          <div class="ribbon-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+          <div class="ribbon-info">
+            <h4>College Wi-Fi Bypass</h4>
+            <p>Direct mirror streaming without VPN blocks</p>
+          </div>
+        </div>
+
+        <div class="ribbon-card">
+          <div class="ribbon-icon"><i class="fa-solid fa-cloud-arrow-down"></i></div>
+          <div class="ribbon-info">
+            <h4>Local Downloader</h4>
+            <p>Save movies &amp; episodes directly to device</p>
+          </div>
+        </div>
+
+        <div class="ribbon-card">
+          <div class="ribbon-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+          <div class="ribbon-info">
+            <h4>CinVerse AI Match</h4>
+            <p>Mood &amp; vibe tailored instant cinema picks</p>
+          </div>
         </div>
       </div>
     </div>
-    <div class="footer-bottom">
-      <p>&copy; 2026 CineVerse. Created by GD.</p>
+
+    <!-- Main Navigation Grid -->
+    <div class="footer-main">
+      <div class="footer-container">
+
+        <!-- Column 1: Brand & Status -->
+        <div class="footer-col footer-col-brand">
+          <a href="#!/home" class="footer-brand-link" title="CinVerse Home">
+            <img src="assets/icons/cineverse-brand.svg" alt="CinVerse 4K" class="footer-brand-logo" />
+          </a>
+          <p class="footer-tagline">
+            Your premier destination for next-generation cinema discovery &amp; buffer-free streaming. Explore millions
+            of movies, web series, anime &amp; cinematic universes in crystal Ultra HD.
+          </p>
+
+          <!-- Live Network Status Pill -->
+          <div class="footer-status-pill">
+            <span class="status-dot"></span>
+            <span class="status-text">3 Cloud Mirrors Online &bull; Ad-Shield Active</span>
+          </div>
+
+          <!-- Social Connect Icons -->
+          <div class="footer-social-wrap">
+            <span class="social-label">Connect &amp; Community</span>
+            <div class="social-icons">
+              <a href="https://github.com" target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub">
+                <i class="fa-brands fa-github"></i>
+              </a>
+              <a href="https://discord.com" target="_blank" rel="noopener noreferrer" aria-label="Discord"
+                title="Discord Community">
+                <i class="fa-brands fa-discord"></i>
+              </a>
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="X Twitter"
+                title="X (Twitter)">
+                <i class="fa-brands fa-x-twitter"></i>
+              </a>
+              <a href="https://telegram.org" target="_blank" rel="noopener noreferrer" aria-label="Telegram"
+                title="Telegram Channel">
+                <i class="fa-brands fa-telegram"></i>
+              </a>
+              <a href="https://reddit.com" target="_blank" rel="noopener noreferrer" aria-label="Reddit"
+                title="Reddit Community">
+                <i class="fa-brands fa-reddit-alien"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 2: Entertainment Catalog -->
+        <div class="footer-col">
+          <details class="footer-acc">
+            <summary class="col-title">
+              <span><i class="fa-solid fa-compass"></i> Discover</span>
+              <i class="fa-solid fa-chevron-down acc-chevron"></i>
+            </summary>
+            <ul class="footer-nav-list">
+              <li><a href="#!/home"><i class="fa-solid fa-angle-right"></i> Home Showcase</a></li>
+              <li><a href="#!/search"><i class="fa-solid fa-angle-right"></i> Movie Library</a></li>
+              <li><a href="#!/shows"><i class="fa-solid fa-angle-right"></i> TV &amp; Web Series</a></li>
+              <li><a href="#!/kdrama"><i class="fa-solid fa-angle-right"></i> K-Drama Collection</a></li>
+              <li><a href="#!/search?sort=popular"><i class="fa-solid fa-angle-right"></i> Trending Now</a></li>
+            </ul>
+          </details>
+        </div>
+
+        <!-- Column 3: Universes & Franchises (4 Core Universes) -->
+        <div class="footer-col">
+          <details class="footer-acc">
+            <summary class="col-title">
+              <span><i class="fa-solid fa-shield-halved"></i> Universes</span>
+              <i class="fa-solid fa-chevron-down acc-chevron"></i>
+            </summary>
+            <ul class="footer-nav-list">
+              <li><a href="#!/franchise/marvel"><i class="fa-solid fa-angle-right"></i> Marvel Cinematic</a></li>
+              <li><a href="#!/franchise/dc"><i class="fa-solid fa-angle-right"></i> DC Extended Universe</a></li>
+              <li><a href="#!/franchise/starwars"><i class="fa-solid fa-angle-right"></i> Star Wars Saga</a></li>
+              <li><a href="#!/franchise/pixar"><i class="fa-solid fa-angle-right"></i> Pixar &amp; Animation</a></li>
+            </ul>
+          </details>
+        </div>
+
+        <!-- Column 4: OTT Platform Hubs -->
+        <div class="footer-col">
+          <details class="footer-acc">
+            <summary class="col-title">
+              <span><i class="fa-solid fa-tv"></i> OTT Originals</span>
+              <i class="fa-solid fa-chevron-down acc-chevron"></i>
+            </summary>
+            <ul class="footer-nav-list">
+              <li><a href="#!/ott/netflix"><i class="fa-solid fa-angle-right"></i> Netflix Originals</a></li>
+              <li><a href="#!/ott/prime"><i class="fa-solid fa-angle-right"></i> Prime Video</a></li>
+              <li><a href="#!/ott/hotstar"><i class="fa-solid fa-angle-right"></i> Disney+ Hotstar</a></li>
+              <li><a href="#!/ott/appletv"><i class="fa-solid fa-angle-right"></i> Apple TV+</a></li>
+              <li><a href="#!/ott/jiocinema"><i class="fa-solid fa-angle-right"></i> JioCinema Hub</a></li>
+            </ul>
+          </details>
+        </div>
+
+        <!-- Column 5: Pro Features & Tools -->
+        <div class="footer-col">
+          <details class="footer-acc">
+            <summary class="col-title">
+              <span><i class="fa-solid fa-sliders"></i> Pro Features</span>
+              <i class="fa-solid fa-chevron-down acc-chevron"></i>
+            </summary>
+            <ul class="footer-nav-list">
+              <li><a href="#!/movie-match"><i class="fa-solid fa-wand-magic-sparkles"></i> CinVerse AI Match</a></li>
+              <li><a href="#!/favorites"><i class="fa-solid fa-heart"></i> Favorites &amp; History</a></li>
+              <li><a href="#!/watchlist"><i class="fa-solid fa-bookmark"></i> My Watchlist</a></li>
+              <li><a href="#!/search"><i class="fa-solid fa-cloud-arrow-down"></i> Local Downloader</a></li>
+              <li><a href="#!/home"><i class="fa-solid fa-volume-high"></i> CineBoost 200% Audio</a></li>
+            </ul>
+          </details>
+        </div>
+
+      </div>
     </div>
+
+    <!-- Bottom Copyright & Quick Scroll Deck -->
+    <div class="footer-bottom">
+      <div class="footer-bottom-container">
+        <div class="bottom-left">
+          <p>&copy; 2026 <strong>CinVerse</strong>. Crafted with <i class="fa-solid fa-heart heart-glow"></i> for cinema
+            enthusiasts worldwide. Created by GD</p>
+        </div>
+
+        <div class="bottom-center">
+          <div class="tech-stack-badges">
+            <span class="tech-pill">AngularJS</span>
+            <span class="tech-pill">Web Audio API</span>
+            <span class="tech-pill">Multi-Audio</span>
+            <span class="tech-pill">TMDB Cloud</span>
+          </div>
+        </div>
+
+        <div class="bottom-right">
+          <button class="footer-back-to-top" ng-click="scrollCtrl.scrollToTop()" title="Scroll back to top">
+            <span>Back to Top</span>
+            <i class="fa-solid fa-arrow-up"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
   </footer>
 
   <!-- ============================= -->
@@ -291,10 +597,13 @@
   <!-- Controllers -->
   <script src="js/controllers/homeController.js"></script>
   <script src="js/controllers/movieController.js"></script>
+  <script src="js/controllers/tvController.js"></script>
+  <script src="js/controllers/catalogController.js"></script>
   <script src="js/controllers/searchController.js"></script>
   <script src="js/controllers/favoriteController.js"></script>
   <script src="js/controllers/watchlistController.js"></script>
   <script src="js/controllers/movieMatchController.js"></script>
 
 </body>
+
 </html>

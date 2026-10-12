@@ -1,0 +1,10 @@
+# CinVerse robots.txt - Optimizing for Google, Bing, Yahoo Crawlers
+User-agent: *
+Allow: /
+Allow: /assets/
+Allow: /css/
+Allow: /js/
+Allow: /views/
+
+# Sitemap location for Googlebot
+Sitemap: https://cineverse.onrender.com/sitemap.xml

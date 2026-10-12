@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 70" width="260" height="70">
+  <defs>
+    <linearGradient id="marvelRed" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E62429"/>
+      <stop offset="100%" stop-color="#B31317"/>
+    </linearGradient>
+    <filter id="marvelGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#E62429" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+  <!-- Red Box -->
+  <rect x="10" y="8" width="240" height="42" rx="4" fill="url(#marvelRed)" filter="url(#marvelGlow)"/>
+  <!-- MARVEL Text -->
+  <text x="130" y="43" font-family="'Impact', 'Arial Black', sans-serif" font-size="44" font-weight="900" fill="#FFFFFF" text-anchor="middle" letter-spacing="1">MARVEL</text>
+  <!-- STUDIOS Subtext with divider lines -->
+  <line x1="20" y1="58" x2="65" y2="58" stroke="#FFFFFF" stroke-width="1.5" stroke-opacity="0.8"/>
+  <text x="130" y="63" font-family="'Outfit', 'Helvetica Neue', Arial, sans-serif" font-size="11" font-weight="800" fill="#FFFFFF" text-anchor="middle" letter-spacing="9">STUDIOS</text>
+  <line x1="195" y1="58" x2="240" y2="58" stroke="#FFFFFF" stroke-width="1.5" stroke-opacity="0.8"/>
+</svg>

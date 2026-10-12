@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none">
+  <defs>
+    <linearGradient id="iconPrismA" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C084FC"/>
+      <stop offset="100%" stop-color="#8B5CF6"/>
+    </linearGradient>
+    <linearGradient id="iconPrismB" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#6D28D9"/>
+    </linearGradient>
+    <linearGradient id="iconPrismC" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#8B5CF6"/>
+    </linearGradient>
+    <filter id="iconGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#8B5CF6" flood-opacity="0.55"/>
+    </filter>
+  </defs>
+
+  <rect x="4" y="4" width="56" height="56" rx="16" fill="#0C101D" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" filter="url(#iconGlow)"/>
+  
+  <path d="M 18 16 L 33 24 L 18 48 Z" fill="url(#iconPrismA)"/>
+  <path d="M 18 16 L 33 24 L 46 32 L 33 32 Z" fill="url(#iconPrismC)"/>
+  <path d="M 23 20 L 44 32 L 23 44 Z" fill="#FFFFFF"/>
+  <polygon points="25,23 39,32 25,41" fill="url(#iconPrismB)"/>
+  <polygon points="26,26 34,32 26,38" fill="#FFFFFF"/>
+</svg>

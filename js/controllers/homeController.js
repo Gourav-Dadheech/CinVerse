@@ -44,17 +44,245 @@
         vm.watchHistory = StorageService.clearHistory();
       };
 
+      vm.addToWatchlist = function (movie) {
+        if (!movie) return;
+        StorageService.toggleWatchlist(movie);
+      };
+
       // ---------------- STATE ----------------
       vm.heroMovies = [];
       vm.currentHeroIndex = 0;
       vm.currentHero = null;
 
       vm.trending = [];
+      vm.top10 = [];
       vm.popular = [];
       vm.topRated = [];
       vm.upcoming = [];
       vm.indianMovies = [];
       vm.genres = [];
+
+      // ---------------- STREAMING SERVICES (OTT PLATFORMS) ----------------
+      vm.streamingServices = [
+        {
+          id: 'netflix',
+          name: 'Netflix',
+          color: '#E50914',
+          glow: 'rgba(229, 9, 20, 0.4)',
+          bgGradient: 'linear-gradient(135deg, rgba(229,9,20,0.15) 0%, rgba(10,12,18,0.9) 100%)',
+          icon: 'fa-solid fa-play',
+          tag: 'Originals & Worldwide Hits',
+          providerId: '8',
+          badge: 'NETFLIX'
+        },
+        {
+          id: 'prime',
+          name: 'Prime Video',
+          color: '#00A8E1',
+          glow: 'rgba(0, 168, 225, 0.4)',
+          bgGradient: 'linear-gradient(135deg, rgba(0,168,225,0.15) 0%, rgba(10,12,18,0.9) 100%)',
+          icon: 'fa-brands fa-amazon',
+          tag: 'Blockbusters & Originals',
+          providerId: '119',
+          badge: 'PRIME'
+        },
+        {
+          id: 'disney_hotstar',
+          name: 'Disney+ Hotstar',
+          color: '#38bdf8',
+          glow: 'rgba(56, 189, 248, 0.4)',
+          bgGradient: 'linear-gradient(135deg, rgba(17,60,207,0.2) 0%, rgba(10,12,18,0.9) 100%)',
+          icon: 'fa-solid fa-star',
+          tag: 'Marvel, Disney & India',
+          providerId: '122',
+          badge: 'DISNEY+ HOTSTAR'
+        },
+        {
+          id: 'jiocinema',
+          name: 'JioCinema',
+          color: '#ec4899',
+          glow: 'rgba(236, 72, 153, 0.4)',
+          bgGradient: 'linear-gradient(135deg, rgba(225,29,72,0.2) 0%, rgba(10,12,18,0.9) 100%)',
+          icon: 'fa-solid fa-tv',
+          tag: 'Bollywood & Hindi Cinema',
+          providerId: '220',
+          badge: 'JIO CINEMA'
+        },
+        {
+          id: 'hbomax',
+          name: 'HBO Max',
+          color: '#a855f7',
+          glow: 'rgba(168, 85, 247, 0.4)',
+          bgGradient: 'linear-gradient(135deg, rgba(124,58,237,0.2) 0%, rgba(10,12,18,0.9) 100%)',
+          icon: 'fa-solid fa-crown',
+          tag: 'Iconic Masterpieces',
+          providerId: '384',
+          badge: 'MAX'
+        },
+        {
+          id: 'appletv',
+          name: 'Apple TV+',
+          color: '#e2e8f0',
+          glow: 'rgba(226, 232, 240, 0.3)',
+          bgGradient: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(10,12,18,0.9) 100%)',
+          icon: 'fa-brands fa-apple',
+          tag: 'Critically Acclaimed',
+          providerId: '350',
+          badge: 'APPLE TV+'
+        }
+      ];
+
+      vm.selectedOtt = vm.streamingServices[0];
+      vm.ottFilter = 'all'; // 'all', 'movie', 'tv'
+      vm.ottItems = [];
+      vm.allOttMovies = [];
+      vm.allOttSeries = [];
+      vm.isLoadingOtt = false;
+
+      vm.setOttFilter = function (filterType) {
+        vm.ottFilter = filterType;
+        if (filterType === 'movie') {
+          vm.ottItems = vm.allOttMovies;
+        } else if (filterType === 'tv') {
+          vm.ottItems = vm.allOttSeries;
+        } else {
+          // 'all': interleave movies and series for a rich FLIQ TV experience
+          var combined = [];
+          var maxLen = Math.max(vm.allOttMovies.length, vm.allOttSeries.length);
+          for (var i = 0; i < maxLen; i++) {
+            if (vm.allOttMovies[i]) combined.push(vm.allOttMovies[i]);
+            if (vm.allOttSeries[i]) combined.push(vm.allOttSeries[i]);
+          }
+          vm.ottItems = combined.slice(0, 16);
+        }
+      };
+
+      vm.selectStreamingService = function (service) {
+        if (!service) return;
+        vm.selectedOtt = service;
+        vm.isLoadingOtt = true;
+
+        var movieReq = MovieService.getByWatchProvider(service.providerId, 'IN')
+          .then(function (data) {
+            var res = (data.results || []).slice(0, 12);
+            res.forEach(function (m) { m.isTv = false; });
+            vm.allOttMovies = res;
+          })
+          .catch(function () {
+            vm.allOttMovies = (vm.popular || []).slice(0, 8);
+          });
+
+        var tvReq = MovieService.getByWatchProviderTv(service.providerId, 'IN')
+          .then(function (data) {
+            var res = (data.results || []).slice(0, 12);
+            res.forEach(function (s) { s.isTv = true; });
+            vm.allOttSeries = res;
+          })
+          .catch(function () {
+            vm.allOttSeries = [];
+          });
+
+        Promise.all([movieReq, tvReq]).finally(function () {
+          vm.setOttFilter(vm.ottFilter || 'all');
+          vm.isLoadingOtt = false;
+          $scope.$applyAsync();
+        });
+      };
+
+      vm.onOttCardClick = function (service) {
+        if (!service) return;
+        if (vm.selectedOtt && vm.selectedOtt.id === service.id) {
+          $location.path('/ott/' + service.id);
+          return;
+        }
+        vm.selectStreamingService(service);
+      };
+
+      vm.openOttCatalog = function (serviceId) {
+        $location.path('/ott/' + (serviceId || (vm.selectedOtt ? vm.selectedOtt.id : 'netflix')));
+      };
+
+
+      // ---------------- STUDIOS & FRANCHISES ----------------
+      vm.franchises = [
+        {
+          id: 'marvel',
+          name: 'MARVEL',
+          subtitle: 'Marvel Cinematic Universe',
+          tagline: 'Iron Man, Avengers, Spider-Man & Multiverse',
+          color: '#E50914',
+          glow: 'rgba(229, 9, 20, 0.45)',
+          bgGradient: 'radial-gradient(circle at top, rgba(229,9,20,0.3) 0%, rgba(12,14,20,0.95) 80%)',
+          icon: 'fa-solid fa-shield-halved',
+          logoText: 'MARVEL',
+          logoSub: 'STUDIOS'
+        },
+        {
+          id: 'dc',
+          name: 'DC STUDIOS',
+          subtitle: 'Worlds of DC',
+          tagline: 'The Batman, Dark Knight, Superman & Joker',
+          color: '#3b82f6',
+          glow: 'rgba(59, 130, 246, 0.45)',
+          bgGradient: 'radial-gradient(circle at top, rgba(30,64,175,0.35) 0%, rgba(12,14,20,0.95) 80%)',
+          icon: 'fa-solid fa-mask',
+          logoText: 'DC',
+          logoSub: 'STUDIOS'
+        },
+        {
+          id: 'starwars',
+          name: 'STAR WARS',
+          subtitle: 'A Galaxy Far, Far Away',
+          tagline: 'Skywalker Saga, Mandalorian & Jedi Legends',
+          color: '#facc15',
+          glow: 'rgba(250, 204, 21, 0.4)',
+          bgGradient: 'radial-gradient(circle at top, rgba(202,138,4,0.3) 0%, rgba(12,14,20,0.95) 80%)',
+          icon: 'fa-solid fa-jedi',
+          logoText: 'STAR WARS',
+          logoSub: 'LUCASFILM'
+        },
+        {
+          id: 'pixar',
+          name: 'DISNEY • PIXAR',
+          subtitle: 'Heartwarming Animation',
+          tagline: 'Toy Story, Inside Out, Coco & Classic Hits',
+          color: '#2dd4bf',
+          glow: 'rgba(45, 212, 191, 0.4)',
+          bgGradient: 'radial-gradient(circle at top, rgba(13,148,136,0.3) 0%, rgba(12,14,20,0.95) 80%)',
+          icon: 'fa-solid fa-wand-magic-sparkles',
+          logoText: 'DISNEY • PIXAR',
+          logoSub: 'ANIMATION'
+        }
+      ];
+
+      vm.selectedFranchise = null;
+      vm.franchiseMovies = [];
+      vm.isLoadingFranchise = false;
+
+      vm.selectFranchise = function (franchise) {
+        if (!franchise) return;
+        vm.selectedFranchise = franchise;
+        vm.isLoadingFranchise = true;
+        MovieService.getFranchiseMovies(franchise.id)
+          .then(function (data) {
+            vm.franchiseMovies = (data.results || []).slice(0, 12);
+          })
+          .catch(function () {
+            vm.franchiseMovies = [];
+          })
+          .finally(function () {
+            vm.isLoadingFranchise = false;
+          });
+      };
+
+      vm.onFranchiseCardClick = function (franchise) {
+        if (!franchise) return;
+        $location.path('/franchise/' + franchise.id);
+      };
+
+      vm.openFranchiseHub = function (franchiseId) {
+        $location.path('/franchise/' + (franchiseId || (vm.selectedFranchise ? vm.selectedFranchise.id : 'marvel')));
+      };
 
       vm.isLoadingHero = true;
       vm.isLoadingTrending = true;
@@ -206,6 +434,7 @@
       MovieService.getTrending()
         .then(function (data) {
           vm.trending = data.results || [];
+          vm.top10 = vm.trending.slice(0, 10);
           buildHeroCarousel();
         })
         .catch(function (err) {
@@ -214,6 +443,10 @@
         .finally(function () {
           vm.isLoadingTrending = false;
         });
+
+      // Pre-load initial OTT and Franchise rows
+      vm.selectStreamingService(vm.selectedOtt);
+      vm.selectFranchise(vm.selectedFranchise);
 
       // 2. Popular movies
       MovieService.getPopular()

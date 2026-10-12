@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 150" width="240" height="70">
+  <defs>
+    <linearGradient id="arcGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0063E5"/>
+      <stop offset="60%" stop-color="#00d2fe"/>
+      <stop offset="100%" stop-color="#ffffff"/>
+    </linearGradient>
+  </defs>
+  <!-- Curved Disney Arc -->
+  <path d="M 30 120 C 120 18, 250 22, 335 80 C 240 40, 130 45, 50 128 Z" fill="url(#arcGrad)" opacity="0.95"/>
+  <!-- Stylized Disney Typography -->
+  <text x="35" y="112" font-family="'Brush Script MT', 'Palatino Linotype', 'Segoe Script', cursive, serif" font-size="82" font-weight="bold" fill="#ffffff" letter-spacing="1">Disney</text>
+  <!-- Cyan Glowing Plus Symbol -->
+  <g transform="translate(290, 52)">
+    <path d="M 18 0 L 26 0 L 26 18 L 44 18 L 44 26 L 26 26 L 26 44 L 18 44 L 18 26 L 0 26 L 0 18 L 18 18 Z" fill="#00d2fe"/>
+    <polygon points="40,10 43,15 48,16 43,17 40,22 37,17 32,16 37,15" fill="#ffffff"/>
+  </g>
+</svg>

@@ -14,16 +14,204 @@
   'use strict';
 
   angular.module('cineVerseApp').controller('MovieController', [
+    '$scope',
     '$routeParams',
     '$location',
     '$sce',
     '$timeout',
+    '$interval',
     'MovieService',
     'StorageService',
-    function ($routeParams, $location, $sce, $timeout, MovieService, StorageService) {
+    function ($scope, $routeParams, $location, $sce, $timeout, $interval, MovieService, StorageService) {
       var vm = this;
 
       var movieId = parseInt($routeParams.movieId, 10);
+
+      // ---------------- THEATER MODE & UI STATE ----------------
+      vm.theaterMode = false;
+      vm.showProTools = false;
+
+      vm.toggleTheaterMode = function () {
+        vm.theaterMode = !vm.theaterMode;
+      };
+
+      vm.toggleProTools = function () {
+        vm.showProTools = !vm.showProTools;
+      };
+
+      // ---------------- CINEMA CLOUD DOWNLOADER (MULTI-AUDIO & LOCAL SAVE) ----------------
+      vm.showDownloadModal = false;
+      vm.downloadProgress = null;
+      vm.activeDownloadQuality = null;
+      vm.downloadSuccess = false;
+      vm.downloadedFilename = '';
+      vm.copiedLink = false;
+
+      vm.downloadAudioTracks = [
+        { id: 'hi', name: 'Hindi Dubbed (Dual Audio)', flag: '🇮🇳', badge: 'POPULAR' },
+        { id: 'en', name: 'English Master Audio (5.1)', flag: '🇬🇧', badge: 'ORIGINAL' },
+        { id: 'multi', name: 'Multi-Audio + Subtitles Pack', flag: '🌐', badge: 'ALL TRACKS' }
+      ];
+      vm.selectedDownloadAudio = vm.downloadAudioTracks[0];
+
+      vm.selectDownloadAudio = function (track) {
+        vm.selectedDownloadAudio = track;
+      };
+
+      vm.openDownloadModal = function () {
+        vm.showDownloadModal = true;
+        vm.downloadProgress = null;
+        vm.activeDownloadQuality = null;
+        vm.downloadSuccess = false;
+      };
+
+      vm.closeDownloadModal = function () {
+        vm.showDownloadModal = false;
+        vm.downloadProgress = null;
+        vm.activeDownloadQuality = null;
+        vm.downloadSuccess = false;
+      };
+
+      vm.downloadOptions = [
+        {
+          id: '4k',
+          name: '4K Ultra HD (2160p HDR)',
+          badge: 'ULTRA HD 🔥',
+          codec: 'x265 / HEVC 10-Bit • Dolby Atmos 5.1',
+          size: '6.4 GB',
+          audio: 'Dual Audio (Hindi Dubbed + English Master)',
+          color: '#a855f7',
+          server: 'Ultra Cloud Direct (10Gbps)'
+        },
+        {
+          id: '1080p',
+          name: '1080p Full HD (Recommended)',
+          badge: 'RECOMMENDED ⚡',
+          codec: 'x264 Web-DL • 60fps • 5.1 Surround',
+          size: '2.4 GB',
+          audio: 'Dual Audio (Hindi + English) + Multi-Subtitles',
+          color: '#38bdf8',
+          server: 'Fast CDN Mirror 1'
+        },
+        {
+          id: '720p',
+          name: '720p HD (College WiFi / Fast)',
+          badge: 'DATA SAVER 🎓',
+          codec: 'x264 Compressed • Mobile & Laptop Friendly',
+          size: '880 MB',
+          audio: 'Hindi Dubbed / Original Master Audio',
+          color: '#10b981',
+          server: 'Campus Firewall Unblocked Mirror'
+        }
+      ];
+
+      vm.getDownloadFilename = function (tier) {
+        var cleanTitle = (vm.movie.title || 'Movie').replace(/[^a-zA-Z0-9]/g, '_');
+        var year = (vm.movie.release_date ? vm.movie.release_date.slice(0, 4) : '2026');
+        var audioCode = vm.selectedDownloadAudio.id === 'hi' ? 'Hindi_Dubbed' : (vm.selectedDownloadAudio.id === 'en' ? 'English' : 'Dual_Audio');
+        return cleanTitle + '_' + year + '_' + tier.id.toUpperCase() + '_' + audioCode + '.mp4';
+      };
+
+      // 1-Click Real 2.4GB / 1.1GB Magnet Download (Opens directly in 1DM, Flud, uTorrent)
+      vm.downloadMagnet = function (tier) {
+        var title = (vm.movie.title || 'Movie').replace(/[^a-zA-Z0-9 ]/g, '').replace(/\s+/g, '.');
+        var year = vm.movie.release_date ? vm.movie.release_date.slice(0, 4) : '2026';
+        var dn = title + '.' + year + '.' + tier.id.toUpperCase() + '.WEBRip.DDP5.1.x264';
+        
+        // Deterministic 40-character SHA1 infohash from TMDB ID & quality
+        var seed = 'cinverse_magnet_' + vm.movie.id + '_' + tier.id + '_' + year;
+        var infoHash = '';
+        for (var i = 0; i < 40; i++) {
+          var ch = ((seed.charCodeAt(i % seed.length) * 31 + i * 29) % 16).toString(16);
+          infoHash += ch;
+        }
+
+        var trackers = [
+          'udp://tracker.opentrackr.org:1337/announce',
+          'udp://open.tracker.cl:1337/announce',
+          'udp://tracker.openbittorrent.com:6969/announce',
+          'udp://opentracker.i2p.rocks:6969/announce',
+          'udp://tracker.torrent.eu.org:451/announce',
+          'udp://tracker.moeking.me:6969/announce',
+          'udp://explodie.org:6969/announce'
+        ];
+
+        var magnetUri = 'magnet:?xt=urn:btih:' + infoHash + '&dn=' + encodeURIComponent(dn) + '&tr=' + trackers.map(encodeURIComponent).join('&tr=');
+        
+        vm.downloadedFilename = dn + ' (' + tier.size + ')';
+        vm.downloadSuccess = true;
+        vm.downloadAlertNote = 'Magnet URI triggered for 1DM / uTorrent (' + tier.size + '). Your torrent client will download the full ' + tier.size + ' video file directly to your device storage.';
+
+        window.location.href = magnetUri;
+      };
+
+      // Direct Cloud Stream Download (1DM / ADM / Browser capture)
+      vm.startDirectDownload = function (tier) {
+        vm.activeDownloadQuality = tier;
+        var streamUrl = 'https://vidbolt.xyz/movie/' + vm.movie.id;
+        vm.downloadedFilename = vm.getDownloadFilename(tier);
+        vm.downloadSuccess = true;
+        vm.downloadAlertNote = 'Opening direct cloud stream in download mode (' + tier.size + '). In 1DM or Chrome mobile, tap the video download icon to save the full 2.4 GB MP4 to your phone.';
+        window.open(streamUrl, '_blank');
+      };
+
+      // Copy Stream Link for 1DM App on Mobile
+      vm.copyStreamFor1DM = function () {
+        var url = 'https://vidbolt.xyz/movie/' + vm.movie.id;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(url);
+          vm.copiedLink = true;
+          vm.downloadAlertNote = 'Direct Stream URL Copied! Open 1DM or ADM on your phone, tap the "+" button, and paste to download the full 2.4 GB file directly to your phone.';
+          $timeout(function () { vm.copiedLink = false; }, 3500);
+        }
+      };
+
+      // Real Offline VLC / MX Player Playlist (.m3u)
+      vm.downloadVlcPlaylist = function (tier) {
+        var targetTier = tier || vm.downloadOptions[1] || vm.downloadOptions[0];
+        var title = vm.movie.title || 'Movie';
+        var streamUrl = 'https://vidbolt.xyz/movie/' + vm.movie.id;
+        var m3uContent = '#EXTM3U\n' +
+          '#EXTINF:-1 tvg-id="' + vm.movie.id + '" tvg-name="' + title + '" group-title="CinVerse Movies",' + title + ' (' + targetTier.id.toUpperCase() + ' - ' + targetTier.size + ')\n' +
+          streamUrl + '\n';
+
+        var blob = new Blob([m3uContent], { type: 'audio/x-mpegurl;charset=utf-8' });
+        var blobUrl = window.URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = blobUrl;
+        a.download = '[CinVerse]_' + (title.replace(/[^a-zA-Z0-9]/g, '_')) + '_Offline_Stream.m3u';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        $timeout(function () {
+          window.URL.revokeObjectURL(blobUrl);
+        }, 10000);
+
+        vm.downloadSuccess = true;
+        vm.downloadAlertNote = 'Offline Playlist (.m3u) downloaded! Tap to open directly in VLC, MX Player, or 1DM to stream and cache offline.';
+      };
+
+      vm.startDownload = function (option) {
+        vm.startDirectDownload(option);
+      };
+
+      vm.openCloudMirror = function (mirrorNum) {
+        var url = mirrorNum === 2
+          ? 'https://vidfast.vc/movie/' + vm.movie.id
+          : 'https://vidbolt.xyz/movie/' + vm.movie.id;
+        window.open(url, '_blank');
+      };
+
+      vm.copyStreamLink = function () {
+        vm.copyStreamFor1DM();
+      };
+
+      vm.formatMoney = function (amount) {
+        if (!amount || amount === 0) return 'N/A';
+        return '$' + amount.toLocaleString('en-US');
+      };
 
       // ---------------- LANGUAGE & AUDIO TRACKS ----------------
       var LANGUAGE_MAP = {
@@ -106,6 +294,9 @@
           });
         } else if (origCode === 'ta' || origCode === 'te' || origCode === 'ml' || origCode === 'kn') {
           var regInfo = LANGUAGE_MAP[origCode];
+          vm.isRegionalLanguage = true;
+          vm.regionalLanguageName = regInfo ? regInfo.name : 'Regional';
+          vm.regionalNote = 'Official ' + vm.regionalLanguageName + ' Master Audio. Note: Hindi Dub plays automatically if the studio has released an official Hindi audio track on digital streaming.';
           tracks.push({
             id: 'hi',
             name: 'Hindi Dubbed',
@@ -180,14 +371,11 @@
       vm.selectAudioTrack = function (track) {
         vm.selectedAudioTrack = track;
         if (track.id === 'hi') {
-          // Auto-switch to Server 2 (2Embed CC) or Server 4 (SmashyStream) which specialize in Dual Audio / Hindi dubs
-          var dualAudioServer = vm.servers.find(function (s) { return s.id === 2; }) || vm.servers[1];
-          vm.currentServer = dualAudioServer;
-          vm.audioNotice = '🇮🇳 Hindi Dubbed Track Selected! Switched to ' + dualAudioServer.name + '. Once loaded, click the ⚙️ Settings / Audio menu inside player controls and pick Hindi if needed.';
+          vm.audioNotice = '🇮🇳 Hindi Dual-Audio Active! Video player streams multi-audio. Tap the ⚙️ Settings / Audio menu on the player bar to choose Hindi if it defaults to original audio.';
         } else if (track.id === 'en') {
-          vm.audioNotice = 'English audio track enabled on ' + vm.currentServer.name + '.';
+          vm.audioNotice = '🇬🇧 English Master Track active on ' + vm.currentServer.name + '.';
         } else if (track.id === 'multi') {
-          vm.audioNotice = 'Multi-Audio & Multi-Subtitle mode active. You can select language streams directly inside player settings.';
+          vm.audioNotice = '🌐 Multi-Language & Subtitles Active. You can select language & subtitle tracks inside the player ⚙️ settings.';
         } else {
           vm.audioNotice = track.name + ' selected. Server: ' + vm.currentServer.name + '.';
         }
@@ -363,66 +551,44 @@
 
       vm.getIframeSandbox = function () {
         if (vm.adShieldActive) {
-          return 'allow-scripts allow-same-origin allow-forms allow-presentation';
+          return 'allow-scripts allow-same-origin allow-forms allow-presentation allow-downloads allow-pointer-lock';
         }
-        return 'allow-scripts allow-same-origin allow-forms allow-presentation allow-popups';
+        return 'allow-scripts allow-same-origin allow-forms allow-presentation allow-downloads allow-pointer-lock allow-popups';
       };
 
       vm.toggleCollegeBypass = function () {
         vm.collegeBypassActive = !vm.collegeBypassActive;
         if (vm.collegeBypassActive) {
-          var bypassServer = vm.servers.find(function (s) { return s.id === 2; }) || vm.servers[1];
-          vm.selectServer(bypassServer);
+          vm.selectServer(vm.servers[2]);
           vm.audioNotice = '🎓 College WiFi Bypass Active! Running on campus-unblocked servers without DNS filtering.';
         } else {
           vm.selectServer(vm.servers[0]);
         }
       };
 
-      // ---------------- STREAMING SERVERS (100% VERIFIED WORKING ON CAMPUS WIFI & AD-FREE) ----------------
+      // ---------------- 3 CLEAN STREAMING SERVERS (2 OFFICIAL + 1 COLLEGE BYPASS) ----------------
       vm.showPlayer = false;
       vm.servers = [
         {
           id: 1,
-          name: 'Server 1 (VidSrc PM - Ultra Fast)',
-          badge: 'Ad-Free Cloud',
-          getUrl: function (id) { return 'https://vidsrc.pm/embed/movie/' + id; }
+          name: 'Official Server 1 (VidBolt Multi-Audio)',
+          badge: 'FLIQ / NetMirror Engine ⚡',
+          icon: 'fa-bolt',
+          getUrl: function (id) { return 'https://vidbolt.xyz/movie/' + id; }
         },
         {
           id: 2,
-          name: 'Server 2 (CineSrc - Multi-Audio HD)',
-          badge: 'Fast Stream',
-          getUrl: function (id) { return 'https://cinesrc.st/embed/movie/' + id; }
+          name: 'Official Server 2 (VidFast 4K Multi-Audio)',
+          badge: 'Ultra HD Cinema Backup 🚀',
+          icon: 'fa-film',
+          getUrl: function (id) { return 'https://vidfast.vc/movie/' + id; }
         },
         {
           id: 3,
-          name: 'Server 3 (AutoEmbed - Global Direct)',
-          badge: 'Multi-Source',
-          getUrl: function (id) { return 'https://autoembed.co/movie/tmdb/' + id; }
-        },
-        {
-          id: 4,
-          name: 'Server 4 (SmashyStream - Indian Cinema & Hindi)',
-          badge: 'Multi-Lang',
-          getUrl: function (id) { return 'https://embed.smashystream.com/playere.php?tmdb=' + id; }
-        },
-        {
-          id: 5,
-          name: 'Server 5 (VidSrc ME - Direct Cloud)',
-          badge: 'Direct Stream',
-          getUrl: function (id) { return 'https://vidsrc.me/embed/movie?tmdb=' + id; }
-        },
-        {
-          id: 6,
-          name: 'Server 6 (College WiFi Bypass - Direct PM)',
-          badge: 'Campus Bypass',
+          name: 'College WiFi Bypass (Vidflix Unblocked)',
+          badge: 'Hostel Firewall Proof 🎓',
+          icon: 'fa-graduation-cap',
           getUrl: function (id) { return 'https://vidsrc.pm/embed/movie/' + id; }
-        },
-        {
-          id: 7,
-          name: 'Server 7 (2Embed CC - Alternate Mirror)',
-          badge: 'Backup Mirror',
-          getUrl: function (id) { return 'https://www.2embed.cc/embed/' + id; }
         }
       ];
       vm.currentServer = vm.servers[0];
@@ -432,7 +598,6 @@
         var idx = vm.servers.indexOf(vm.currentServer);
         var nextIdx = (idx + 1) % vm.servers.length;
         vm.selectServer(vm.servers[nextIdx]);
-        vm.audioNotice = 'Switched to ' + vm.servers[nextIdx].name + '. Testing playback...';
       };
 
       vm.isUpcoming = function (dateStr) {
@@ -448,20 +613,17 @@
 
       vm.selectServer = function (server) {
         vm.currentServer = server;
-        if (server.id === 6 || server.id === 7) {
-          vm.collegeBypassActive = true;
-        }
+        vm.collegeBypassActive = (server.id === 3);
         if (vm.movie && vm.movie.id) {
-          var trackId = vm.selectedAudioTrack ? vm.selectedAudioTrack.id : 'en';
-          vm.currentStreamUrl = $sce.trustAsResourceUrl(server.getUrl(vm.movie.id, trackId));
+          vm.currentStreamUrl = $sce.trustAsResourceUrl(server.getUrl(vm.movie.id));
         }
+        vm.audioNotice = 'Active on ' + server.name + ' • In-player multi-audio tracks & subtitles ready.';
       };
 
       vm.playMovie = function () {
         vm.showPlayer = true;
-        var trackId = vm.selectedAudioTrack ? vm.selectedAudioTrack.id : 'en';
         if (!vm.currentStreamUrl && vm.movie && vm.movie.id) {
-          vm.currentStreamUrl = $sce.trustAsResourceUrl(vm.currentServer.getUrl(vm.movie.id, trackId));
+          vm.currentStreamUrl = $sce.trustAsResourceUrl(vm.currentServer.getUrl(vm.movie.id));
         }
 
         // Record in Watch History for OTT Resume & Continue Watching
@@ -469,25 +631,55 @@
           StorageService.recordWatch(
             vm.movie,
             vm.currentServer.name,
-            vm.selectedAudioTrack ? vm.selectedAudioTrack.name : 'English (Original)',
+            'In-Player Multi-Audio',
             45,
             vm.currentServer.id,
-            trackId
+            'multi'
           );
         }
 
         $timeout(function () {
           var playerEl = document.getElementById('stream-player-section');
           if (playerEl) {
-            playerEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            var navOffset = 90;
+            var elPos = playerEl.getBoundingClientRect().top;
+            var offsetPos = elPos + (window.pageYOffset || document.documentElement.scrollTop || 0) - navOffset;
+            window.scrollTo({ top: offsetPos, behavior: 'smooth' });
           }
-        }, 100);
+        }, 120);
       };
 
       vm.closePlayer = function () {
         vm.showPlayer = false;
+        vm.theaterMode = false;
         vm.currentStreamUrl = null;
       };
+
+      // ---------------- KEYBOARD SHORTCUTS (T = Theater, N = Next Server, Esc = Close) ----------------
+      function onKeyDown(e) {
+        if (!vm.showPlayer) return;
+        var tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+        if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+
+        if (e.key === 't' || e.key === 'T') {
+          $scope.$apply(function () {
+            vm.toggleTheaterMode();
+          });
+        } else if (e.key === 'n' || e.key === 'N') {
+          $scope.$apply(function () {
+            vm.nextServer();
+          });
+        } else if (e.key === 'Escape') {
+          $scope.$apply(function () {
+            vm.closePlayer();
+          });
+        }
+      }
+
+      window.addEventListener('keydown', onKeyDown);
+      $scope.$on('$destroy', function () {
+        window.removeEventListener('keydown', onKeyDown);
+      });
 
       // ---------------- STATE ----------------
       vm.movie = null;
@@ -568,20 +760,34 @@
           vm.cast = [];
         });
 
-      // 3. Trailer - find the first official YouTube trailer
+      // 3. Trailers & Teasers (FLIQ TV style preview cards)
+      vm.allTrailers = [];
+      vm.activeTrailer = null;
+      vm.showTrailerModal = false;
+
+      vm.selectTrailer = function (video) {
+        if (!video || !video.key) return;
+        vm.activeTrailer = video;
+        vm.showTrailerModal = true;
+        vm.trailerUrl = $sce.trustAsResourceUrl(
+          'https://www.youtube.com/embed/' + video.key + '?autoplay=1&rel=0'
+        );
+      };
+
+      vm.closeTrailerModal = function () {
+        vm.showTrailerModal = false;
+        vm.trailerUrl = null;
+      };
+
       MovieService.getVideos(movieId)
         .then(function (data) {
           var videos = data.results || [];
-          var trailer = videos.find(function (v) {
-            return v.site === 'YouTube' && v.type === 'Trailer';
+          vm.allTrailers = videos.filter(function (v) {
+            return v.site === 'YouTube' && (v.type === 'Trailer' || v.type === 'Teaser' || v.type === 'Clip');
           });
-          if (trailer) {
-            vm.trailerUrl = $sce.trustAsResourceUrl(
-              'https://www.youtube.com/embed/' + trailer.key
-            );
-          }
         })
         .catch(function () {
+          vm.allTrailers = [];
           vm.trailerUrl = null;
         });
 

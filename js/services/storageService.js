@@ -183,10 +183,10 @@
       var DEFAULT_USER = {
         id: 'usr_member',
         name: 'VIP Member',
-        email: 'member@cineverse.tv',
+        email: 'member@cinverse.tv',
         avatar: '🎬',
         avatarColor: '#E50914',
-        membership: 'CineVerse Pro VIP',
+        membership: 'CinVerse Pro VIP',
         joinedDate: '2026'
       };
 
@@ -224,11 +224,11 @@
         name = name.charAt(0).toUpperCase() + name.slice(1);
         var newUser = {
           id: 'usr_' + Date.now(),
-          name: name || 'CineVerse Member',
+          name: name || 'CinVerse Member',
           email: email,
           avatar: '🍿',
           avatarColor: '#E50914',
-          membership: 'CineVerse Pro',
+          membership: 'CinVerse Pro',
           joinedDate: 'Today'
         };
         service.setCurrentUser(newUser);
@@ -253,7 +253,7 @@
           email: email,
           avatar: randomAvatar,
           avatarColor: '#E50914',
-          membership: 'CineVerse Pro VIP',
+          membership: 'CinVerse Pro VIP',
           joinedDate: 'Today'
         };
 

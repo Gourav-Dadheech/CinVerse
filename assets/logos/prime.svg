@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 100" width="240" height="70">
+  <text x="20" y="60" font-family="'Outfit', 'Segoe UI', sans-serif" font-size="54" font-weight="800" fill="#ffffff" letter-spacing="-1">prime</text>
+  <text x="165" y="60" font-family="'Outfit', 'Segoe UI', sans-serif" font-size="48" font-weight="400" fill="#ffffff" letter-spacing="-0.5">video</text>
+  <path d="M 30 76 C 80 96, 185 94, 238 72" fill="none" stroke="#00A8E1" stroke-width="6" stroke-linecap="round"/>
+  <path d="M 226 64 L 248 72 L 236 86 Z" fill="#00A8E1"/>
+</svg>

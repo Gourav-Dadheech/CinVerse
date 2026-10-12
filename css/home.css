@@ -4,16 +4,21 @@
    horizontal movie sliders, and the shared movie-card look.
    ============================================================ */
 
-/* ---------------- HERO BANNER ---------------- */
+/* ---------------- FULL-BLEED IMMERSIVE HERO BANNER (NO BLACK SCREEN) ---------------- */
+.home-page {
+  margin-top: -80px;
+  position: relative;
+}
+
 .hero-banner {
-  height: 75vh;
-  min-height: 480px;
+  height: 92vh;
+  min-height: 620px;
   width: 100%;
   background-size: cover;
   background-position: top center;
   display: flex;
   align-items: flex-end;
-  padding: 0 60px 60px;
+  padding: 160px 60px 80px;
   position: relative;
   transition: background-image 0.6s ease-in-out;
 }
@@ -51,27 +56,33 @@
   background: var(--color-primary);
   border-color: var(--color-primary);
   transform: translateY(-50%) scale(1.12);
-  box-shadow: 0 0 20px rgba(229, 9, 20, 0.6);
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.6);
 }
 
-/* Carousel Slide Indicator Dots */
+/* Carousel Slide Indicator Dots (FLIQ TV Glass Capsule) */
 .hero-dots {
   position: absolute;
-  bottom: 24px;
-  right: 60px;
+  bottom: 28px;
+  right: 50px;
   display: flex;
-  gap: 8px;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 6px 12px;
+  border-radius: 999px;
+  backdrop-filter: blur(12px);
   z-index: 10;
 }
 
 .hero-dot {
-  width: 26px;
-  height: 5px;
-  border-radius: 4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
   background: rgba(255, 255, 255, 0.35);
   border: none;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
   padding: 0;
 }
 
@@ -80,9 +91,10 @@
 }
 
 .hero-dot.active {
-  background: var(--color-primary);
-  width: 42px;
-  box-shadow: 0 0 10px rgba(229, 9, 20, 0.8);
+  background: #ffffff;
+  width: 22px;
+  border-radius: 999px;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.85);
 }
 
 .hero-lang-badge {
@@ -97,16 +109,16 @@
 }
 
 .hero-content {
-  max-width: 640px;
+  max-width: 680px;
 }
 
 .hero-tag {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(229, 9, 20, 0.15);
-  border: 1px solid rgba(229, 9, 20, 0.5);
-  color: #FCA5A5;
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.45);
+  color: #c084fc;
   padding: 6px 16px;
   border-radius: 50px;
   font-size: 0.75rem;
@@ -152,24 +164,52 @@
 
 .hero-actions {
   display: flex;
-  gap: 16px;
+  align-items: center;
+  gap: 14px;
   flex-wrap: wrap;
 }
 
 .btn-hero-watch {
-  background: var(--color-primary);
+  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
   color: #fff;
   font-weight: 700;
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  box-shadow: 0 4px 20px rgba(229, 9, 20, 0.45);
+  padding: 13px 30px;
+  border-radius: 999px;
+  font-size: 1rem;
+  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.45);
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .btn-hero-watch:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(229, 9, 20, 0.7);
+  box-shadow: 0 8px 28px rgba(139, 92, 246, 0.7);
+}
+
+.btn-hero-circle {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  backdrop-filter: blur(12px);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.btn-hero-circle:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(139, 92, 246, 0.5);
+  transform: scale(1.08);
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.35);
 }
 
 /* ---------------- GENRE SECTION ---------------- */
@@ -309,12 +349,12 @@
   height: 8px;
 }
 
-/* Centered Red Play Button on Card Hover */
+/* Centered Purple Play Button on Card Hover (FLIQ Cinema Style) */
 .card-play-btn {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: #E50914;
+  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
   color: #fff;
   font-size: 1.25rem;
   display: flex;
@@ -322,7 +362,7 @@
   justify-content: center;
   border: none;
   cursor: pointer;
-  box-shadow: 0 0 24px rgba(229, 9, 20, 0.75);
+  box-shadow: 0 0 24px rgba(139, 92, 246, 0.75);
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s, background 0.2s;
   margin: auto 0;
 }
@@ -333,8 +373,8 @@
 
 .card-play-btn:hover {
   transform: scale(1.18);
-  background: #ff1f2d;
-  box-shadow: 0 0 35px rgba(229, 9, 20, 1);
+  background: linear-gradient(135deg, #c084fc 0%, #8b5cf6 100%);
+  box-shadow: 0 0 35px rgba(139, 92, 246, 1);
 }
 
 .card-overlay-bottom {
@@ -425,17 +465,13 @@ padding:70px 0;
 }
 
 .match-card{
-
-text-align:center;
-
-background:linear-gradient(135deg,#ff3b30,#ff7b54);
-
-padding:60px;
-
-border-radius:20px;
-
-color:white;
-
+  text-align: center;
+  background: linear-gradient(135deg, #1b1633 0%, #120e26 50%, #0b0f1d 100%);
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  box-shadow: 0 15px 45px rgba(0,0,0,.7), 0 0 35px rgba(139, 92, 246, 0.25);
+  padding: 60px 40px;
+  border-radius: 24px;
+  color: white;
 }
 
 .match-card h2{
@@ -508,9 +544,9 @@ color:#999;
 }
 
 .continue-count {
-  background: rgba(229, 9, 20, 0.15);
-  color: #f87171;
-  border: 1px solid rgba(229, 9, 20, 0.3);
+  background: rgba(139, 92, 246, 0.15);
+  color: #c084fc;
+  border: 1px solid rgba(139, 92, 246, 0.4);
   font-size: 0.72rem;
   font-weight: 700;
   padding: 2px 8px;
@@ -605,13 +641,13 @@ color:#999;
   width: 46px;
   height: 46px;
   border-radius: 50%;
-  background: var(--color-primary);
+  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   color: #fff;
   font-size: 1.1rem;
-  box-shadow: 0 0 20px rgba(229, 9, 20, 0.7);
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.7);
   transform: scale(0.9);
   transition: transform 0.2s ease;
 }
@@ -631,8 +667,8 @@ color:#999;
 
 .continue-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #e50914 0%, #ff3b30 100%);
-  box-shadow: 0 0 8px rgba(229, 9, 20, 0.8);
+  background: linear-gradient(90deg, #8b5cf6 0%, #c084fc 100%);
+  box-shadow: 0 0 8px rgba(139, 92, 246, 0.8);
 }
 
 .continue-remove-btn {
@@ -655,9 +691,9 @@ color:#999;
 }
 
 .continue-remove-btn:hover {
-  background: #e50914;
+  background: #8b5cf6;
   color: #fff;
-  border-color: #ff3b30;
+  border-color: #a855f7;
 }
 
 .continue-info {
@@ -688,7 +724,7 @@ color:#999;
 .continue-pct {
   font-size: 0.76rem;
   font-weight: 700;
-  color: #f87171;
+  color: #c084fc;
 }
 
 .continue-details {
@@ -716,9 +752,9 @@ color:#999;
 .btn-resume-now {
   margin-top: auto;
   width: 100%;
-  background: rgba(229, 9, 20, 0.12);
-  color: #f87171;
-  border: 1px solid rgba(229, 9, 20, 0.3);
+  background: rgba(139, 92, 246, 0.14);
+  color: #c084fc;
+  border: 1px solid rgba(139, 92, 246, 0.4);
   border-radius: 7px;
   padding: 8px;
   font-size: 0.82rem;
@@ -735,5 +771,626 @@ color:#999;
   background: var(--color-primary);
   color: #fff;
   border-color: var(--color-primary);
-  box-shadow: 0 4px 14px rgba(229, 9, 20, 0.4);
+  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.5);
+}
+
+/* ================= HERO CIRCLE BUTTONS ================= */
+.btn-hero-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(8px);
+}
+
+.btn-hero-circle:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: #fff;
+  transform: scale(1.08);
+}
+
+/* ================= 1. STREAMING SERVICES (OTT PLATFORMS) ================= */
+.ott-services-section {
+  max-width: 1400px;
+  margin: 30px auto 45px;
+  padding: 0 40px;
+}
+
+.ott-header-title {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.ott-subtitle {
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+.ott-services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.ott-service-card {
+  position: relative;
+  background: #101522;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  height: 96px;
+  padding: 18px 24px;
+  cursor: pointer;
+  transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
+}
+
+.ott-service-card:hover {
+  transform: translateY(-4px);
+  background: #141b2b;
+}
+
+.ott-card-inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.ott-brand-img {
+  height: 38px;
+  width: 140px;
+  max-width: 85%;
+  object-fit: contain;
+  display: block;
+  transition: transform 0.25s ease;
+  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.5));
+}
+
+.ott-quick-hub-btn {
+  position: absolute;
+  top: -8px;
+  right: -12px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.ott-service-card:hover .ott-quick-hub-btn {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.ott-quick-hub-btn:hover {
+  background: #8b5cf6;
+  border-color: #8b5cf6;
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(139, 92, 246, 0.5);
+}
+
+.ott-service-card:hover .ott-brand-img {
+  transform: scale(1.06);
+}
+
+.franchise-brand-img {
+  height: 44px;
+  width: 160px;
+  max-width: 85%;
+  object-fit: contain;
+  display: block;
+  transition: transform 0.25s ease;
+  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.5));
+}
+
+.franchise-card:hover .franchise-brand-img {
+  transform: scale(1.06);
+}
+
+/* Individual Brand Highlights & Glows matching FLIQ TV */
+.ott-card-netflix:hover,
+.ott-card-netflix.active {
+  border-color: #E50914;
+  box-shadow: 0 8px 26px rgba(229, 9, 20, 0.4);
+}
+
+.ott-card-disney:hover,
+.ott-card-disney.active {
+  border-color: #38bdf8;
+  box-shadow: 0 8px 26px rgba(56, 189, 248, 0.4);
+}
+
+.ott-card-hbomax:hover,
+.ott-card-hbomax.active {
+  border-color: #a855f7;
+  box-shadow: 0 8px 26px rgba(168, 85, 247, 0.4);
+}
+
+.ott-card-prime:hover,
+.ott-card-prime.active {
+  border-color: #00A8E1;
+  box-shadow: 0 8px 26px rgba(0, 168, 225, 0.4);
+}
+
+.ott-card-appletv:hover,
+.ott-card-appletv.active {
+  border-color: #ffffff;
+  box-shadow: 0 8px 26px rgba(255, 255, 255, 0.3);
+}
+
+.ott-card-jiocinema:hover,
+.ott-card-jiocinema.active {
+  border-color: #ec4899;
+  box-shadow: 0 8px 26px rgba(236, 72, 153, 0.4);
+}
+
+.ott-shelf-container,
+.franchise-shelf-container {
+  background: rgba(13, 18, 29, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  padding: 24px;
+  margin-top: 10px;
+  backdrop-filter: blur(16px);
+  animation: fadeIn 0.3s ease;
+}
+
+.ott-shelf-header,
+.franchise-shelf-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.shelf-brand-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.shelf-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 10px currentColor;
+}
+
+.shelf-brand-info h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #f1f5f9;
+  margin: 0;
+}
+
+/* FLIQ TV Filter Pills for OTT Shelf */
+.ott-filter-pills {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ott-pill-btn {
+  background: rgba(255, 255, 255, 0.06);
+  color: #94a3b8;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  padding: 5px 14px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.ott-pill-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.ott-pill-btn.active {
+  background: #8b5cf6;
+  color: #fff;
+  border-color: #8b5cf6;
+  box-shadow: 0 2px 10px rgba(139, 92, 246, 0.4);
+}
+
+.shelf-right-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.btn-explore-ott {
+  background: rgba(139, 92, 246, 0.15);
+  color: #c084fc;
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.btn-explore-ott:hover {
+  background: #8b5cf6;
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+}
+
+/* ================= 2. TOP 10 MOVIES TODAY (FLIQ TV / NETFLIX STYLE) ================= */
+.top10-section {
+  max-width: 1400px;
+  margin: 30px auto 45px;
+  padding: 0 40px;
+}
+
+.top10-header-title {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.top10-subtitle {
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+.top10-track {
+  display: flex;
+  gap: 28px;
+  overflow-x: auto;
+  padding: 15px 10px 25px 30px;
+  scrollbar-width: thin;
+  scrollbar-color: #8b5cf6 transparent;
+}
+
+.top10-card {
+  position: relative;
+  flex: 0 0 200px;
+  display: flex;
+  align-items: flex-end;
+}
+
+/* FLIQ TV / Netflix Style Giant Rank Number */
+.top10-rank-number {
+  position: absolute;
+  left: -28px;
+  bottom: -15px;
+  font-family: var(--font-heading);
+  font-size: 6.8rem;
+  font-weight: 900;
+  line-height: 0.85;
+  color: #1e1b4b;
+  -webkit-text-stroke: 3px #818cf8;
+  text-shadow: 0 8px 24px rgba(129, 140, 248, 0.45);
+  z-index: 2;
+  user-select: none;
+  pointer-events: none;
+  letter-spacing: -6px;
+  transition: transform 0.3s ease, -webkit-text-stroke-color 0.3s ease;
+}
+
+.top10-card:hover .top10-rank-number {
+  transform: scale(1.08) translateY(-4px);
+  -webkit-text-stroke-color: #c084fc;
+}
+
+.top10-poster-wrap {
+  position: relative;
+  width: 170px;
+  height: 250px;
+  margin-left: auto;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #0f172a;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: block;
+  z-index: 3;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.top10-card:hover .top10-poster-wrap {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 16px 36px rgba(139, 92, 246, 0.35);
+  border-color: rgba(168, 85, 247, 0.5);
+}
+
+.top10-poster {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.top10-card:hover .top10-poster {
+  transform: scale(1.08);
+}
+
+.top10-rating-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(6px);
+  color: #fbbf24;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  z-index: 4;
+}
+
+.top10-hover-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.1) 0%, rgba(7, 9, 14, 0.95) 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 12px;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  z-index: 5;
+}
+
+.top10-card:hover .top10-hover-overlay {
+  opacity: 1;
+}
+
+.btn-top10-play {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #8b5cf6;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  margin-bottom: 8px;
+  box-shadow: 0 0 16px rgba(139, 92, 246, 0.8);
+}
+
+.top10-hover-title {
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ================= 3. STUDIOS & FRANCHISES ================= */
+.franchises-section {
+  max-width: 1400px;
+  margin: 30px auto 45px;
+  padding: 0 40px;
+}
+
+.franchises-header-title {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.franchises-subtitle {
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+.franchises-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.franchise-card {
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  height: 130px;
+  padding: 20px 18px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.franchise-card:hover {
+  transform: translateY(-5px);
+}
+
+.franchise-card-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.franchise-logo-box {
+  height: 48px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.franchise-svg {
+  transition: transform 0.25s ease;
+  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.5));
+}
+
+.franchise-card:hover .franchise-svg {
+  transform: scale(1.06);
+}
+
+.franchise-fliq-subtitle {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #94a3b8;
+  letter-spacing: 0.3px;
+  transition: color 0.2s ease;
+}
+
+.franchise-card:hover .franchise-fliq-subtitle {
+  color: #f1f5f9;
+}
+
+/* FLIQ TV Franchise Themes matching 4 core universes */
+.f-card-marvel {
+  background: radial-gradient(circle at center, rgba(160, 20, 20, 0.26) 0%, #10141f 95%);
+  border-color: rgba(229, 9, 20, 0.25);
+}
+.f-card-marvel:hover,
+.f-card-marvel.active {
+  border-color: #E50914;
+  box-shadow: 0 12px 32px rgba(229, 9, 20, 0.35);
+}
+
+.f-card-dc {
+  background: radial-gradient(circle at center, rgba(14, 56, 122, 0.32) 0%, #0d121c 95%);
+  border-color: rgba(0, 116, 228, 0.25);
+}
+.f-card-dc:hover,
+.f-card-dc.active {
+  border-color: #0074E4;
+  box-shadow: 0 12px 32px rgba(0, 116, 228, 0.35);
+}
+
+.f-card-starwars {
+  background: radial-gradient(circle at center, rgba(110, 85, 10, 0.28) 0%, #12151d 95%);
+  border-color: rgba(250, 204, 21, 0.22);
+}
+.f-card-starwars:hover,
+.f-card-starwars.active {
+  border-color: #facc15;
+  box-shadow: 0 12px 32px rgba(250, 204, 21, 0.3);
+}
+
+.f-card-pixar {
+  background: radial-gradient(circle at center, rgba(15, 80, 80, 0.28) 0%, #0f1620 95%);
+  border-color: rgba(45, 212, 191, 0.25);
+}
+.f-card-pixar:hover,
+.f-card-pixar.active {
+  border-color: #2dd4bf;
+  box-shadow: 0 12px 32px rgba(45, 212, 191, 0.3);
+}
+
+.franchise-quick-hub-btn {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  opacity: 0.75;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 5;
+  text-decoration: none;
+}
+
+.franchise-card:hover .franchise-quick-hub-btn {
+  opacity: 1;
+  background: #8B5CF6;
+  border-color: #A855F7;
+  transform: scale(1.12);
+  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.5);
+}
+
+.btn-explore-franchise {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  color: #f1f5f9;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-explore-franchise:hover {
+  background: #8B5CF6;
+  border-color: #8B5CF6;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.45);
+}
+
+.franchise-explore-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #8B5CF6;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  transition: transform 0.2s ease;
+}
+
+.franchise-card:hover .franchise-explore-badge {
+  transform: translateX(4px);
 }

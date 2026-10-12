@@ -114,48 +114,191 @@
 }
 
 /* ------------------------------------------------------------
-   4. SMALL TABLETS & LARGE PHONES (481px - 768px)
+   4. SMALL TABLETS & PHONES (FLIQ TV Mobile Experience)
    ------------------------------------------------------------ */
 @media (max-width: 768px) {
+  body {
+    padding-bottom: 84px !important;
+  }
+
   main {
-    padding-top: 74px;
+    padding-top: 60px;
+  }
+
+  /* FLIQ TV Mobile Top Navbar */
+  .navbar {
+    padding: 10px 0 !important;
+    background: linear-gradient(180deg, rgba(7, 9, 14, 0.95) 0%, rgba(7, 9, 14, 0.6) 65%, transparent 100%) !important;
   }
 
   .navbar-container {
-    padding: 0 16px;
+    padding: 0 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
   }
 
+  .navbar-brand {
+    max-width: 160px !important;
+  }
+
+  .navbar-brand-img {
+    height: 28px !important;
+  }
+
+  .navbar-search-wrapper,
+  .navbar-search,
+  .navbar-user-area {
+    display: none !important;
+  }
+
+  .hamburger-btn {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 38px !important;
+    height: 38px !important;
+    border: none !important;
+    background: transparent !important;
+    color: #FFFFFF !important;
+    font-size: 1.35rem !important;
+    cursor: pointer !important;
+  }
+
+  /* FLIQ TV Mobile Cinematic Hero Banner */
   .hero-banner {
-    padding: 0 20px 32px;
-    height: auto;
-    min-height: 420px;
+    height: 82vh !important;
+    min-height: 520px !important;
+    max-height: 720px !important;
+    padding: 0 20px 42px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-end !important;
+    background-position: center top !important;
+    position: relative !important;
+  }
+
+  .hero-arrow {
+    display: none !important;
+  }
+
+  .hero-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 0 12px 0 !important;
+    text-align: left !important;
+  }
+
+  .hero-tag {
+    font-size: 0.68rem !important;
+    padding: 4px 10px !important;
+    margin-bottom: 8px !important;
+    display: inline-flex !important;
   }
 
   .hero-title {
-    font-size: 2.2rem;
-    line-height: 1.15;
+    font-size: 2.1rem !important;
+    font-weight: 800 !important;
+    line-height: 1.15 !important;
+    margin-bottom: 8px !important;
+    text-shadow: 0 4px 20px rgba(0,0,0,0.9) !important;
+  }
+
+  .hero-meta {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    font-size: 0.85rem !important;
+    margin-bottom: 8px !important;
+    color: #E2E8F0 !important;
   }
 
   .hero-overview {
-    font-size: 0.88rem;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    font-size: 0.82rem !important;
+    line-height: 1.45 !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    color: #94A3B8 !important;
+    margin-bottom: 12px !important;
+    max-width: 95% !important;
   }
 
+  /* FLIQ TV Signature Horizontal Row of 3 Buttons: Play + Watchlist (+) + Details (i) */
   .hero-actions {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-    width: 100%;
-    max-width: 320px;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 12px !important;
+    width: auto !important;
+    max-width: 100% !important;
+    margin-top: 10px !important;
   }
 
-  .hero-actions .btn {
-    width: 100%;
-    justify-content: center;
-    padding: 12px 20px;
+  .hero-actions .btn-hero-watch {
+    width: auto !important;
+    flex: 0 0 auto !important;
+    padding: 12px 28px !important;
+    border-radius: 999px !important;
+    background: #8B5CF6 !important;
+    color: #FFFFFF !important;
+    font-size: 0.95rem !important;
+    font-weight: 700 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.5) !important;
+  }
+
+  .hero-actions .btn-hero-circle {
+    width: 48px !important;
+    height: 48px !important;
+    min-width: 48px !important;
+    min-height: 48px !important;
+    max-width: 48px !important;
+    max-height: 48px !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 50% !important;
+    flex: 0 0 48px !important;
+    padding: 0 !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+    border: 1px solid rgba(255, 255, 255, 0.22) !important;
+    color: #FFFFFF !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.1rem !important;
+    backdrop-filter: blur(10px) !important;
+  }
+
+  /* FLIQ TV Mobile Dots Indicator */
+  .hero-dots {
+    position: absolute !important;
+    bottom: 14px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    z-index: 5 !important;
+  }
+
+  .hero-dot {
+    width: 6px !important;
+    height: 6px !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.35) !important;
+    transition: all 0.25s ease !important;
+    cursor: pointer !important;
+  }
+
+  .hero-dot.active {
+    width: 22px !important;
+    border-radius: 999px !important;
+    background: #FFFFFF !important;
   }
 
   .movie-slider-section,
@@ -311,15 +454,258 @@
     gap: 14px;
   }
 
+  /* Streamlined Mobile Footer (Compact Collapsible Accordions) */
+  .site-footer {
+    margin-top: 28px !important;
+  }
+
+  .footer-ribbon {
+    display: none !important;
+  }
+
+  .footer-main {
+    padding: 18px 0 10px !important;
+  }
+
   .footer-container {
-    grid-template-columns: 1fr;
-    padding: 36px 20px;
-    gap: 28px;
-    text-align: center;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    padding: 0 16px !important;
+    max-width: 480px !important;
+    margin: 0 auto !important;
+  }
+
+  .footer-col-brand {
+    text-align: center !important;
+    padding: 0 0 10px !important;
+    margin-bottom: 4px !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+
+  .footer-brand-logo {
+    height: 26px !important;
+    margin: 0 auto 6px auto !important;
+  }
+
+  .footer-tagline {
+    display: none !important;
+  }
+
+  .footer-status-pill {
+    margin: 2px auto 8px !important;
+    padding: 3px 10px !important;
+    font-size: 0.68rem !important;
+    display: inline-flex !important;
+  }
+
+  .footer-social-wrap {
+    margin-top: 0 !important;
+    margin-bottom: 6px !important;
+  }
+
+  .social-label {
+    display: none !important;
   }
 
   .social-icons {
-    justify-content: center;
+    justify-content: center !important;
+    gap: 8px !important;
+  }
+
+  .social-icons a {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 0.82rem !important;
+    border-radius: 9px !important;
+  }
+
+  .footer-col:not(.footer-col-brand) {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    padding: 0 !important;
+  }
+
+  .footer-acc summary {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 10px 6px !important;
+    font-size: 0.82rem !important;
+    font-weight: 600 !important;
+    color: #cbd5e1 !important;
+    cursor: pointer !important;
+    list-style: none !important;
+    user-select: none !important;
+  }
+
+  .footer-acc summary::-webkit-details-marker {
+    display: none !important;
+  }
+
+  .footer-acc .acc-chevron {
+    display: inline-block !important;
+    font-size: 0.7rem !important;
+    color: #94a3b8 !important;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .footer-acc[open] summary .acc-chevron {
+    transform: rotate(180deg) !important;
+    color: #c084fc !important;
+  }
+
+  .footer-acc[open] summary {
+    color: #f1f5f9 !important;
+  }
+
+  .footer-acc .footer-nav-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 7px !important;
+    padding: 4px 10px 12px !important;
+  }
+
+  .footer-acc .footer-nav-list li a {
+    font-size: 0.78rem !important;
+    color: #94a3b8 !important;
+    padding: 2px 0 !important;
+    gap: 6px !important;
+  }
+
+  .footer-disclaimer-wrap {
+    display: none !important;
+  }
+
+  .footer-bottom {
+    padding: 12px 16px 85px !important;
+    background: #040508 !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .footer-bottom-container {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 8px !important;
+    text-align: center !important;
+    padding: 0 !important;
+  }
+
+  .bottom-left p {
+    font-size: 0.72rem !important;
+    line-height: 1.4 !important;
+  }
+
+  .tech-stack-badges {
+    display: none !important;
+  }
+
+  .footer-back-to-top {
+    padding: 6px 14px !important;
+    font-size: 0.72rem !important;
+    margin: 0 auto !important;
+  }
+
+  /* Studios & Franchises 2x2 Grid (Mobile & Tablet <= 768px matching Image 1) */
+  .franchises-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .franchise-card {
+    height: auto !important;
+    min-height: 104px !important;
+    padding: 14px 10px 12px !important;
+    border-radius: 18px !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-decoration: none !important;
+  }
+
+  .franchise-card-inner {
+    gap: 8px !important;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .franchise-logo-box {
+    height: 38px !important;
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .franchise-brand-img {
+    max-height: 34px !important;
+    max-width: 95px !important;
+    object-fit: contain !important;
+  }
+
+  .franchise-fliq-subtitle {
+    font-size: 0.72rem !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.2px !important;
+    color: #94a3b8 !important;
+    text-align: center !important;
+    line-height: 1.25 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
+  }
+
+  .franchise-quick-hub-btn {
+    display: none !important;
+  }
+
+  .f-card-marvel {
+    background: linear-gradient(135deg, #2b1114 0%, #17090b 100%) !important;
+    border: 1px solid rgba(239, 68, 68, 0.28) !important;
+  }
+  .f-card-marvel:active,
+  .f-card-marvel.active {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 18px rgba(239, 68, 68, 0.35) !important;
+  }
+
+  .f-card-dc {
+    background: linear-gradient(135deg, #0e1e30 0%, #070e17 100%) !important;
+    border: 1px solid rgba(56, 189, 248, 0.28) !important;
+  }
+  .f-card-dc:active,
+  .f-card-dc.active {
+    border-color: #38bdf8 !important;
+    box-shadow: 0 0 18px rgba(56, 189, 248, 0.35) !important;
+  }
+
+  .f-card-starwars {
+    background: linear-gradient(135deg, #24200c 0%, #121006 100%) !important;
+    border: 1px solid rgba(250, 204, 21, 0.25) !important;
+  }
+  .f-card-starwars:active,
+  .f-card-starwars.active {
+    border-color: #facc15 !important;
+    box-shadow: 0 0 18px rgba(250, 204, 21, 0.35) !important;
+  }
+
+  .f-card-pixar {
+    background: linear-gradient(135deg, #0d232c 0%, #061217 100%) !important;
+    border: 1px solid rgba(45, 212, 191, 0.25) !important;
+  }
+  .f-card-pixar:active,
+  .f-card-pixar.active {
+    border-color: #2dd4bf !important;
+    box-shadow: 0 0 18px rgba(45, 212, 191, 0.35) !important;
   }
 }
 
@@ -328,63 +714,54 @@
    ------------------------------------------------------------ */
 @media (max-width: 480px) {
   main {
-    padding-top: 66px;
+    padding-top: 60px;
   }
 
   .navbar {
-    height: 64px;
+    padding: 10px 0 !important;
   }
 
   .navbar-container {
-    padding: 0 14px;
-  }
-
-  .brand-cine, .brand-verse {
-    font-size: 1.4rem;
+    padding: 0 14px !important;
   }
 
   /* Mobile Navbar Drawer */
   .navbar-links {
-    width: 82%;
+    width: 85%;
     max-width: 320px;
     padding: 80px 24px 30px;
   }
 
   /* Hero Billboard */
   .hero-banner {
-    padding: 0 16px 28px;
-    min-height: 400px;
-  }
-
-  .hero-tag {
-    font-size: 0.62rem;
-    padding: 4px 10px;
+    height: 80vh !important;
+    min-height: 500px !important;
+    padding: 0 16px 38px !important;
   }
 
   .hero-title {
-    font-size: 1.8rem;
+    font-size: 1.85rem !important;
     line-height: 1.15;
   }
 
-  .hero-overview {
-    font-size: 0.82rem;
-    line-height: 1.45;
-    -webkit-line-clamp: 2;
-  }
-
-  .hero-meta {
-    gap: 8px;
-    font-size: 0.8rem;
-  }
-
   .hero-actions {
-    max-width: 100%;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 10px !important;
   }
 
-  .hero-actions .btn {
-    padding: 12px 16px;
-    font-size: 0.88rem;
-    min-height: 44px;
+  .hero-actions .btn-hero-watch {
+    padding: 11px 24px !important;
+    font-size: 0.9rem !important;
+  }
+
+  .hero-actions .btn-hero-circle {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    flex: 0 0 44px !important;
   }
 
   /* Sliders & Section Headers */
@@ -442,104 +819,85 @@
     font-size: 0.9rem;
   }
 
-  /* Video Stream Player on Mobile */
-  .player-wrapper {
-    border-radius: 8px;
+  /* Cinema Theater Player on Mobile */
+  .cinema-theater-section {
+    padding: 0 10px;
+    margin: 20px auto 40px;
   }
 
-  .player-title-box .section-title {
-    font-size: 1.25rem;
-    line-height: 1.25;
+  .cinema-theater-section.theater-mode-wide {
+    padding: 0 4px;
   }
 
-  .player-header-actions {
+  .cinema-theater-container {
+    padding: 14px 12px 14px;
+    border-radius: 14px;
+  }
+
+  .theater-top-bar {
     flex-direction: column;
-    gap: 8px;
-  }
-
-  .player-header-actions .tool-badge-btn,
-  .player-header-actions .btn-close-player {
-    width: 100%;
-    min-height: 42px;
-  }
-
-  .player-languages-bar {
-    padding: 12px;
+    align-items: flex-start;
     gap: 12px;
   }
 
-  .lang-meta-row {
-    flex-direction: column;
-    align-items: flex-start;
+  .theater-title-info {
+    width: 100%;
+  }
+
+  .theater-movie-title {
+    font-size: 1.15rem;
+  }
+
+  .theater-actions {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
     gap: 6px;
   }
 
-  .lang-badges-list {
-    flex-wrap: wrap;
-    gap: 6px;
+  .theater-action-btn {
+    flex: 1;
+    justify-content: center;
+    padding: 7px 8px;
+    font-size: 0.72rem;
   }
 
-  .audio-tracks-row {
+  .theater-servers-bar,
+  .theater-inplayer-bar {
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
+    gap: 10px;
   }
 
-  .audio-track-buttons {
+  .server-pill-list {
+    width: 100%;
     display: flex;
     flex-direction: column;
-    width: 100%;
     gap: 6px;
   }
 
-  .audio-track-btn {
-    width: 100%;
-    min-height: 44px;
-    font-size: 0.82rem;
-    padding: 10px 14px;
-  }
-
-  .hindi-dub-guide-banner {
-    padding: 12px;
-    margin-top: 10px;
-  }
-
-  .btn-hindi-ext {
+  .server-pill,
+  .btn-quick-next {
     width: 100%;
     justify-content: center;
-    min-height: 44px;
-    font-size: 0.78rem;
-    text-align: center;
-  }
-
-  .server-buttons {
-    grid-template-columns: 1fr;
-    gap: 6px;
-  }
-
-  .server-btn {
-    width: 100%;
-    min-height: 44px;
-    font-size: 0.82rem;
-  }
-
-  .stream-wrap {
-    border-radius: 6px;
-    min-height: 220px;
-  }
-
-  .player-playback-tools {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
-    padding: 10px 12px;
-  }
-
-  .btn-fallback-server {
-    width: 100%;
-    justify-content: center;
-    min-height: 44px;
+    min-height: 40px;
     font-size: 0.8rem;
+  }
+
+  .inplayer-tip {
+    font-size: 0.75rem;
+    line-height: 1.4;
+  }
+
+  .inplayer-languages {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .theater-footer-bar {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
   }
 
   /* Audio Booster on Mobile */
@@ -637,6 +995,116 @@
     font-size: 0.88rem !important;
   }
 
+  /* OTT Services, Top 10, Franchises on Mobile */
+  .ott-services-section,
+  .top10-section,
+  .franchises-section {
+    padding: 0 16px;
+    margin: 24px auto 32px;
+  }
+
+  .ott-services-grid {
+    display: flex !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scroll-snap-type: x mandatory !important;
+    gap: 12px !important;
+    padding: 6px 0 12px !important;
+    scrollbar-width: none !important;
+  }
+
+  .ott-services-grid::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .ott-service-card {
+    flex: 0 0 140px !important;
+    height: 72px !important;
+    scroll-snap-align: start !important;
+    border-radius: 14px !important;
+    padding: 10px 14px !important;
+  }
+
+  .ott-service-card .ott-brand-img {
+    max-height: 30px !important;
+    max-width: 90px !important;
+  }
+
+  /* Studios & Franchises: 2x2 Grid Matching User Reference Image Exactly */
+  .franchises-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .franchise-card {
+    height: auto !important;
+    min-height: 104px !important;
+    padding: 14px 10px 12px !important;
+    border-radius: 18px !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .franchise-card-inner {
+    gap: 8px !important;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .franchise-logo-box {
+    height: 40px !important;
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .franchise-brand-img {
+    max-height: 34px !important;
+    max-width: 95px !important;
+    object-fit: contain !important;
+  }
+
+  .franchise-fliq-subtitle {
+    font-size: 0.72rem !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.2px !important;
+    color: #94a3b8 !important;
+    text-align: center !important;
+    line-height: 1.25 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
+  }
+
+  /* Hide top-right hub button on mobile so card is uncluttered like Image 1 */
+  .franchise-quick-hub-btn {
+    display: none !important;
+  }
+
+  .top10-rank-number {
+    font-size: 5.2rem;
+    left: -20px;
+    bottom: -10px;
+  }
+
+  .top10-card {
+    flex: 0 0 160px;
+  }
+
+  .top10-poster-wrap {
+    width: 140px;
+    height: 205px;
+  }
+
   /* Back to Top */
   .back-to-top {
     bottom: 16px;
@@ -670,5 +1138,67 @@
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scroll-snap-type: x proximity;
+  }
+}
+
+/* ============================================================
+   FLIQ TV MOBILE BOTTOM FLOATING NAVIGATION DOCK
+   ============================================================ */
+.mobile-bottom-dock {
+  position: fixed !important;
+  bottom: 16px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: calc(100% - 32px) !important;
+  max-width: 380px !important;
+  height: 60px !important;
+  background: rgba(14, 18, 28, 0.92) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 999px !important;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.85), 0 0 25px rgba(139, 92, 246, 0.22) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-around !important;
+  padding: 0 8px !important;
+  z-index: 1500 !important;
+}
+
+.dock-item {
+  flex: 1 !important;
+  height: 44px !important;
+  max-width: 54px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 50% !important;
+  color: #94A3B8 !important;
+  text-decoration: none !important;
+  font-size: 1.15rem !important;
+  background: transparent !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.dock-item:hover,
+.dock-item:focus {
+  color: #FFFFFF !important;
+}
+
+.dock-item.active {
+  color: #C084FC !important;
+  background: rgba(139, 92, 246, 0.22) !important;
+  box-shadow: 0 0 16px rgba(139, 92, 246, 0.4) !important;
+}
+
+.dock-avatar-text {
+  font-size: 1.25rem !important;
+}
+
+@media (min-width: 769px) {
+  .mobile-bottom-dock {
+    display: none !important;
   }
 }

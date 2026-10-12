@@ -2,24 +2,29 @@
      PARTIAL: movie-card.html
      Reused by the <movie-card> directive everywhere in the app.
      ============================================================ -->
-<a href="#!/movie/{{ movie.id }}" class="movie-card scroll-reveal">
+<a ng-href="{{ cardUrl }}" class="movie-card scroll-reveal">
 
   <div class="movie-card-poster-wrap">
-    <img class="movie-card-poster" ng-src="{{ posterUrl }}" alt="{{ movie.title }} poster" loading="lazy" />
+    <img class="movie-card-poster" ng-src="{{ posterUrl }}" alt="{{ itemTitle }} poster" loading="lazy" />
 
     <!-- Rating badge -->
     <div class="movie-card-rating">
       <i class="fa-solid fa-star"></i> {{ ratingDisplay }}
     </div>
 
+    <!-- Series pill badge -->
+    <div class="movie-card-type-tag" ng-if="isTv">
+      <i class="fa-solid fa-tv"></i> SERIES
+    </div>
+
     <!-- Hover overlay with quick actions -->
     <div class="movie-card-overlay">
       <div class="card-overlay-spacer"></div>
 
-      <!-- Prominent Red Play Button -->
+      <!-- Prominent Play Button -->
       <button class="card-play-btn"
               ng-click="playMovie($event)"
-              title="Watch {{ movie.title }} Now">
+              title="Watch {{ itemTitle }} Now">
         <i class="fa-solid fa-play"></i>
       </button>
 
@@ -48,7 +53,7 @@
   </div>
 
   <div class="movie-card-info">
-    <h4 class="movie-card-title">{{ movie.title }}</h4>
+    <h4 class="movie-card-title">{{ itemTitle }}</h4>
     <span class="movie-card-year">{{ releaseYear }}</span>
   </div>
 

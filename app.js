@@ -76,13 +76,77 @@
     '$location',
     '$window',
     '$rootScope',
+    '$timeout',
     'StorageService',
-    function ($location, $window, $rootScope, StorageService) {
+    'MovieService',
+    function ($location, $window, $rootScope, $timeout, StorageService, MovieService) {
       var vm = this;
 
       vm.menuOpen = false;
       vm.isScrolled = false;
       vm.quickQuery = '';
+      vm.suggestions = [];
+      vm.showSuggestions = false;
+      vm.isLoadingSuggestions = false;
+
+      var searchTimer = null;
+
+      vm.getPosterUrl = function (path) {
+        return MovieService.getPosterUrl(path, 'w92');
+      };
+
+      vm.onSearchInput = function () {
+        var q = (vm.quickQuery || '').trim();
+        if (searchTimer) {
+          $timeout.cancel(searchTimer);
+        }
+        if (q.length < 2) {
+          vm.suggestions = [];
+          vm.showSuggestions = false;
+          vm.isLoadingSuggestions = false;
+          return;
+        }
+
+        vm.isLoadingSuggestions = true;
+        vm.showSuggestions = true;
+
+        searchTimer = $timeout(function () {
+          MovieService.searchMulti(q, 1)
+            .then(function (data) {
+              if ((vm.quickQuery || '').trim() === q) {
+                var results = (data.results || []).filter(function (it) {
+                  return it.media_type === 'movie' || it.media_type === 'tv';
+                });
+                results.forEach(function (it) {
+                  it.isTv = (it.media_type === 'tv') || (!it.title && !!it.name);
+                  it.displayTitle = it.title || it.name || 'Untitled';
+                  it.displayDate = it.release_date || it.first_air_date || '';
+                  it.targetUrl = it.isTv ? ('#!/tv/' + it.id) : ('#!/movie/' + it.id);
+                });
+                vm.suggestions = results.slice(0, 7);
+              }
+            })
+            .catch(function () {
+              vm.suggestions = [];
+            })
+            .finally(function () {
+              vm.isLoadingSuggestions = false;
+            });
+        }, 220);
+      };
+
+      vm.clearQuickSearch = function () {
+        vm.quickQuery = '';
+        vm.suggestions = [];
+        vm.showSuggestions = false;
+      };
+
+      vm.closeSuggestions = function () {
+        $timeout(function () {
+          vm.showSuggestions = false;
+        }, 250);
+      };
+
       vm.userDropdownOpen = false;
       vm.showAuthModal = false;
       vm.authTab = 'login';
@@ -177,9 +241,24 @@
         $location.path('/search').search({ q: query });
       };
 
-      // Shrink navbar background once user scrolls down
+      vm.isActive = function (path) {
+        var current = $location.path();
+        if (path === '/home' && (current === '' || current === '/' || current === '/home')) {
+          return true;
+        }
+        if (path && path !== '/home' && current.indexOf(path) === 0) {
+          return true;
+        }
+        return current === path;
+      };
+
+      // Smooth scroll state update for navbar glass capsule transformation
       angular.element($window).on('scroll', function () {
-        vm.isScrolled = $window.pageYOffset > 40;
+        var shouldScrolled = ($window.pageYOffset || document.documentElement.scrollTop || 0) > 40;
+        if (shouldScrolled !== vm.isScrolled) {
+          vm.isScrolled = shouldScrolled;
+          $rootScope.$applyAsync();
+        }
       });
     }
   ]);
@@ -209,5 +288,35 @@
       };
     }
   ]);
+
+  /* ------------------------------------------------------------
+     6. FOOTER ACCORDION SYNC (DESKTOP OPEN / MOBILE COMPACT)
+     ------------------------------------------------------------ */
+  function syncFooterAccordions() {
+    var isDesktop = window.innerWidth >= 769;
+    var accs = document.querySelectorAll('.footer-acc');
+    for (var i = 0; i < accs.length; i++) {
+      var acc = accs[i];
+      if (isDesktop) {
+        acc.setAttribute('open', '');
+      } else if (!acc.dataset.userToggled) {
+        acc.removeAttribute('open');
+      }
+    }
+  }
+
+  window.addEventListener('resize', syncFooterAccordions);
+  document.addEventListener('DOMContentLoaded', syncFooterAccordions);
+
+  // Mark accordion as manually opened/closed when user taps summary on mobile
+  document.addEventListener('click', function (e) {
+    var summary = e.target.closest('.footer-acc summary');
+    if (summary && window.innerWidth < 769) {
+      var parentAcc = summary.closest('.footer-acc');
+      if (parentAcc) {
+        parentAcc.dataset.userToggled = 'true';
+      }
+    }
+  });
 
 })();

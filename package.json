@@ -1,7 +1,7 @@
 {
-  "name": "cineverse-movie-recommendation",
+  "name": "cinverse-movie-recommendation",
   "version": "1.0.0",
-  "description": "CineVerse - A Netflix + IMDb inspired movie recommendation website built with AngularJS 1.8.x, ES6 JavaScript, HTML5 and CSS3, powered by the TMDB API.",
+  "description": "CinVerse - A Netflix + IMDb inspired movie recommendation website built with AngularJS 1.8.x, ES6 JavaScript, HTML5 and CSS3, powered by the TMDB API.",
   "private": true,
   "license": "MIT",
   "scripts": {

@@ -4,13 +4,14 @@
 
         <!-- Progress (Only shown during the 6 questions) -->
         <div class="progress-wrapper" ng-if="vm.step <= 6 && !vm.loading">
+            <div class="match-wizard-header">
+                <span class="match-ai-tag"><i class="fa-solid fa-wand-magic-sparkles"></i> AI MOVIE MATCH</span>
+                <span class="progress-step-pill">Question {{vm.step}} of 6</span>
+            </div>
             <div class="progress-bar">
                 <div class="progress-fill"
                      ng-style="{'width': vm.getProgress() + '%'}">
                 </div>
-            </div>
-            <div class="progress-text">
-                Question {{vm.step}} of 6
             </div>
         </div>
 
@@ -119,17 +120,19 @@
         <!-- ========================= -->
         <!-- STEP 7 : LOADING ANIMATION -->
         <!-- ========================= -->
-        <div class="question-page fade-in" ng-if="vm.loading">
-            <h1>🤖 CineVerse AI</h1>
-            <h2>Finding your perfect movies...</h2>
+        <div class="question-page fade-in loading-card-wrap" ng-if="vm.loading">
+            <div class="ai-loading-orb">
+                <i class="fa-solid fa-brain"></i>
+            </div>
+            <h1>CinVerse AI</h1>
+            <p>Finding your perfect movie matches in real-time...</p>
             <div class="loading-bar">
                 <div class="loading-fill"></div>
             </div>
             <ul class="loading-list">
-                <li>✔ Analyzing Mood & Emotion</li>
-                <li>✔ Matching Genre & Era</li>
-                <li>✔ Filtering High-Rated Titles</li>
-                <li>✔ Searching TMDB Catalog</li>
+                <li><i class="fa-solid fa-circle-check"></i> Analyzing Mood &amp; Emotional Palette</li>
+                <li><i class="fa-solid fa-circle-check"></i> Filtering Chosen Cinematic Era &amp; Region</li>
+                <li><i class="fa-solid fa-circle-check"></i> Curating High-Rating TMDB Recommendations</li>
             </ul>
         </div>
 
@@ -141,16 +144,18 @@
             <h1>🎬 Recommended Movies</h1>
 
             <div class="preference-card">
-                <h2>Your Preferences</h2>
-                <p>😊 {{vm.answers.mood}}</p>
-                <p>🎭 {{vm.answers.genre}}</p>
-                <p>🌍 {{vm.answers.industry}}</p>
-                <p>🗣 {{vm.answers.language}}</p>
-                <p>📅 {{vm.answers.timeline.name}}</p>
-                <p>⭐ {{vm.answers.rating}}</p>
+                <h2><i class="fa-solid fa-sliders"></i> Your Selected AI Criteria</h2>
+                <div class="preference-chips">
+                    <span class="pref-chip">😊 {{vm.answers.mood}}</span>
+                    <span class="pref-chip">🎭 {{vm.answers.genre}}</span>
+                    <span class="pref-chip">🌍 {{vm.answers.industry}}</span>
+                    <span class="pref-chip">🗣 {{vm.answers.language}}</span>
+                    <span class="pref-chip">📅 {{vm.answers.timeline.name}}</span>
+                    <span class="pref-chip">⭐ {{vm.answers.rating}}</span>
+                </div>
             </div>
 
-            <p>Based on your preferences</p>
+            <p>Personalized Recommendations Curated Just For You</p>
 
             <!-- Results Grid -->
             <div class="movie-grid" ng-if="vm.results.length > 0">

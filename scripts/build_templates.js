@@ -7,7 +7,8 @@ const templates = {
   'views/movie.html': fs.readFileSync('views/movie.html', 'utf8'),
   'views/favorites.html': fs.readFileSync('views/favorites.html', 'utf8'),
   'views/watchlist.html': fs.readFileSync('views/watchlist.html', 'utf8'),
-  'views/notfound.html': fs.readFileSync('views/notfound.html', 'utf8'),
+  'views/catalog.html': fs.readFileSync('views/catalog.html', 'utf8'),
+  'views/tv.html': fs.readFileSync('views/tv.html', 'utf8'),
   'views/partials/movie-card.html': fs.readFileSync('views/partials/movie-card.html', 'utf8')
 };
 

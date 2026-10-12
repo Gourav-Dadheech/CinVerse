@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 70" width="240" height="70">
+  <defs>
+    <linearGradient id="dcBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284C7"/>
+      <stop offset="100%" stop-color="#0050B3"/>
+    </linearGradient>
+    <filter id="dcGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#0284C7" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+  <!-- DC Circle Emblem -->
+  <circle cx="50" cy="35" r="26" fill="url(#dcBlue)" filter="url(#dcGlow)"/>
+  <circle cx="50" cy="35" r="22" fill="#090D16"/>
+  <text x="50" y="44" font-family="'Outfit', 'Arial Black', sans-serif" font-size="24" font-weight="900" fill="#38BDF8" text-anchor="middle" letter-spacing="-1">DC</text>
+  <!-- DC STUDIOS Wordmark -->
+  <text x="90" y="34" font-family="'Outfit', 'Arial Black', sans-serif" font-size="22" font-weight="900" fill="#FFFFFF" letter-spacing="1">DC</text>
+  <text x="90" y="52" font-family="'Outfit', sans-serif" font-size="12" font-weight="800" fill="#38BDF8" letter-spacing="6">STUDIOS</text>
+</svg>

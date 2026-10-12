@@ -36,6 +36,48 @@
           controllerAs: 'movieCtrl'
         })
 
+        // ---------------- TV SHOW / WEB SERIES DETAILS ----------------
+        .when('/tv/:tvId', {
+          templateUrl: 'views/tv.html',
+          controller: 'TvController',
+          controllerAs: 'tvCtrl'
+        })
+
+        // ---------------- TV SHOWS / WEB SERIES CATALOG ----------------
+        .when('/shows', {
+          templateUrl: 'views/catalog.html',
+          controller: 'CatalogController',
+          controllerAs: 'catalogCtrl'
+        })
+
+        // ---------------- ANIME UNIVERSE ----------------
+        .when('/anime', {
+          templateUrl: 'views/catalog.html',
+          controller: 'CatalogController',
+          controllerAs: 'catalogCtrl'
+        })
+
+        // ---------------- K-DRAMA HUB ----------------
+        .when('/kdrama', {
+          templateUrl: 'views/catalog.html',
+          controller: 'CatalogController',
+          controllerAs: 'catalogCtrl'
+        })
+
+        // ---------------- OTT PLATFORMS HUB (Netflix, Prime, Disney+, etc.) ----------------
+        .when('/ott/:ottId', {
+          templateUrl: 'views/catalog.html',
+          controller: 'CatalogController',
+          controllerAs: 'catalogCtrl'
+        })
+
+        // ---------------- STUDIOS & FRANCHISES HUB (Marvel, DC, Star Wars, Pixar) ----------------
+        .when('/franchise/:franchiseId', {
+          templateUrl: 'views/catalog.html',
+          controller: 'CatalogController',
+          controllerAs: 'catalogCtrl'
+        })
+
         // ---------------- FAVORITES ----------------
         .when('/favorites', {
           templateUrl: 'views/favorites.html',
@@ -55,10 +97,10 @@
           templateUrl: 'views/notfound.html'
         })
         .when("/movie-match", {
-    templateUrl: "views/movie-match.html",
-    controller: "MovieMatchController",
-    controllerAs: "vm"
-})
+          templateUrl: "views/movie-match.html",
+          controller: "MovieMatchController",
+          controllerAs: "vm"
+        })
 
         // ---------------- DEFAULT / FALLBACK ----------------
         .otherwise({

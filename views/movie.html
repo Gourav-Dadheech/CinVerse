@@ -61,6 +61,9 @@
             <button class="btn btn-primary btn-play-movie" ng-click="movieCtrl.playMovie()">
               <i class="fa-solid fa-play"></i> Watch Movie
             </button>
+            <button class="btn btn-download-movie" ng-click="movieCtrl.openDownloadModal()" title="Download in 4K, 1080p, or 720p">
+              <i class="fa-solid fa-cloud-arrow-down"></i> Download
+            </button>
             <button class="btn btn-favorite" ng-class="{ 'active': movieCtrl.isFavorite }" ng-click="movieCtrl.toggleFavorite()">
               <i class="fa-solid fa-heart"></i>
               {{ movieCtrl.isFavorite ? 'Remove Favorite' : 'Add to Favorites' }}
@@ -74,25 +77,45 @@
       </div>
     </section>
 
-    <!-- ================= STREAMING PLAYER (Netmirror Mode) ================= -->
-    <section class="movie-section scroll-reveal" id="stream-player-section" ng-if="movieCtrl.showPlayer">
-      <div class="stream-player-container">
-        <div class="player-header">
-          <div class="player-title-box">
-            <h2 class="section-title"><i class="fa-solid fa-circle-play"></i> Watch {{ movieCtrl.movie.title }} Online</h2>
-            <span class="player-sub-badge"><i class="fa-solid fa-bolt"></i> CineVerse Direct Stream</span>
+    <!-- ================= CINEMA THEATER MODE STREAMING PLAYER ================= -->
+    <section class="cinema-theater-section scroll-reveal" id="stream-player-section" ng-if="movieCtrl.showPlayer" ng-class="{ 'theater-mode-wide': movieCtrl.theaterMode }">
+      <div class="cinema-theater-container">
+
+        <!-- Ambient Backlight Glow -->
+        <div class="ambient-glow"
+             ng-style="{ 'background-image': 'url(' + movieCtrl.getBackdropUrl(movieCtrl.movie.backdrop_path) + ')' }">
+        </div>
+
+        <!-- Cinema Top Control Deck -->
+        <div class="theater-top-bar">
+          <div class="theater-title-info">
+            <span class="live-pill"><i class="fa-solid fa-circle"></i> 1080p HD</span>
+            <h2 class="theater-movie-title">{{ movieCtrl.movie.title }}</h2>
+            <span class="theater-server-tag"><i class="fa-solid" ng-class="movieCtrl.currentServer.icon || 'fa-bolt'"></i> {{ movieCtrl.currentServer.name }}</span>
           </div>
-          <div class="player-header-actions">
-            <!-- Ad-Free Shield Toggle -->
-            <button class="tool-badge-btn" ng-class="{ 'active': movieCtrl.adShieldActive }" ng-click="movieCtrl.toggleAdShield()" title="Blocks popup ads and unwanted redirect tabs">
-              <i class="fa-solid fa-shield-halved"></i> Ad-Free Shield: {{ movieCtrl.adShieldActive ? 'ON' : 'OFF' }}
+
+          <div class="theater-actions">
+            <!-- Theater Mode Expand -->
+            <button class="theater-action-btn" ng-class="{ 'active': movieCtrl.theaterMode }" ng-click="movieCtrl.toggleTheaterMode()" title="Toggle Cinema Theater Width (Hotkey: T)">
+              <i class="fa-solid" ng-class="movieCtrl.theaterMode ? 'fa-compress' : 'fa-expand'"></i>
+              <span>{{ movieCtrl.theaterMode ? 'Exit Theater' : 'Theater Mode' }}</span>
             </button>
-            <!-- College WiFi Bypass Toggle -->
-            <button class="tool-badge-btn college-btn" ng-class="{ 'active': movieCtrl.collegeBypassActive }" ng-click="movieCtrl.toggleCollegeBypass()" title="Bypass college / campus Wi-Fi firewall blocks without VPN">
-              <i class="fa-solid fa-graduation-cap"></i> College WiFi Bypass: {{ movieCtrl.collegeBypassActive ? 'ACTIVE' : 'OFF' }}
+
+            <!-- Ad-Shield Toggle -->
+            <button class="theater-action-btn" ng-class="{ 'active': movieCtrl.adShieldActive }" ng-click="movieCtrl.toggleAdShield()" title="Ad-Shield neutralizes popup windows">
+              <i class="fa-solid fa-shield-halved"></i>
+              <span>Ad Shield: {{ movieCtrl.adShieldActive ? 'ON' : 'OFF' }}</span>
             </button>
-            <button class="btn-close-player" ng-click="movieCtrl.closePlayer()" title="Close Player">
-              <i class="fa-solid fa-xmark"></i> Close Player
+
+            <!-- Pro Tools Toggle -->
+            <button class="theater-action-btn pro-tools-btn" ng-class="{ 'active': movieCtrl.showProTools }" ng-click="movieCtrl.toggleProTools()" title="CineBoost 200% Audio & College Network Tools">
+              <i class="fa-solid fa-sliders"></i>
+              <span>Audio & Tools</span>
+            </button>
+
+            <!-- Close Player -->
+            <button class="theater-close-btn" ng-click="movieCtrl.closePlayer()" title="Close Cinema Player (Hotkey: Esc)">
+              <i class="fa-solid fa-xmark"></i>
             </button>
           </div>
         </div>
@@ -101,78 +124,52 @@
         <div class="unreleased-warning" ng-if="movieCtrl.isUpcoming(movieCtrl.movie.release_date)">
           <i class="fa-solid fa-triangle-exclamation"></i>
           <div>
-            <strong>Upcoming / Unreleased Title ({{ movieCtrl.movie.release_date }}):</strong>
-            This movie is listed with a future release date in TMDB. Third-party streaming mirrors typically only host video once a movie has premiered in theaters or on digital VOD. For instant playback, explore released movies!
+            <strong>Upcoming Title ({{ movieCtrl.movie.release_date }}):</strong>
+            This movie has a future theatrical release date in TMDB. Digital streaming mirrors host content once it releases on VOD/theaters.
           </div>
         </div>
 
-        <!-- ================= IN-BUILT PLAYER CONTROLS (AUDIO / CAPTIONS / SERVERS) ================= -->
-        <div class="player-languages-bar">
-          <!-- Spoken Languages from TMDB -->
-          <div class="lang-meta-row" ng-if="movieCtrl.availableLanguages.length">
-            <span class="lang-label"><i class="fa-solid fa-language"></i> Available In:</span>
-            <div class="lang-badges-list">
-              <span class="avail-lang-chip" ng-repeat="lang in movieCtrl.availableLanguages">
-                <span class="flag-icon">{{ lang.flag }}</span> {{ lang.name }}
-                <span class="orig-tag" ng-if="lang.isOriginal">ORIGINAL</span>
-              </span>
-            </div>
+        <!-- Sleek Server Switcher Bar (2 Official + 1 College Bypass) -->
+        <div class="theater-servers-bar">
+          <span class="bar-label"><i class="fa-solid fa-server"></i> Server:</span>
+          <div class="server-pill-list">
+            <button class="server-pill"
+                    ng-repeat="server in movieCtrl.servers"
+                    ng-class="{ 'active': movieCtrl.currentServer.id === server.id, 'campus-pill': server.id === 3 }"
+                    ng-click="movieCtrl.selectServer(server)">
+              <i class="fa-solid" ng-class="server.icon || 'fa-bolt'"></i>
+              <span>{{ server.name }}</span>
+              <span class="server-badge" ng-if="server.badge">{{ server.badge }}</span>
+            </button>
           </div>
+          <button class="btn-quick-next" ng-click="movieCtrl.nextServer()" title="Switch to Next Server (Hotkey: N)">
+            <i class="fa-solid fa-rotate"></i> Next Server
+          </button>
+        </div>
 
-          <!-- Video Audio Track Switcher (Built directly into player control deck) -->
-          <div class="audio-tracks-row">
-            <span class="audio-track-label"><i class="fa-solid fa-headphones"></i> Audio Track:</span>
-            <div class="audio-track-buttons">
-              <button class="audio-track-btn"
-                      ng-repeat="track in movieCtrl.audioTracks"
-                      ng-class="{ 'active': movieCtrl.selectedAudioTrack.id === track.id }"
-                      ng-click="movieCtrl.selectAudioTrack(track)">
-                <span class="track-icon">{{ track.flag }}</span>
-                <span class="track-name">{{ track.name }}</span>
-                <span class="track-badge" ng-if="track.badge">{{ track.badge }}</span>
-              </button>
-            </div>
+        <!-- In-Player Audio & Language Guide (NetMirror & FLIQ Style - Built Directly Into Player) -->
+        <div class="theater-inplayer-bar">
+          <div class="inplayer-tip">
+            <i class="fa-solid fa-headphones"></i>
+            <span><strong>In-Player Multi-Audio & Subtitles:</strong> Audio tracks (Hindi, English, Regional) and subtitles are built directly into this player. Tap the <strong>⚙️ Settings / Audio</strong> icon on the bottom player bar to switch language without changing servers!</span>
           </div>
-
-          <!-- Active Audio Notice -->
-          <div class="audio-track-tip" ng-if="movieCtrl.audioNotice">
+          <div class="server-switch-notice" ng-if="movieCtrl.audioNotice">
             <i class="fa-solid fa-circle-check"></i>
             <span>{{ movieCtrl.audioNotice }}</span>
           </div>
-
-          <!-- Hindi Audio Guidance Banner -->
-          <div class="hindi-dub-guide-banner" ng-if="movieCtrl.selectedAudioTrack.id === 'hi'">
-            <div class="guide-header">
-              <i class="fa-solid fa-language"></i>
-              <span>HINDI DUBBED STREAMING GUIDE (HOLLYWOOD / KDRAMA / TOLLYWOOD)</span>
-            </div>
-            <div class="guide-body">
-              <p>⚡ <strong>Hindi Dual-Audio Active:</strong> Automatically connected to <strong>{{ movieCtrl.currentServer.name }}</strong>.</p>
-              <p>🎬 <strong>If video starts in original audio (Tamil / English / Korean):</strong> Click the <strong>⚙️ Settings / Audio</strong> or <strong>Server</strong> menu at the bottom-right of the player to choose <strong>"Hindi"</strong> or switch to <strong>Server 2 (2Embed CC)</strong> or <strong>Server 4 (SmashyStream)</strong>!</p>
-              <div class="hindi-dub-actions">
-                <a class="btn-hindi-ext" ng-href="{{ movieCtrl.getHindiSearchUrl() }}" target="_blank" rel="noopener noreferrer">
-                  <i class="fa-solid fa-arrow-up-right-from-square"></i> Search Hindi Dubbed Stream (NetMirror / Multi-Mirror)
-                </a>
-              </div>
-            </div>
+          <div class="regional-audio-note" ng-if="movieCtrl.isRegionalLanguage && movieCtrl.regionalNote">
+            <i class="fa-solid fa-language"></i>
+            <span>{{ movieCtrl.regionalNote }}</span>
+          </div>
+          <div class="inplayer-languages" ng-if="movieCtrl.availableLanguages.length">
+            <span class="meta-lang-tag" ng-repeat="lang in movieCtrl.availableLanguages | limitTo: 4">
+              {{ lang.flag }} {{ lang.name }}
+            </span>
           </div>
         </div>
 
-        <!-- ================= SERVER SELECTOR CONTROLS ================= -->
-        <div class="player-server-bar">
-          <span class="server-label"><i class="fa-solid fa-server"></i> Choose Server:</span>
-          <div class="server-buttons">
-            <button class="server-btn"
-                    ng-repeat="server in movieCtrl.servers"
-                    ng-class="{ 'active': movieCtrl.currentServer.id === server.id, 'bypass-server': server.id === 6 || server.id === 7 }"
-                    ng-click="movieCtrl.selectServer(server)">
-              <i class="fa-solid" ng-class="server.id === 6 ? 'fa-graduation-cap' : 'fa-bolt'"></i> {{ server.name }}
-            </button>
-          </div>
-        </div>
-
-        <!-- ================= STREAM VIDEO WRAPPER + CINEBOOST OSD + AD-SHIELD SANDBOX ================= -->
-        <div class="stream-wrap">
+        <!-- Screen / Video Container with Ambient Shadow (No Restrictive Sandbox) -->
+        <div class="theater-screen-wrap">
           <!-- CineBoost On-Screen HUD Overlay -->
           <div class="mx-player-osd" ng-class="{ 'visible': movieCtrl.showOsd, 'super-boost': movieCtrl.audioBoostLevel > 100 }">
             <div class="osd-icon">
@@ -190,10 +187,9 @@
             </div>
           </div>
 
-          <!-- Ad-Free Shield Sandbox physically prevents popup ads and redirect tabs -->
+          <!-- Pure Native Playback Iframe without Sandbox Blocking -->
           <iframe
             ng-src="{{ movieCtrl.currentStreamUrl }}"
-            sandbox="{{ movieCtrl.getIframeSandbox() }}"
             title="{{ movieCtrl.movie.title }} Stream"
             frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
@@ -203,110 +199,167 @@
           </iframe>
         </div>
 
-        <!-- Quick Server Fallback & Ad-Shield Bar -->
-        <div class="player-playback-tools">
-          <button class="btn-fallback-server" ng-click="movieCtrl.nextServer()" title="Tap if current server fails or buffers on campus network">
-            <i class="fa-solid fa-rotate"></i> Server Buffering or Failed? Tap to Try Next Server
-          </button>
-          <span class="shield-status-indicator" ng-class="{ 'shield-on': movieCtrl.adShieldActive }">
-            <i class="fa-solid fa-shield-halved"></i> Ad-Free Shield: {{ movieCtrl.adShieldActive ? 'ACTIVE (0 Popup Ads)' : 'OFF' }}
-          </span>
-        </div>
-
-        <!-- ================= CINEVERSE AUDIO BOOSTER (UP TO 200%) ================= -->
-        <div class="audio-booster-panel">
-          <div class="booster-header">
-            <div class="booster-title">
-              <i class="fa-solid fa-volume-high"></i>
-              <span>CineVerse Audio Booster</span>
-              <span class="booster-badge" ng-class="{ 'boost-active': movieCtrl.audioBoostLevel > 100 }">
-                {{ movieCtrl.getBoostLabel() }}
-              </span>
-            </div>
-            <div class="booster-actions">
-              <button class="btn-audio-test" ng-click="movieCtrl.playAudioTest()" title="Test audio amplification in real-time">
-                <i class="fa-solid fa-wave-square"></i> Test Audio ({{ movieCtrl.audioBoostLevel }}%)
-              </button>
-            </div>
+        <!-- Theater Footer: Quick Keyboard Hints & Status -->
+        <div class="theater-footer-bar">
+          <div class="keyboard-hints">
+            <span class="hint-key">T</span> Theater Mode
+            <span class="hint-sep">•</span>
+            <span class="hint-key">N</span> Next Server
+            <span class="hint-sep">•</span>
+            <span class="hint-key">Esc</span> Close
           </div>
-
-          <div class="booster-controls-row">
-            <div class="slider-box">
-              <span class="slider-min">0%</span>
-              <input type="range" min="0" max="200" step="1"
-                     ng-model="movieCtrl.audioBoostLevel"
-                     ng-change="movieCtrl.onSliderChange()"
-                     class="booster-slider"
-                     ng-class="{ 'overdrive': movieCtrl.audioBoostLevel > 100 }"
-                     aria-label="CineVerse Audio Booster Slider">
-              <span class="slider-max">200% 🔥</span>
-            </div>
-
-            <div class="preset-buttons">
-              <button class="preset-btn" ng-class="{ 'active': movieCtrl.audioBoostLevel === 100 }" ng-click="movieCtrl.setAudioBoost(100)">
-                100% (Default)
-              </button>
-              <button class="preset-btn" ng-class="{ 'active': movieCtrl.audioBoostLevel === 130 }" ng-click="movieCtrl.setAudioBoost(130)">
-                130%
-              </button>
-              <button class="preset-btn" ng-class="{ 'active': movieCtrl.audioBoostLevel === 160 }" ng-click="movieCtrl.setAudioBoost(160)">
-                160%
-              </button>
-              <button class="preset-btn preset-max" ng-class="{ 'active': movieCtrl.audioBoostLevel === 200 }" ng-click="movieCtrl.setAudioBoost(200)">
-                <i class="fa-solid fa-fire"></i> 200% MAX
-              </button>
-            </div>
-          </div>
-
-          <div class="booster-enhancers-row">
-            <button class="enhancer-btn" ng-class="{ 'active': movieCtrl.isVocalBoost }" ng-click="movieCtrl.toggleVocalBoost()">
-              <i class="fa-solid fa-bullhorn"></i> Clear Dialogue / Vocal Boost
-            </button>
-            <button class="enhancer-btn" ng-class="{ 'active': movieCtrl.isBassBoost }" ng-click="movieCtrl.toggleBassBoost()">
-              <i class="fa-solid fa-compact-disc"></i> Cinematic Bass Punch
-            </button>
-            <span class="booster-note">
-              <i class="fa-solid fa-circle-info"></i> CineBoost amplifies audio output up to 200% (+6.0dB gain) via Web Audio API.
-            </span>
-          </div>
-
-          <div class="booster-tip-note">
-            <i class="fa-solid fa-volume-high"></i>
-            <span><strong>CineVerse Audio Booster Tip:</strong> Amplifies sound up to 200% (+6.0dB) with dynamic vocal clarity. When watching movies, set the player's internal volume to <strong>100%</strong> and raise your system volume—CineBoost delivers boosted headroom and dialogue clarity! Click <strong>"Test Audio"</strong> above to preview the amplifier.</span>
+          <div class="theater-footer-right">
+            <span class="buffer-tip"><i class="fa-solid fa-circle-check"></i> Ad-Protected Bufferless Cloud Stream</span>
           </div>
         </div>
 
-        <div class="stream-tip">
-          <i class="fa-solid fa-shield-halved"></i>
-          <span>CineVerse Pro Tip: Ad-Free Shield is active to block all popup tabs. If your college or hostel Wi-Fi restricts standard links, click <strong>Server 6 (College WiFi Bypass)</strong> above to stream without VPN!</span>
+        <!-- ================= COLLAPSIBLE PRO TOOLS DRAWER ================= -->
+        <div class="pro-tools-drawer" ng-if="movieCtrl.showProTools">
+          <div class="pro-tools-inner">
+            <div class="pro-tools-header">
+              <h3><i class="fa-solid fa-sliders"></i> CinVerse Pro Tools: Audio Booster (200%) & Network Bypass</h3>
+              <button class="btn-close-tools" ng-click="movieCtrl.toggleProTools()" title="Close Tools"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="audio-booster-panel">
+              <div class="booster-header">
+                <div class="booster-title">
+                  <i class="fa-solid fa-volume-high"></i>
+                  <span>CinVerse Audio Booster</span>
+                  <span class="booster-badge" ng-class="{ 'boost-active': movieCtrl.audioBoostLevel > 100 }">
+                    {{ movieCtrl.getBoostLabel() }}
+                  </span>
+                </div>
+                <button class="btn-audio-test" ng-click="movieCtrl.playAudioTest()" title="Test audio gain">
+                  <i class="fa-solid fa-wave-square"></i> Test Audio ({{ movieCtrl.audioBoostLevel }}%)
+                </button>
+              </div>
+
+              <div class="booster-controls-row">
+                <div class="slider-box">
+                  <span class="slider-min">0%</span>
+                  <input type="range" min="0" max="200" step="1"
+                         ng-model="movieCtrl.audioBoostLevel"
+                         ng-change="movieCtrl.onSliderChange()"
+                         class="booster-slider"
+                         ng-class="{ 'overdrive': movieCtrl.audioBoostLevel > 100 }"
+                         aria-label="CinVerse Audio Booster Slider">
+                  <span class="slider-max">200% 🔥</span>
+                </div>
+
+                <div class="preset-buttons">
+                  <button class="preset-btn" ng-class="{ 'active': movieCtrl.audioBoostLevel === 100 }" ng-click="movieCtrl.setAudioBoost(100)">100%</button>
+                  <button class="preset-btn" ng-class="{ 'active': movieCtrl.audioBoostLevel === 130 }" ng-click="movieCtrl.setAudioBoost(130)">130%</button>
+                  <button class="preset-btn" ng-class="{ 'active': movieCtrl.audioBoostLevel === 160 }" ng-click="movieCtrl.setAudioBoost(160)">160%</button>
+                  <button class="preset-btn preset-max" ng-class="{ 'active': movieCtrl.audioBoostLevel === 200 }" ng-click="movieCtrl.setAudioBoost(200)">200% MAX</button>
+                </div>
+              </div>
+
+              <div class="booster-enhancers-row">
+                <button class="enhancer-btn" ng-class="{ 'active': movieCtrl.isVocalBoost }" ng-click="movieCtrl.toggleVocalBoost()">
+                  <i class="fa-solid fa-bullhorn"></i> Clear Dialogue / Vocal Boost
+                </button>
+                <button class="enhancer-btn" ng-class="{ 'active': movieCtrl.isBassBoost }" ng-click="movieCtrl.toggleBassBoost()">
+                  <i class="fa-solid fa-compact-disc"></i> Cinematic Bass Punch
+                </button>
+                <button class="enhancer-btn college-toggle-btn" ng-class="{ 'active': movieCtrl.collegeBypassActive }" ng-click="movieCtrl.toggleCollegeBypass()">
+                  <i class="fa-solid fa-graduation-cap"></i> College Wi-Fi Bypass
+                </button>
+              </div>
+
+              <div class="booster-tip-note">
+                <i class="fa-solid fa-circle-info"></i>
+                <span>CineBoost amplifies audio output up to 200% (+6.0dB) using Web Audio API filters. If your college/hostel Wi-Fi restricts standard links, toggle College Wi-Fi Bypass above to stream without VPN!</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================= TRAILERS & TEASERS (FLIQ TV STYLE) ================= -->
+    <section class="movie-section scroll-reveal" ng-if="movieCtrl.allTrailers.length">
+      <h2 class="section-title"><i class="fa-solid fa-clapperboard"></i> Trailer</h2>
+
+      <!-- Horizontal Preview Cards Track with Purple Play Circles (Matching FLIQ TV) -->
+      <div class="trailer-cards-track">
+        <div class="trailer-card"
+             ng-repeat="video in movieCtrl.allTrailers track by video.id"
+             ng-click="movieCtrl.selectTrailer(video)">
+          <div class="trailer-thumb-wrap">
+            <img class="trailer-thumb"
+                 ng-src="https://img.youtube.com/vi/{{ video.key }}/hqdefault.jpg"
+                 alt="{{ video.name }}" />
+            <div class="trailer-play-circle">
+              <i class="fa-solid fa-play"></i>
+            </div>
+          </div>
+          <div class="trailer-card-meta">
+            <span class="trailer-type-pill">{{ video.type ? (video.type === 'Trailer' ? 'OFFICIAL TRAILER' : video.type.toUpperCase()) : 'OFFICIAL TRAILER' }}</span>
+            <h5 class="trailer-card-name" title="{{ video.name }}">{{ video.name }}</h5>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- ================= TRAILER ================= -->
-    <section class="movie-section scroll-reveal" ng-if="movieCtrl.trailerUrl">
-      <h2 class="section-title"><i class="fa-solid fa-clapperboard"></i> Official Trailer</h2>
-      <div class="trailer-wrap">
-        <iframe
-          ng-src="{{ movieCtrl.trailerUrl }}"
-          title="Movie Trailer"
-          frameborder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen>
-        </iframe>
+    <!-- Trailer Lightbox Modal (Opens ONLY when user clicks a trailer card) -->
+    <div class="trailer-lightbox-backdrop" ng-if="movieCtrl.showTrailerModal" ng-click="movieCtrl.closeTrailerModal()">
+      <div class="trailer-lightbox-card" ng-click="$event.stopPropagation()">
+        <div class="trailer-lightbox-header">
+          <div class="trailer-header-info">
+            <span class="lightbox-pill">{{ movieCtrl.activeTrailer.type || 'Trailer' }}</span>
+            <h4>{{ movieCtrl.activeTrailer.name }}</h4>
+          </div>
+          <button class="btn-close-modal" ng-click="movieCtrl.closeTrailerModal()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="trailer-iframe-box">
+          <iframe
+            ng-src="{{ movieCtrl.trailerUrl }}"
+            title="{{ movieCtrl.activeTrailer.name || 'Movie Trailer' }}"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen>
+          </iframe>
+        </div>
       </div>
-    </section>
+    </div>
 
-    <!-- ================= CAST ================= -->
+    <!-- ================= CAST (FLIQ TV CIRCULAR HEADSHOTS) ================= -->
     <section class="movie-section scroll-reveal" ng-if="movieCtrl.cast.length">
-      <h2 class="section-title"><i class="fa-solid fa-users"></i> Top Cast</h2>
-      <div class="cast-row">
-        <div class="cast-card" ng-repeat="actor in movieCtrl.cast track by actor.id">
-          <img class="cast-photo"
-               ng-src="{{ movieCtrl.getPosterUrl(actor.profile_path, 'w185') }}"
-               alt="{{ actor.name }}" />
-          <h5 class="cast-name">{{ actor.name }}</h5>
-          <span class="cast-character">{{ actor.character }}</span>
+      <h2 class="section-title"><i class="fa-solid fa-users"></i> Cast</h2>
+      <div class="cast-circular-row">
+        <div class="cast-circular-card" ng-repeat="actor in movieCtrl.cast track by actor.id">
+          <div class="cast-avatar-wrap">
+            <img class="cast-avatar-img"
+                 ng-src="{{ movieCtrl.getPosterUrl(actor.profile_path, 'w185') }}"
+                 alt="{{ actor.name }}" />
+          </div>
+          <h5 class="cast-actor-name" title="{{ actor.name }}">{{ actor.name }}</h5>
+          <span class="cast-actor-role" title="{{ actor.character }}">{{ actor.character }}</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= DETAILS (FLIQ TV STAT GRID) ================= -->
+    <section class="movie-section scroll-reveal" ng-if="movieCtrl.movie">
+      <h2 class="section-title"><i class="fa-solid fa-circle-info"></i> Details</h2>
+      <div class="details-stat-grid">
+        <div class="stat-card">
+          <span class="stat-label">RUNTIME</span>
+          <span class="stat-value">{{ movieCtrl.formatRuntime(movieCtrl.movie.runtime) }}</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">RELEASED</span>
+          <span class="stat-value">{{ movieCtrl.movie.release_date || 'TBA' }}</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">BUDGET / REVENUE</span>
+          <span class="stat-value">{{ movieCtrl.formatMoney(movieCtrl.movie.budget) }} / {{ movieCtrl.formatMoney(movieCtrl.movie.revenue) }}</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">STATUS</span>
+          <span class="stat-value">{{ movieCtrl.movie.status || 'Released' }}</span>
         </div>
       </div>
     </section>
@@ -330,6 +383,109 @@
         </div>
       </div>
     </section>
+
+    <!-- ================= CINEMA CLOUD DOWNLOAD MODAL (MULTI-AUDIO & LOCAL SAVE) ================= -->
+    <div class="download-modal-backdrop" ng-if="movieCtrl.showDownloadModal" ng-click="movieCtrl.closeDownloadModal()">
+      <div class="download-modal-card" ng-click="$event.stopPropagation()">
+        <div class="download-modal-header">
+          <div class="download-header-left">
+            <i class="fa-solid fa-cloud-arrow-down"></i>
+            <div>
+              <h3>Download <strong>{{ movieCtrl.movie.title }}</strong></h3>
+              <span class="download-subtitle">Multi-Audio Local Downloader • 100% Direct Save to PC • Fast Cloud CDN</span>
+            </div>
+          </div>
+          <button class="btn-close-modal" ng-click="movieCtrl.closeDownloadModal()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <div class="download-modal-body">
+          <!-- Step 1: Select Audio Language -->
+          <div class="download-section-box">
+            <label class="download-section-label"><i class="fa-solid fa-headphones"></i> 1. Choose Audio Track:</label>
+            <div class="download-audio-options">
+              <button class="download-audio-pill"
+                      ng-repeat="track in movieCtrl.downloadAudioTracks"
+                      ng-class="{ 'active': movieCtrl.selectedDownloadAudio.id === track.id }"
+                      ng-click="movieCtrl.selectDownloadAudio(track)">
+                <span class="audio-flag">{{ track.flag }}</span>
+                <span class="audio-name">{{ track.name }}</span>
+                <span class="audio-badge" ng-if="track.badge">{{ track.badge }}</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 2: Select Resolution & Quality Tiers -->
+          <div class="download-section-box">
+            <label class="download-section-label"><i class="fa-solid fa-sliders"></i> 2. Choose Quality & Download to Device:</label>
+            <div class="download-tiers-list">
+              <div class="download-tier-card"
+                   ng-repeat="tier in movieCtrl.downloadOptions"
+                   ng-class="{ 'downloading': movieCtrl.activeDownloadQuality.id === tier.id }">
+                <div class="tier-left">
+                  <span class="tier-quality-badge" ng-style="{ 'background-color': tier.color }">{{ tier.id.toUpperCase() }}</span>
+                  <div class="tier-details">
+                    <div class="tier-title-row">
+                      <h4 class="tier-name">{{ tier.name }}</h4>
+                      <span class="tier-badge-pill">{{ tier.badge }}</span>
+                    </div>
+                    <span class="tier-codec">{{ tier.codec }}</span>
+                    <span class="tier-audio"><i class="fa-solid fa-volume-high"></i> {{ movieCtrl.selectedDownloadAudio.name }}</span>
+                  </div>
+                </div>
+
+                <div class="tier-right">
+                  <span class="tier-size">{{ tier.size }}</span>
+                  <div class="tier-download-actions">
+                    <button class="btn-tier-magnet" ng-click="movieCtrl.downloadMagnet(tier)" title="Download real {{ tier.size }} via 1DM / uTorrent / Flud">
+                      <i class="fa-solid fa-magnet"></i> <span>1DM / Torrent ({{ tier.size }})</span>
+                    </button>
+                    <button class="btn-start-download" ng-click="movieCtrl.startDirectDownload(tier)" title="Direct Cloud Stream Download">
+                      <i class="fa-solid fa-cloud-arrow-down"></i> <span>Direct Download</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Alert banner when download initiates -->
+          <div class="download-success-banner" ng-if="movieCtrl.downloadSuccess">
+            <i class="fa-solid fa-circle-check"></i>
+            <div>
+              <strong>Download Initiated!</strong>
+              <p>{{ movieCtrl.downloadAlertNote || 'Your download has been triggered in your browser or 1DM app.' }}</p>
+            </div>
+          </div>
+
+          <!-- Direct High-Speed Cloud Stream, Mobile 1DM & VLC Links -->
+          <div class="download-cloud-mirrors-box">
+            <label class="download-section-label"><i class="fa-solid fa-server"></i> 3. Mobile 1DM App, Cloud Mirrors &amp; VLC Player:</label>
+            <div class="cloud-mirror-buttons">
+              <button class="mirror-btn btn-highlight-1dm" ng-click="movieCtrl.copyStreamFor1DM()" title="Copy Link for 1DM App on Android">
+                <i class="fa-solid" ng-class="movieCtrl.copiedLink ? 'fa-check' : 'fa-mobile-screen'"></i>
+                <span>{{ movieCtrl.copiedLink ? 'Stream URL Copied! Paste into 1DM' : '📱 Copy Stream for 1DM App' }}</span>
+              </button>
+              <button class="mirror-btn" ng-click="movieCtrl.downloadVlcPlaylist()" title="Download Offline VLC / MX Player Playlist (.m3u)">
+                <i class="fa-solid fa-file-video"></i> Offline VLC Playlist (.m3u)
+              </button>
+              <button class="mirror-btn" ng-click="movieCtrl.openCloudMirror(1)" title="Open Fast Cloud Server 1">
+                <i class="fa-solid fa-bolt"></i> Fast Cloud Mirror
+              </button>
+              <button class="mirror-btn" ng-click="movieCtrl.openCloudMirror(2)" title="Open Ultra HD Mirror 2">
+                <i class="fa-solid fa-film"></i> Ultra HD VidFast
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="download-modal-footer">
+          <div class="download-tip">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>Encrypted cloud streaming download via CinVerse P2P edge acceleration. Unblocked on college/hostel networks.</span>
+          </div>
+        </div>
+      </div>
+    </div>
 
   </div>
 </div>

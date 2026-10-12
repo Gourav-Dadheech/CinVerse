@@ -7,7 +7,7 @@
 
   <!-- ================= HERO BANNER CAROUSEL ================= -->
   <section class="hero-banner" ng-if="homeCtrl.currentHero"
-           ng-style="{ 'background-image': 'linear-gradient(180deg, rgba(15,23,42,0.15) 0%, rgba(15,23,42,0.85) 65%, #0F172A 100%), url(' + homeCtrl.getBackdropUrl(homeCtrl.currentHero.backdrop_path) + ')' }">
+           ng-style="{ 'background-image': 'linear-gradient(180deg, rgba(7,9,14,0.6) 0%, rgba(7,9,14,0.15) 35%, rgba(7,9,14,0.85) 75%, #07090E 100%), url(' + homeCtrl.getBackdropUrl(homeCtrl.currentHero.backdrop_path) + ')' }">
 
     <!-- Carousel Arrow Controls -->
     <button class="hero-arrow hero-prev" ng-click="homeCtrl.prevHero()" aria-label="Previous Featured Movie" title="Previous Movie">
@@ -30,14 +30,14 @@
       </div>
       <p class="hero-overview">{{ homeCtrl.currentHero.overview | limitTo: 220 }}{{ homeCtrl.currentHero.overview.length > 220 ? '...' : '' }}</p>
       <div class="hero-actions">
-        <a href="#!/movie/{{ homeCtrl.currentHero.id }}?play=true" class="btn btn-primary btn-hero-watch">
-          <i class="fa-solid fa-play"></i> Watch Now
+        <a href="#!/movie/{{ homeCtrl.currentHero.id }}?play=true" class="btn btn-hero-watch">
+          <i class="fa-solid fa-play"></i> Play
         </a>
-        <a href="#!/movie/{{ homeCtrl.currentHero.id }}" class="btn btn-secondary">
-          <i class="fa-solid fa-circle-info"></i> View Details
-        </a>
-        <a href="#!/search" class="btn btn-secondary">
-          <i class="fa-solid fa-magnifying-glass"></i> Explore Movies
+        <button class="btn btn-hero-circle" ng-click="homeCtrl.addToWatchlist(homeCtrl.currentHero)" title="Add to Watchlist">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+        <a href="#!/movie/{{ homeCtrl.currentHero.id }}" class="btn btn-hero-circle" title="View Full Details">
+          <i class="fa-solid fa-circle-info"></i>
         </a>
       </div>
     </div>
@@ -112,22 +112,258 @@
     <i class="fa-solid fa-triangle-exclamation"></i> {{ homeCtrl.errorMessage }}
   </div>
 
-  <!-- ================= GENRE CATEGORY BADGES ================= -->
-  <section class="genre-section scroll-reveal" ng-if="homeCtrl.genres.length">
-    <h2 class="section-title">Browse by Category</h2>
-    <div class="genre-badges">
-      <a class="genre-badge"
-         ng-repeat="genre in homeCtrl.genres"
-         href="#!/search?genre={{ genre.id }}">
-        {{ genre.name }}
-      </a>
+  <!-- ================= 1. STREAMING SERVICES (OTT PLATFORMS) ================= -->
+  <section class="ott-services-section scroll-reveal" id="streaming-services">
+    <div class="section-header">
+      <div class="ott-header-title">
+        <h2 class="section-title">Streaming services</h2>
+        <span class="ott-subtitle">Explore original movies and blockbuster releases by platform</span>
+      </div>
+    </div>
+
+    <!-- OTT Service Cards Grid (FLIQ TV Style) -->
+    <div class="ott-services-grid">
+      <!-- Netflix -->
+      <div class="ott-service-card ott-card-netflix"
+           ng-class="{ 'active': homeCtrl.selectedOtt.id === 'netflix' }"
+           ng-click="homeCtrl.onOttCardClick(homeCtrl.streamingServices[0])">
+        <div class="ott-card-inner">
+          <img src="assets/logos/netflix.svg" alt="Netflix" class="ott-brand-img" />
+          <a class="ott-quick-hub-btn" ng-href="#!/ott/netflix" ng-click="$event.stopPropagation()" title="Open Netflix Catalog Hub">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Disney+ Hotstar -->
+      <div class="ott-service-card ott-card-disney"
+           ng-class="{ 'active': homeCtrl.selectedOtt.id === 'disney_hotstar' }"
+           ng-click="homeCtrl.onOttCardClick(homeCtrl.streamingServices[2])">
+        <div class="ott-card-inner">
+          <img src="assets/logos/disney.svg" alt="Disney+ Hotstar" class="ott-brand-img" />
+          <a class="ott-quick-hub-btn" ng-href="#!/ott/disney_hotstar" ng-click="$event.stopPropagation()" title="Open Disney+ Hotstar Catalog Hub">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- HBO Max -->
+      <div class="ott-service-card ott-card-hbomax"
+           ng-class="{ 'active': homeCtrl.selectedOtt.id === 'hbomax' }"
+           ng-click="homeCtrl.onOttCardClick(homeCtrl.streamingServices[4])">
+        <div class="ott-card-inner">
+          <img src="assets/logos/hbomax.svg" alt="HBO Max" class="ott-brand-img" />
+          <a class="ott-quick-hub-btn" ng-href="#!/ott/hbomax" ng-click="$event.stopPropagation()" title="Open HBO Max Catalog Hub">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Prime Video -->
+      <div class="ott-service-card ott-card-prime"
+           ng-class="{ 'active': homeCtrl.selectedOtt.id === 'prime' }"
+           ng-click="homeCtrl.onOttCardClick(homeCtrl.streamingServices[1])">
+        <div class="ott-card-inner">
+          <img src="assets/logos/prime.svg" alt="Prime Video" class="ott-brand-img" />
+          <a class="ott-quick-hub-btn" ng-href="#!/ott/prime" ng-click="$event.stopPropagation()" title="Open Prime Video Catalog Hub">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Apple TV+ -->
+      <div class="ott-service-card ott-card-appletv"
+           ng-class="{ 'active': homeCtrl.selectedOtt.id === 'appletv' }"
+           ng-click="homeCtrl.onOttCardClick(homeCtrl.streamingServices[5])">
+        <div class="ott-card-inner">
+          <img src="assets/logos/appletv.svg" alt="Apple TV+" class="ott-brand-img" />
+          <a class="ott-quick-hub-btn" ng-href="#!/ott/appletv" ng-click="$event.stopPropagation()" title="Open Apple TV+ Catalog Hub">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- JioCinema -->
+      <div class="ott-service-card ott-card-jiocinema"
+           ng-class="{ 'active': homeCtrl.selectedOtt.id === 'jiocinema' }"
+           ng-click="homeCtrl.onOttCardClick(homeCtrl.streamingServices[3])">
+        <div class="ott-card-inner">
+          <img src="assets/logos/jiocinema.svg" alt="JioCinema" class="ott-brand-img" />
+          <a class="ott-quick-hub-btn" ng-href="#!/ott/jiocinema" ng-click="$event.stopPropagation()" title="Open JioCinema Catalog Hub">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active OTT Shelf (FLIQ TV Style: Both Movies and Series) -->
+    <div class="ott-shelf-container" ng-if="homeCtrl.selectedOtt">
+      <div class="ott-shelf-header">
+        <div class="shelf-brand-info">
+          <span class="shelf-dot" ng-style="{ 'background-color': homeCtrl.selectedOtt.color }"></span>
+          <h3>Popular on <strong>{{ homeCtrl.selectedOtt.name }}</strong></h3>
+
+          <!-- Filter Pills: All, Movies, Series (FLIQ TV Style) -->
+          <div class="ott-filter-pills">
+            <button class="ott-pill-btn" ng-class="{ 'active': homeCtrl.ottFilter === 'all' }" ng-click="homeCtrl.setOttFilter('all')">All Titles</button>
+            <button class="ott-pill-btn" ng-class="{ 'active': homeCtrl.ottFilter === 'movie' }" ng-click="homeCtrl.setOttFilter('movie')"><i class="fa-solid fa-film"></i> Movies</button>
+            <button class="ott-pill-btn" ng-class="{ 'active': homeCtrl.ottFilter === 'tv' }" ng-click="homeCtrl.setOttFilter('tv')"><i class="fa-solid fa-tv"></i> Series</button>
+          </div>
+        </div>
+
+        <div class="shelf-right-actions">
+          <a class="btn-explore-ott" ng-href="#!/ott/{{ homeCtrl.selectedOtt.id }}" title="Open full {{ homeCtrl.selectedOtt.name }} Originals Catalog">
+            <span>Explore All {{ homeCtrl.selectedOtt.name }} Originals</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </a>
+          <div class="slider-controls">
+            <button ng-click="homeCtrl.scrollSlider('ott-slider', -1)" aria-label="Scroll left"><i class="fa-solid fa-chevron-left"></i></button>
+            <button ng-click="homeCtrl.scrollSlider('ott-slider', 1)" aria-label="Scroll right"><i class="fa-solid fa-chevron-right"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="slider-track skeleton-track" ng-if="homeCtrl.isLoadingOtt">
+        <div class="skeleton-card" ng-repeat="s in [1,2,3,4,5,6]"></div>
+      </div>
+
+      <div class="slider-track" id="ott-slider" ng-if="!homeCtrl.isLoadingOtt">
+        <div class="slider-item" ng-repeat="movie in homeCtrl.ottItems track by movie.id">
+          <movie-card movie="movie"></movie-card>
+        </div>
+      </div>
     </div>
   </section>
 
-  <!-- ================= TRENDING SLIDER ================= -->
-  <section class="movie-slider-section">
+  <!-- ================= 2. TOP 10 MOVIES TODAY (FLIQ TV / NETFLIX STYLE) ================= -->
+  <section class="top10-section scroll-reveal" id="top-10" ng-if="homeCtrl.top10.length">
     <div class="section-header">
-      <h2 class="section-title"><i class="fa-solid fa-fire"></i> Trending This Week</h2>
+      <div class="top10-header-title">
+        <h2 class="section-title"><i class="fa-solid fa-ranking-star"></i> Top 10 Movies Today</h2>
+        <span class="top10-subtitle">The most watched cinema blockbusters right now</span>
+      </div>
+      <div class="slider-controls">
+        <button ng-click="homeCtrl.scrollSlider('top10-slider', -1)" aria-label="Scroll left"><i class="fa-solid fa-chevron-left"></i></button>
+        <button ng-click="homeCtrl.scrollSlider('top10-slider', 1)" aria-label="Scroll right"><i class="fa-solid fa-chevron-right"></i></button>
+      </div>
+    </div>
+
+    <div class="top10-track" id="top10-slider">
+      <div class="top10-card" ng-repeat="movie in homeCtrl.top10 track by movie.id">
+        <!-- Giant Stylized FLIQ / Netflix Number -->
+        <span class="top10-rank-number">{{ $index + 1 }}</span>
+
+        <a class="top10-poster-wrap" href="#!/movie/{{ movie.id }}">
+          <img class="top10-poster"
+               ng-src="{{ homeCtrl.getPosterUrl(movie.poster_path) }}"
+               alt="{{ movie.title }}"
+               loading="lazy" />
+          <div class="top10-rating-badge">
+            <i class="fa-solid fa-star"></i> {{ movie.vote_average ? movie.vote_average.toFixed(1) : '8.5' }}
+          </div>
+          <div class="top10-hover-overlay">
+            <span class="btn-top10-play"><i class="fa-solid fa-play"></i></span>
+            <span class="top10-hover-title">{{ movie.title }}</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 3. STUDIOS & FRANCHISES (MARVEL, DC, STAR WARS, PIXAR) ================= -->
+  <section class="franchises-section scroll-reveal" id="franchises">
+    <div class="section-header">
+      <div class="franchises-header-title">
+        <h2 class="section-title">Studios & Franchises</h2>
+        <span class="franchises-subtitle">Explore iconic cinematic universes from Marvel, DC, Star Wars & Pixar</span>
+      </div>
+    </div>
+
+    <div class="franchises-grid">
+      <!-- Marvel Studios -->
+      <div class="franchise-card f-card-marvel"
+           ng-class="{ 'active': homeCtrl.selectedFranchise.id === 'marvel' }"
+           ng-click="homeCtrl.onFranchiseCardClick(homeCtrl.franchises[0])">
+        <div class="franchise-card-inner">
+          <div class="franchise-logo-box">
+            <img src="assets/logos/marvel.svg" alt="Marvel Studios" class="franchise-brand-img" />
+          </div>
+          <span class="franchise-fliq-subtitle">Marvel Cinematic Universe</span>
+        </div>
+      </div>
+
+      <!-- DC Studios -->
+      <div class="franchise-card f-card-dc"
+           ng-class="{ 'active': homeCtrl.selectedFranchise.id === 'dc' }"
+           ng-click="homeCtrl.onFranchiseCardClick(homeCtrl.franchises[1])">
+        <div class="franchise-card-inner">
+          <div class="franchise-logo-box">
+            <img src="assets/logos/dc.svg" alt="DC Studios" class="franchise-brand-img" />
+          </div>
+          <span class="franchise-fliq-subtitle">Worlds of DC</span>
+        </div>
+      </div>
+
+      <!-- Star Wars -->
+      <div class="franchise-card f-card-starwars"
+           ng-class="{ 'active': homeCtrl.selectedFranchise.id === 'starwars' }"
+           ng-click="homeCtrl.onFranchiseCardClick(homeCtrl.franchises[2])">
+        <div class="franchise-card-inner">
+          <div class="franchise-logo-box">
+            <img src="assets/logos/starwars.svg" alt="Star Wars" class="franchise-brand-img" />
+          </div>
+          <span class="franchise-fliq-subtitle">A Galaxy Far, Far Away</span>
+        </div>
+      </div>
+
+      <!-- Disney • Pixar -->
+      <div class="franchise-card f-card-pixar"
+           ng-class="{ 'active': homeCtrl.selectedFranchise.id === 'pixar' }"
+           ng-click="homeCtrl.onFranchiseCardClick(homeCtrl.franchises[3])">
+        <div class="franchise-card-inner">
+          <div class="franchise-logo-box">
+            <img src="assets/logos/pixar.svg" alt="Disney Pixar" class="franchise-brand-img" />
+          </div>
+          <span class="franchise-fliq-subtitle">Heartwarming Animation</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Franchise Showcase Shelf -->
+    <div class="franchise-shelf-container" ng-if="homeCtrl.selectedFranchise && (homeCtrl.franchiseMovies.length || homeCtrl.isLoadingFranchise)">
+      <div class="franchise-shelf-header">
+        <div class="shelf-brand-info">
+          <span class="shelf-dot" ng-style="{ 'background-color': homeCtrl.selectedFranchise.color }"></span>
+          <h3>{{ homeCtrl.selectedFranchise.subtitle }} ({{ homeCtrl.selectedFranchise.name }})</h3>
+        </div>
+        <div class="shelf-right-actions">
+          <a class="btn-explore-ott btn-explore-franchise" ng-href="#!/franchise/{{ homeCtrl.selectedFranchise.id }}" title="Open full {{ homeCtrl.selectedFranchise.name }} Universe Hub">
+            <span>Explore All {{ homeCtrl.selectedFranchise.name }} Universe Titles</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </a>
+          <div class="slider-controls">
+            <button ng-click="homeCtrl.scrollSlider('franchise-slider', -1)" aria-label="Scroll left"><i class="fa-solid fa-chevron-left"></i></button>
+            <button ng-click="homeCtrl.scrollSlider('franchise-slider', 1)" aria-label="Scroll right"><i class="fa-solid fa-chevron-right"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="slider-track skeleton-track" ng-if="homeCtrl.isLoadingFranchise">
+        <div class="skeleton-card" ng-repeat="s in [1,2,3,4,5,6]"></div>
+      </div>
+
+      <div class="slider-track" id="franchise-slider" ng-if="!homeCtrl.isLoadingFranchise">
+        <div class="slider-item" ng-repeat="movie in homeCtrl.franchiseMovies track by movie.id">
+          <movie-card movie="movie"></movie-card>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TRENDING SLIDER (MATCHING IMAGE 1 DIRECTLY AFTER FRANCHISES) ================= -->
+  <section class="movie-slider-section" id="trending">
+    <div class="section-header">
+      <h2 class="section-title"><i class="fa-solid fa-fire"></i> Trending Today</h2>
       <div class="slider-controls">
         <button ng-click="homeCtrl.scrollSlider('trending-slider', -1)" aria-label="Scroll left"><i class="fa-solid fa-chevron-left"></i></button>
         <button ng-click="homeCtrl.scrollSlider('trending-slider', 1)" aria-label="Scroll right"><i class="fa-solid fa-chevron-right"></i></button>
@@ -143,6 +379,18 @@
       <div class="slider-item" ng-repeat="movie in homeCtrl.trending track by movie.id">
         <movie-card movie="movie"></movie-card>
       </div>
+    </div>
+  </section>
+
+  <!-- ================= GENRE CATEGORY BADGES ================= -->
+  <section class="genre-section scroll-reveal" ng-if="homeCtrl.genres.length">
+    <h2 class="section-title">Browse by Category</h2>
+    <div class="genre-badges">
+      <a class="genre-badge"
+         ng-repeat="genre in homeCtrl.genres"
+         href="#!/search?genre={{ genre.id }}">
+        {{ genre.name }}
+      </a>
     </div>
   </section>
 

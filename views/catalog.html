@@ -1,0 +1,93 @@
+<!-- ============================================================
+     VIEW: catalog.html
+     Powers OTT Hubs (Netflix, Disney+, Prime, etc.),
+     TV Shows Catalog, Anime Universe & K-Drama Hub.
+     Matches FLIQ TV & Netflix Originals catalog layouts.
+     ============================================================ -->
+<div class="catalog-page">
+
+  <!-- ================= BRANDED HERO BANNER (MATCHES SCREENSHOT 3) ================= -->
+  <section class="catalog-hero-banner" ng-style="{ 'background': catalogCtrl.currentMeta.bgGradient }">
+    <div class="catalog-hero-container">
+
+      <!-- Branded Logo or Stylized Title -->
+      <div class="catalog-brand-header">
+        <img ng-if="catalogCtrl.currentMeta.logo"
+             ng-src="{{ catalogCtrl.currentMeta.logo }}"
+             alt="{{ catalogCtrl.currentMeta.title }}"
+             class="catalog-brand-logo-img" />
+        <h1 ng-if="!catalogCtrl.currentMeta.logo || catalogCtrl.mode === 'franchise'" class="catalog-brand-title">
+          {{ catalogCtrl.currentMeta.title }}
+        </h1>
+      </div>
+
+      <!-- Description / Tagline -->
+      <p class="catalog-subtitle">{{ catalogCtrl.currentMeta.description }}</p>
+
+      <!-- Meta Badges Bar (Matches Screenshot 3) -->
+      <div class="catalog-meta-badges">
+        <span class="catalog-status-badge">
+          <i class="fa-solid fa-circle live-dot"></i>
+          {{ catalogCtrl.currentMeta.badge || 'Official Catalog' }}
+        </span>
+        <span class="catalog-count-badge" ng-if="catalogCtrl.filteredItems.length">
+          {{ catalogCtrl.filteredItems.length }} Titles Loaded
+        </span>
+        <span class="catalog-audio-badge">
+          <i class="fa-solid fa-headphones"></i> Dual Audio & Hindi Dubbed Ready
+        </span>
+      </div>
+
+      <!-- Category Filter Pills (Matches Screenshot 3) -->
+      <div class="catalog-filter-bar">
+        <button class="catalog-filter-pill"
+                ng-repeat="tab in catalogCtrl.filterTabs"
+                ng-class="{ 'active': catalogCtrl.activeTab === tab.id }"
+                ng-click="catalogCtrl.setFilterTab(tab.id)">
+          <i class="fa-solid" ng-class="tab.icon" ng-if="tab.icon"></i>
+          {{ tab.name }}
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= CATALOG CONTENT GRID ================= -->
+  <section class="catalog-content-section">
+    <div class="catalog-container">
+
+      <!-- Loading State -->
+      <div class="catalog-skeleton" ng-if="catalogCtrl.isLoading">
+        <div class="catalog-grid">
+          <div class="skeleton-card" ng-repeat="s in [1,2,3,4,5,6,7,8,9,10,11,12]"></div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="catalog-empty" ng-if="!catalogCtrl.isLoading && catalogCtrl.filteredItems.length === 0">
+        <i class="fa-solid fa-film"></i>
+        <h3>No titles found</h3>
+        <p>No content currently available in this category.</p>
+        <button class="btn btn-primary" ng-click="catalogCtrl.setFilterTab('all')">Show All Titles</button>
+      </div>
+
+      <!-- Titles Grid (Matches Screenshot 3 6-column clean layout) -->
+      <div class="catalog-grid" ng-if="!catalogCtrl.isLoading && catalogCtrl.filteredItems.length > 0">
+        <div class="catalog-card-wrap" ng-repeat="item in catalogCtrl.filteredItems track by (item.id + '-' + (item.isTv ? 'tv' : 'm'))">
+          <movie-card movie="item"></movie-card>
+        </div>
+      </div>
+
+      <!-- Pagination / Load More -->
+      <div class="catalog-pagination" ng-if="!catalogCtrl.isLoading && catalogCtrl.hasMore">
+        <button class="btn btn-load-more" ng-click="catalogCtrl.loadMore()" ng-disabled="catalogCtrl.isLoadingMore">
+          <i class="fa-solid fa-circle-notch fa-spin" ng-if="catalogCtrl.isLoadingMore"></i>
+          <i class="fa-solid fa-angles-down" ng-if="!catalogCtrl.isLoadingMore"></i>
+          <span>{{ catalogCtrl.isLoadingMore ? 'Loading Next Page...' : 'Load More Titles' }}</span>
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+</div>

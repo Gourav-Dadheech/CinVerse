@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 100" width="240" height="70">
+  <defs>
+    <linearGradient id="maxGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9333ea"/>
+      <stop offset="60%" stop-color="#c084fc"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+  </defs>
+  <!-- HBO -->
+  <g fill="#ffffff">
+    <rect x="15" y="18" width="17" height="64" rx="2"/>
+    <rect x="58" y="18" width="17" height="64" rx="2"/>
+    <rect x="28" y="42" width="34" height="16"/>
+    <path d="M 88 18 L 122 18 C 137 18, 145 25, 145 37 C 145 44, 140 48, 132 50 C 142 53, 147 58, 147 67 C 147 79, 137 82, 122 82 L 88 82 Z M 105 33 L 105 43 L 118 43 C 124 43, 128 41, 128 38 C 128 35, 124 33, 118 33 Z M 105 57 L 105 67 L 120 67 C 126 67, 130 65, 130 62 C 130 59, 126 57, 120 57 Z"/>
+    <circle cx="180" cy="50" r="32" fill="none" stroke="#ffffff" stroke-width="16"/>
+    <circle cx="180" cy="50" r="10" fill="#ffffff"/>
+  </g>
+  <text x="228" y="75" font-family="'Outfit', 'Arial Black', sans-serif" font-size="64" font-weight="900" font-style="italic" fill="url(#maxGrad)" letter-spacing="1">max</text>
+</svg>

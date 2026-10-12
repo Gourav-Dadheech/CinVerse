@@ -249,6 +249,364 @@
         });
       };
 
+      // ---------------------------------------------------------
+      // TV SHOWS, WEB SERIES, ANIME & K-DRAMAS (FLIQ TV Engine)
+      // ---------------------------------------------------------
+
+      // Popular TV Shows / Web Series
+      service.getPopularTv = function (page) {
+        return request('/tv/popular', { page: page || 1 });
+      };
+
+      // Top Rated TV Shows
+      service.getTopRatedTv = function (page) {
+        return request('/tv/top_rated', { page: page || 1 });
+      };
+
+      // Trending TV Shows (this week)
+      service.getTrendingTv = function () {
+        return request('/trending/tv/week');
+      };
+
+      // Anime TV Series (Demon Slayer, Jujutsu Kaisen, etc.)
+      service.getAnimeShows = function (page) {
+        return request('/discover/tv', {
+          with_genres: '16',
+          with_original_language: 'ja',
+          sort_by: 'popularity.desc',
+          page: page || 1
+        });
+      };
+
+      // K-Drama TV Series (Korean Drama)
+      service.getKdramaShows = function (page) {
+        return request('/discover/tv', {
+          with_original_language: 'ko',
+          sort_by: 'popularity.desc',
+          page: page || 1
+        });
+      };
+
+      // Full TV Show Details (includes number of seasons, episodes, networks)
+      service.getTvDetails = function (tvId) {
+        return request('/tv/' + tvId);
+      };
+
+      // Season Details with all episodes
+      service.getTvSeason = function (tvId, seasonNumber) {
+        return request('/tv/' + tvId + '/season/' + seasonNumber);
+      };
+
+      // Cast & Crew for TV Show
+      service.getTvCredits = function (tvId) {
+        return request('/tv/' + tvId + '/credits');
+      };
+
+      // Trailers & Videos for TV Show
+      service.getTvVideos = function (tvId) {
+        return request('/tv/' + tvId + '/videos');
+      };
+
+      // Similar TV Shows
+      service.getTvSimilar = function (tvId) {
+        return request('/tv/' + tvId + '/similar');
+      };
+
+      // TV Shows by Watch Provider (Netflix, Prime, Disney+, etc.)
+      service.getByWatchProviderTv = function (providerId, region, page) {
+        return request('/discover/tv', {
+          with_watch_providers: providerId,
+          watch_region: region || 'IN',
+          sort_by: 'popularity.desc',
+          page: page || 1
+        }).then(function (res) {
+          if (!res.results || res.results.length === 0) {
+            return request('/discover/tv', {
+              with_watch_providers: providerId,
+              watch_region: 'US',
+              sort_by: 'popularity.desc',
+              page: page || 1
+            });
+          }
+          return res;
+        });
+      };
+
+      // Multi-search: searches across BOTH movies AND TV shows
+      service.searchMulti = function (query, page) {
+        return request('/search/multi', {
+          query: query,
+          page: page || 1,
+          include_adult: false
+        });
+      };
+
+      // Discover movies by OTT Streaming Provider (Netflix, Prime, Disney+ Hotstar, JioCinema, etc.)
+      service.getByWatchProvider = function (providerId, region, page) {
+        return request('/discover/movie', {
+          with_watch_providers: providerId,
+          watch_region: region || 'IN',
+          sort_by: 'popularity.desc',
+          page: page || 1
+        }).then(function (res) {
+          if (!res.results || res.results.length === 0) {
+            // Relax region to US if regional provider list is sparse
+            return request('/discover/movie', {
+              with_watch_providers: providerId,
+              watch_region: 'US',
+              sort_by: 'popularity.desc',
+              page: page || 1
+            });
+          }
+          return res;
+        });
+      };
+
+      // Discover movies by Studio / Franchise (Marvel, DC, Star Wars, Pixar, Harry Potter, Anime)
+      service.getFranchiseMovies = function (franchiseKey, page, sortBy) {
+        page = page || 1;
+        sortBy = sortBy || 'popularity.desc';
+        switch (franchiseKey) {
+          case 'marvel':
+            return request('/discover/movie', {
+              with_companies: '420|7505',
+              sort_by: sortBy,
+              page: page
+            });
+          case 'dc':
+            return request('/discover/movie', {
+              with_companies: '429|9993|128064',
+              sort_by: sortBy,
+              page: page
+            });
+          case 'starwars':
+            return request('/search/movie', {
+              query: 'Star Wars',
+              page: page
+            });
+          case 'pixar':
+            return request('/discover/movie', {
+              with_companies: '3',
+              sort_by: sortBy,
+              page: page
+            });
+          case 'harrypotter':
+            return request('/search/movie', {
+              query: 'Harry Potter',
+              page: page
+            });
+          case 'anime':
+            return request('/discover/movie', {
+              with_genres: '16',
+              with_original_language: 'ja',
+              sort_by: sortBy,
+              page: page
+            });
+          default:
+            return request('/search/movie', {
+              query: franchiseKey,
+              page: page
+            });
+        }
+      };
+
+      // Discover TV Shows / Web Series by Franchise
+      service.getFranchiseTv = function (franchiseKey, page, sortBy) {
+        page = page || 1;
+        sortBy = sortBy || 'popularity.desc';
+        switch (franchiseKey) {
+          case 'marvel':
+            return request('/discover/tv', {
+              with_companies: '420|7505',
+              without_genres: '16',
+              sort_by: sortBy,
+              page: page
+            });
+          case 'dc':
+            return request('/discover/tv', {
+              with_companies: '429|9993|128064',
+              without_genres: '16',
+              sort_by: sortBy,
+              page: page
+            });
+          case 'starwars':
+            return request('/discover/tv', {
+              with_companies: '1',
+              without_genres: '16',
+              sort_by: sortBy,
+              page: page
+            });
+          case 'pixar':
+            return request('/discover/tv', {
+              with_companies: '3',
+              sort_by: sortBy,
+              page: page
+            });
+          case 'harrypotter':
+            return request('/search/tv', {
+              query: 'Harry Potter',
+              page: page
+            });
+          case 'anime':
+            return request('/discover/tv', {
+              with_genres: '16',
+              with_original_language: 'ja',
+              sort_by: sortBy,
+              page: page
+            });
+          default:
+            return request('/search/tv', {
+              query: franchiseKey,
+              page: page
+            });
+        }
+      };
+
+      // Discover Animation & Cartoons (Series) by Franchise
+      service.getFranchiseAnimation = function (franchiseKey, page) {
+        page = page || 1;
+        switch (franchiseKey) {
+          case 'marvel':
+            return request('/discover/tv', {
+              with_companies: '420|7505',
+              with_genres: '16',
+              sort_by: 'popularity.desc',
+              page: page
+            });
+          case 'dc':
+            return request('/discover/tv', {
+              with_companies: '429|9993|128064',
+              with_genres: '16',
+              sort_by: 'popularity.desc',
+              page: page
+            });
+          case 'starwars':
+            return request('/discover/tv', {
+              with_companies: '1',
+              with_genres: '16',
+              sort_by: 'popularity.desc',
+              page: page
+            });
+          case 'pixar':
+            return request('/discover/movie', {
+              with_companies: '3',
+              with_genres: '16',
+              sort_by: 'popularity.desc',
+              page: page
+            });
+          case 'harrypotter':
+            return request('/search/movie', {
+              query: 'Fantastic Beasts',
+              page: page
+            });
+          case 'anime':
+            return request('/discover/tv', {
+              with_genres: '16',
+              with_original_language: 'ja',
+              sort_by: 'popularity.desc',
+              page: page
+            });
+          default:
+            return request('/discover/movie', {
+              with_genres: '16',
+              sort_by: 'popularity.desc',
+              page: page
+            });
+        }
+      };
+
+      // Discover Animated Movies & Specials by Franchise
+      service.getFranchiseAnimationMovies = function (franchiseKey, page) {
+        page = page || 1;
+        switch (franchiseKey) {
+          case 'marvel':
+            return request('/discover/movie', {
+              with_companies: '420|7505',
+              with_genres: '16',
+              sort_by: 'popularity.desc',
+              page: page
+            });
+          case 'dc':
+            return request('/discover/movie', {
+              with_companies: '429|9993|128064',
+              with_genres: '16',
+              sort_by: 'popularity.desc',
+              page: page
+            });
+          case 'starwars':
+            return request('/search/movie', {
+              query: 'Star Wars LEGO',
+              page: page
+            });
+          case 'pixar':
+            return request('/discover/movie', {
+              with_companies: '3',
+              with_genres: '16',
+              sort_by: 'popularity.desc',
+              page: page
+            });
+          case 'harrypotter':
+            return request('/search/movie', {
+              query: 'LEGO Harry Potter',
+              page: page
+            });
+          case 'anime':
+            return request('/discover/movie', {
+              with_genres: '16',
+              with_original_language: 'ja',
+              sort_by: 'popularity.desc',
+              page: page
+            });
+          default:
+            return service.getFranchiseAnimation(franchiseKey, page);
+        }
+      };
+
+      // Chronological Timeline Order
+      service.getFranchiseTimeline = function (franchiseKey, page) {
+        page = page || 1;
+        switch (franchiseKey) {
+          case 'marvel':
+            return request('/discover/movie', {
+              with_companies: '420|7505',
+              'primary_release_date.gte': '2008-01-01',
+              sort_by: 'primary_release_date.asc',
+              page: page
+            });
+          case 'dc':
+            return request('/discover/movie', {
+              with_companies: '429|9993|128064',
+              'primary_release_date.gte': '1989-01-01',
+              sort_by: 'primary_release_date.asc',
+              page: page
+            });
+          case 'starwars':
+            return service.getCollection(10);
+          case 'pixar':
+            return request('/discover/movie', {
+              with_companies: '3',
+              sort_by: 'primary_release_date.asc',
+              page: page
+            });
+          case 'harrypotter':
+            return service.getCollection(1241);
+          case 'anime':
+            return request('/discover/movie', {
+              with_genres: '16',
+              with_original_language: 'ja',
+              sort_by: 'primary_release_date.asc',
+              page: page
+            });
+          default:
+            return service.getFranchiseMovies(franchiseKey, page, 'primary_release_date.asc');
+        }
+      };
+
+      // Get official collection (e.g. Harry Potter Collection = 1241, Star Wars = 10, Fantastic Beasts = 435259)
+      service.getCollection = function (collectionId) {
+        return request('/collection/' + collectionId);
+      };
+
       /* ----------------------------------------------------------
          IMAGE URL HELPERS
          Centralizing this means if TMDB changes their CDN path

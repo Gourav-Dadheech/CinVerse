@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 70" width="240" height="70">
+  <defs>
+    <linearGradient id="goldMagic" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE047"/>
+      <stop offset="50%" stop-color="#EAB308"/>
+      <stop offset="100%" stop-color="#CA8A04"/>
+    </linearGradient>
+    <filter id="magicGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="1" stdDeviation="3" flood-color="#FDE047" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+  <!-- Sparkle Glyph -->
+  <path d="M 120 4 L 122 13 L 131 15 L 122 17 L 120 26 L 118 17 L 109 15 L 118 13 Z" fill="url(#goldMagic)" filter="url(#magicGlow)"/>
+  <!-- WIZARDING -->
+  <text x="120" y="44" font-family="'Cinzel', 'Georgia', 'Times New Roman', serif" font-size="24" font-weight="800" fill="url(#goldMagic)" text-anchor="middle" letter-spacing="4" filter="url(#magicGlow)">WIZARDING</text>
+  <!-- WORLD -->
+  <text x="120" y="62" font-family="'Cinzel', 'Georgia', 'Times New Roman', serif" font-size="16" font-weight="700" fill="#E2E8F0" text-anchor="middle" letter-spacing="8">WORLD</text>
+</svg>

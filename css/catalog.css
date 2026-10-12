@@ -1,0 +1,240 @@
+/* ============================================================
+   CineVerse - catalog.css
+   ------------------------------------------------------------
+   Ultra-premium styling for OTT Hubs (Netflix, Disney+, Prime, etc.),
+   Web Series, Anime Universe & K-Drama catalog pages.
+   Matches FLIQ TV & Netflix Originals layout (Screenshot 3).
+   ============================================================ */
+
+.catalog-page {
+  min-height: 100vh;
+  background-color: var(--color-bg);
+  padding-bottom: 80px;
+}
+
+/* ================= HERO BANNER ================= */
+.catalog-hero-banner {
+  position: relative;
+  width: 100%;
+  padding: 120px 40px 40px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.catalog-hero-container {
+  max-width: 1380px;
+  margin: 0 auto;
+}
+
+.catalog-brand-header {
+  margin-bottom: 12px;
+}
+
+.catalog-brand-logo-img {
+  height: 48px;
+  max-width: 220px;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.6));
+}
+
+.catalog-brand-title {
+  font-family: var(--font-heading);
+  font-size: 3rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #fff;
+  margin: 0;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+}
+
+.catalog-subtitle {
+  color: #94a3b8;
+  font-size: 1.05rem;
+  margin: 0 0 20px;
+  max-width: 700px;
+  line-height: 1.5;
+}
+
+/* Meta Badges Row */
+.catalog-meta-badges {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
+
+.catalog-status-badge {
+  background: rgba(139, 92, 246, 0.18);
+  border: 1px solid rgba(139, 92, 246, 0.45);
+  color: #c084fc;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.catalog-status-badge .live-dot {
+  font-size: 0.5rem;
+  animation: pulseDot 2s infinite ease-in-out;
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+}
+
+.catalog-count-badge {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #cbd5e1;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 999px;
+}
+
+.catalog-audio-badge {
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  color: #c084fc;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Filter Bar Pills (Matches Screenshot 3) */
+.catalog-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.catalog-filter-pill {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #94a3b8;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 8px 20px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.catalog-filter-pill:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.catalog-filter-pill.active {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+  color: #fff;
+  border-color: #8b5cf6;
+  box-shadow: 0 4px 18px rgba(139, 92, 246, 0.45);
+}
+
+/* ================= CATALOG CONTENT SECTION ================= */
+.catalog-content-section {
+  padding: 40px 40px 60px;
+}
+
+.catalog-container {
+  max-width: 1380px;
+  margin: 0 auto;
+}
+
+/* 6-Column Grid matching Screenshot 3 */
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 1400px) {
+  .catalog-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+@media (max-width: 1100px) {
+  .catalog-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 850px) {
+  .catalog-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .catalog-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+}
+
+.catalog-card-wrap {
+  min-width: 0;
+}
+
+/* Empty State */
+.catalog-empty {
+  text-align: center;
+  padding: 80px 20px;
+  color: #94a3b8;
+}
+
+.catalog-empty i {
+  font-size: 3rem;
+  color: #64748b;
+  margin-bottom: 16px;
+}
+
+.catalog-empty h3 {
+  font-size: 1.4rem;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+/* Pagination / Load More */
+.catalog-pagination {
+  text-align: center;
+  margin-top: 50px;
+}
+
+.btn-load-more {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 12px 32px;
+  border-radius: 999px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.25s ease;
+}
+
+.btn-load-more:hover {
+  background: rgba(139, 92, 246, 0.2);
+  border-color: #8b5cf6;
+  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+  transform: translateY(-2px);
+}
