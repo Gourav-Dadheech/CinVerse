@@ -89,11 +89,42 @@
       vm.suggestions = [];
       vm.showSuggestions = false;
       vm.isLoadingSuggestions = false;
+      vm.mobileSearchOpen = false;
 
       var searchTimer = null;
 
       vm.getPosterUrl = function (path) {
         return MovieService.getPosterUrl(path, 'w92');
+      };
+
+      vm.toggleMobileSearch = function () {
+        vm.mobileSearchOpen = !vm.mobileSearchOpen;
+        if (vm.mobileSearchOpen) {
+          vm.menuOpen = false;
+          $timeout(function () {
+            var input = $window.document.getElementById('navbarSearchInput');
+            if (input) {
+              input.focus();
+            }
+          }, 120);
+        } else {
+          vm.showSuggestions = false;
+        }
+      };
+
+      vm.closeMobileSearch = function () {
+        vm.mobileSearchOpen = false;
+        vm.showSuggestions = false;
+      };
+
+      vm.onSearchFocus = function () {
+        var q = (vm.quickQuery || '').trim();
+        if (q.length >= 2) {
+          vm.showSuggestions = true;
+          if (!vm.suggestions || vm.suggestions.length === 0) {
+            vm.onSearchInput();
+          }
+        }
       };
 
       vm.onSearchInput = function () {
@@ -133,7 +164,18 @@
             .finally(function () {
               vm.isLoadingSuggestions = false;
             });
-        }, 220);
+        }, 180);
+      };
+
+      vm.selectSuggestion = function (item) {
+        vm.showSuggestions = false;
+        vm.mobileSearchOpen = false;
+        vm.quickQuery = '';
+        vm.suggestions = [];
+        if (item && item.targetUrl) {
+          var cleanPath = item.targetUrl.replace('#!', '');
+          $location.url(cleanPath);
+        }
       };
 
       vm.clearQuickSearch = function () {
@@ -145,7 +187,7 @@
       vm.closeSuggestions = function () {
         $timeout(function () {
           vm.showSuggestions = false;
-        }, 250);
+        }, 300);
       };
 
       vm.userDropdownOpen = false;
@@ -239,6 +281,8 @@
           return;
         }
         vm.menuOpen = false;
+        vm.mobileSearchOpen = false;
+        vm.showSuggestions = false;
         $location.path('/search').search({ q: query });
       };
 

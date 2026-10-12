@@ -24,6 +24,9 @@
       // ---------------- STATE ----------------
       vm.query = ($location.search().q || '');
       vm.results = [];
+      vm.suggestions = [];
+      vm.showSuggestions = false;
+      vm.isLoadingSuggestions = false;
       vm.genres = [];
       vm.selectedGenre = '';
       vm.sortOption = 'relevance';
@@ -31,6 +34,46 @@
       vm.isLoading = false;
       vm.hasSearched = false;
       vm.errorMessage = null;
+
+      vm.getPosterUrl = function (path) {
+        return MovieService.getPosterUrl(path, 'w92');
+      };
+
+      vm.onInputFocus = function () {
+        var q = (vm.query || '').trim();
+        if (q.length >= 2) {
+          vm.showSuggestions = true;
+          if (!vm.suggestions || vm.suggestions.length === 0) {
+            performSearch();
+          }
+        }
+      };
+
+      vm.closeSuggestions = function () {
+        $timeout(function () {
+          vm.showSuggestions = false;
+        }, 280);
+      };
+
+      vm.selectSuggestion = function (item) {
+        vm.showSuggestions = false;
+        if (item && item.targetUrl) {
+          var cleanPath = item.targetUrl.replace('#!', '');
+          $location.url(cleanPath);
+        }
+      };
+
+      vm.clearQuery = function () {
+        vm.query = '';
+        vm.suggestions = [];
+        vm.showSuggestions = false;
+        vm.results = [];
+        vm.hasSearched = false;
+        if (debounceTimer) {
+          $timeout.cancel(debounceTimer);
+        }
+        $location.search('q', null).replace();
+      };
 
       // ---------------- LOAD GENRES (for filter dropdown) ----------------
       MovieService.getGenres()
@@ -42,29 +85,63 @@
         });
 
       // ---------------- CORE SEARCH LOGIC ----------------
+      function formatItems(rawList) {
+        return (rawList || []).filter(function (it) {
+          return it.media_type === 'movie' || it.media_type === 'tv' || !it.media_type;
+        }).map(function (it) {
+          it.isTv = (it.media_type === 'tv') || (!it.title && !!it.name);
+          it.displayTitle = it.title || it.name || 'Untitled';
+          it.title = it.displayTitle;
+          it.displayDate = it.release_date || it.first_air_date || '';
+          it.release_date = it.displayDate;
+          it.targetUrl = it.isTv ? ('#!/tv/' + it.id) : ('#!/movie/' + it.id);
+          return it;
+        });
+      }
+
       function performSearch() {
         var trimmedQuery = (vm.query || '').trim();
 
         if (trimmedQuery.length === 0) {
           vm.results = [];
+          vm.suggestions = [];
+          vm.showSuggestions = false;
           vm.hasSearched = false;
           return;
         }
 
         vm.isLoading = true;
+        vm.isLoadingSuggestions = true;
         vm.errorMessage = null;
 
-        MovieService.searchMovies(trimmedQuery)
+        MovieService.searchMulti(trimmedQuery, 1)
           .then(function (data) {
-            vm.results = data.results || [];
+            var items = formatItems(data.results);
+            vm.results = items;
+            vm.suggestions = items.slice(0, 6);
             vm.hasSearched = true;
+            if ((vm.query || '').trim().length >= 2) {
+              vm.showSuggestions = true;
+            }
+          })
+          .catch(function () {
+            // Fallback to plain searchMovies if multi-search fails
+            return MovieService.searchMovies(trimmedQuery)
+              .then(function (movieData) {
+                var movieItems = formatItems(movieData.results);
+                vm.results = movieItems;
+                vm.suggestions = movieItems.slice(0, 6);
+                vm.hasSearched = true;
+              });
           })
           .catch(function (err) {
-            vm.errorMessage = err.message;
+            vm.errorMessage = err.message || 'Search failed. Please try again.';
             vm.results = [];
+            vm.suggestions = [];
           })
           .finally(function () {
             vm.isLoading = false;
+            vm.isLoadingSuggestions = false;
           });
       }
 
@@ -76,6 +153,14 @@
       // ---------------- LIVE SEARCH (DEBOUNCED) ----------------
       // Triggered by ng-change on the search input in search.html
       vm.onQueryChange = function () {
+        var q = (vm.query || '').trim();
+        if (q.length < 2) {
+          vm.suggestions = [];
+          vm.showSuggestions = false;
+        } else {
+          vm.showSuggestions = true;
+        }
+
         if (debounceTimer) {
           $timeout.cancel(debounceTimer);
         }

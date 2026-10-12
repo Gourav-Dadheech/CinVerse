@@ -7,18 +7,55 @@
 
   <!-- ================= SEARCH HEADER ================= -->
   <section class="search-header">
-    <h1 class="page-heading">Find Your Next Movie</h1>
+    <h1 class="page-heading">Find Movies &amp; TV Series</h1>
 
     <div class="search-input-wrap">
       <i class="fa-solid fa-magnifying-glass"></i>
       <input
         type="text"
         class="search-input-large"
-        placeholder="Search by title, e.g. Inception..."
+        placeholder="Search by title, e.g. Inception, Stranger Things, Batman..."
         ng-model="searchCtrl.query"
         ng-change="searchCtrl.onQueryChange()"
+        ng-focus="searchCtrl.onInputFocus()"
+        ng-blur="searchCtrl.closeSuggestions()"
+        autocomplete="off"
         autofocus />
-      <i class="fa-solid fa-xmark clear-icon" ng-if="searchCtrl.query" ng-click="searchCtrl.query=''; searchCtrl.onQueryChange()"></i>
+      <i class="fa-solid fa-xmark clear-icon" ng-if="searchCtrl.query" ng-click="searchCtrl.clearQuery()" title="Clear"></i>
+
+      <!-- Instant Live Suggestions Dropdown on Search Page -->
+      <div class="search-page-suggestions" ng-if="searchCtrl.showSuggestions" ng-mousedown="$event.preventDefault()">
+        <div class="suggestions-loading" ng-if="searchCtrl.isLoadingSuggestions">
+          <i class="fa-solid fa-circle-notch fa-spin"></i> Searching CinVerse...
+        </div>
+
+        <div class="suggestions-list" ng-if="!searchCtrl.isLoadingSuggestions && searchCtrl.suggestions.length > 0">
+          <a class="suggestion-item" ng-repeat="item in searchCtrl.suggestions track by (item.media_type + '-' + item.id)"
+            ng-href="{{ item.targetUrl }}" ng-click="searchCtrl.selectSuggestion(item)">
+            <img class="suggestion-poster" ng-src="{{ searchCtrl.getPosterUrl(item.poster_path) }}"
+              alt="{{ item.displayTitle }}" />
+            <div class="suggestion-info">
+              <span class="suggestion-title">
+                {{ item.displayTitle }}
+                <span class="suggestion-tag-series" ng-if="item.isTv">SERIES</span>
+              </span>
+              <div class="suggestion-meta">
+                <span class="suggestion-year">{{ item.displayDate ? item.displayDate.slice(0,4) : 'TBA' }}</span>
+                <span class="suggestion-rating" ng-if="item.vote_average">
+                  <i class="fa-solid fa-star"></i> {{ item.vote_average.toFixed(1) }}
+                </span>
+                <span class="suggestion-lang" ng-if="item.original_language">{{ item.original_language.toUpperCase() }}</span>
+              </div>
+            </div>
+            <i class="fa-solid fa-chevron-right suggestion-arrow"></i>
+          </a>
+        </div>
+
+        <div class="suggestions-empty"
+          ng-if="!searchCtrl.isLoadingSuggestions && searchCtrl.suggestions.length === 0 && searchCtrl.query.length >= 2">
+          <i class="fa-solid fa-film"></i> No instant suggestions found for "{{ searchCtrl.query }}"
+        </div>
+      </div>
     </div>
 
     <!-- ================= FILTERS ================= -->
@@ -68,7 +105,7 @@
 
   <!-- ================= RESULTS GRID ================= -->
   <section class="movie-grid" ng-if="!searchCtrl.isLoading && searchCtrl.filteredResults().length > 0">
-    <div class="grid-item" ng-repeat="movie in searchCtrl.filteredResults() track by movie.id">
+    <div class="grid-item" ng-repeat="movie in searchCtrl.filteredResults() track by (movie.media_type ? (movie.media_type + '-' + movie.id) : ('item-' + movie.id))">
       <movie-card movie="movie"></movie-card>
     </div>
   </section>

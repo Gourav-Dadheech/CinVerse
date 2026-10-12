@@ -151,12 +151,20 @@
 
         <!-- Right Group: Search Pill + Profile (FLIQ style) -->
         <div class="navbar-right-group">
+          <!-- Mobile Search Trigger Button (Visible only on mobile/tablet screens <= 900px) -->
+          <button type="button" class="mobile-search-toggle" ng-click="navCtrl.toggleMobileSearch()" aria-label="Search CinVerse" title="Search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+
           <!-- Quick Search with Instant Suggestions Dropdown (FLIQ TV style) -->
-          <div class="navbar-search-wrapper" id="navbarSearchWrapper">
+          <div class="navbar-search-wrapper" id="navbarSearchWrapper" ng-class="{'mobile-search-open': navCtrl.mobileSearchOpen}">
             <form class="navbar-search" ng-submit="navCtrl.goToSearch()">
+              <button type="button" class="btn-mobile-search-back" ng-click="navCtrl.closeMobileSearch()" aria-label="Back">
+                <i class="fa-solid fa-arrow-left"></i>
+              </button>
               <i class="fa-solid fa-magnifying-glass search-icon"></i>
-              <input type="text" placeholder="Search..." ng-model="navCtrl.quickQuery"
-                ng-change="navCtrl.onSearchInput()" ng-focus="navCtrl.onSearchInput()"
+              <input type="text" id="navbarSearchInput" placeholder="Search movies & shows..." ng-model="navCtrl.quickQuery"
+                ng-change="navCtrl.onSearchInput()" ng-focus="navCtrl.onSearchFocus()"
                 ng-blur="navCtrl.closeSuggestions()" aria-label="Search movies" autocomplete="off" />
               <button type="button" class="btn-clear-search" ng-if="navCtrl.quickQuery"
                 ng-click="navCtrl.clearQuickSearch()" title="Clear">
@@ -165,14 +173,14 @@
             </form>
 
             <!-- Live Instant Suggestions Dropdown -->
-            <div class="navbar-search-suggestions" ng-if="navCtrl.showSuggestions">
+            <div class="navbar-search-suggestions" ng-if="navCtrl.showSuggestions" ng-mousedown="$event.preventDefault()">
               <div class="suggestions-loading" ng-if="navCtrl.isLoadingSuggestions">
                 <i class="fa-solid fa-circle-notch fa-spin"></i> Searching CinVerse...
               </div>
 
               <div class="suggestions-list" ng-if="!navCtrl.isLoadingSuggestions && navCtrl.suggestions.length > 0">
-                <a class="suggestion-item" ng-repeat="item in navCtrl.suggestions track by item.id"
-                  ng-href="{{ item.targetUrl }}" ng-click="navCtrl.clearQuickSearch()">
+                <a class="suggestion-item" ng-repeat="item in navCtrl.suggestions track by (item.media_type + '-' + item.id)"
+                  ng-href="{{ item.targetUrl }}" ng-click="navCtrl.selectSuggestion(item)">
                   <img class="suggestion-poster" ng-src="{{ navCtrl.getPosterUrl(item.poster_path) }}"
                     alt="{{ item.displayTitle }}" />
                   <div class="suggestion-info">
@@ -200,7 +208,7 @@
 
               <div class="suggestions-empty"
                 ng-if="!navCtrl.isLoadingSuggestions && navCtrl.suggestions.length === 0 && navCtrl.quickQuery.length >= 2">
-                <i class="fa-solid fa-film"></i> No movies found for "{{ navCtrl.quickQuery }}"
+                <i class="fa-solid fa-film"></i> No results found for "{{ navCtrl.quickQuery }}"
               </div>
             </div>
           </div>
