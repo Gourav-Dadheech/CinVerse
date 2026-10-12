@@ -7,4 +7,4 @@ Allow: /js/
 Allow: /views/
 
 # Sitemap location for Googlebot
-Sitemap: https://cinverse.onrender.com/sitemap.xml
+Sitemap: https://cineverse-uq71.onrender.com/sitemap.xml
