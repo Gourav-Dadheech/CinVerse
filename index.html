@@ -147,10 +147,22 @@
             title="Watchlist">
             <i class="fa-solid fa-bookmark"></i>
           </a>
+          <!-- Mobile Drawer Item for App (Only shown inside drawer on mobile) -->
+          <a href="javascript:void(0)" class="nav-link nav-link-app-drawer" ng-click="navCtrl.openAppDownloadModal(); navCtrl.closeMenu()" title="Download CinVerse Android App (APK)">
+            <i class="fa-brands fa-android"></i> <span>Download App (APK)</span>
+            <span class="nav-app-badge">FREE</span>
+          </a>
         </nav>
 
         <!-- Right Group: Search Pill + Profile (FLIQ style) -->
         <div class="navbar-right-group">
+          <!-- Single App Pill Button between Menu Navbar and Search -->
+          <button type="button" class="navbar-app-pill-btn" ng-click="navCtrl.openAppDownloadModal()" title="Download CinVerse Android App (APK)">
+            <i class="fa-brands fa-android"></i>
+            <span class="app-pill-text">Get App</span>
+            <span class="app-pill-badge">APK</span>
+          </button>
+
           <!-- Mobile Search Trigger Button (Visible only on mobile/tablet screens <= 900px) -->
           <button type="button" class="mobile-search-toggle" ng-click="navCtrl.toggleMobileSearch()" aria-label="Search CinVerse" title="Search">
             <i class="fa-solid fa-magnifying-glass"></i>

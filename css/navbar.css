@@ -1132,8 +1132,108 @@
 }
 
 /* ============================================================
-   CINVERSE ANDROID APP DOWNLOAD FOOTER CARD & MODAL
+   CINVERSE ANDROID APP DOWNLOAD (NAVBAR, FOOTER & MODAL)
    ============================================================ */
+
+/* Single App Pill Button between Menu Navbar and Search */
+.navbar-app-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 12px;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.16) 0%, rgba(124, 58, 237, 0.28) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.45);
+  border-radius: 999px;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+  box-shadow: 0 2px 10px rgba(168, 85, 247, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.navbar-app-pill-btn:hover {
+  transform: translateY(-2px);
+  border-color: #c084fc;
+  box-shadow: 0 4px 18px rgba(168, 85, 247, 0.45);
+}
+
+.navbar-app-pill-btn i {
+  color: #34d399;
+  font-size: 0.95rem;
+}
+
+.app-pill-badge {
+  background: #10b981;
+  color: #042f2e;
+  font-size: 0.58rem;
+  font-weight: 900;
+  padding: 1px 5px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+/* Hide in-drawer link inside desktop pill */
+.nav-link-app-drawer {
+  display: none !important;
+}
+
+/* Mobile Screen Adjustments (<= 900px) */
+@media (max-width: 900px) {
+  .navbar-app-pill-btn {
+    width: 38px !important;
+    height: 38px !important;
+    padding: 0 !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    box-shadow: none !important;
+  }
+  .navbar-app-pill-btn:hover {
+    background: rgba(139, 92, 246, 0.25) !important;
+    border-color: rgba(139, 92, 246, 0.5) !important;
+    transform: scale(1.05);
+  }
+  .navbar-app-pill-btn .app-pill-text,
+  .navbar-app-pill-btn .app-pill-badge {
+    display: none !important;
+  }
+  .navbar-app-pill-btn i {
+    font-size: 1.15rem !important;
+    color: #34d399 !important;
+  }
+
+  /* Show in mobile opened drawer */
+  .navbar-links.nav-open .nav-link-app-drawer {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(16, 185, 129, 0.16) 100%) !important;
+    border: 1px solid rgba(168, 85, 247, 0.45) !important;
+    color: #fff !important;
+    font-weight: 700 !important;
+    border-radius: 10px !important;
+    margin-top: 8px;
+  }
+  .nav-link-app-drawer i {
+    color: #34d399 !important;
+    font-size: 1.05rem;
+  }
+  .nav-app-badge {
+    background: #10b981;
+    color: #042f2e;
+    font-size: 0.62rem;
+    font-weight: 900;
+    padding: 2px 7px;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+  }
+}
 
 /* Footer App Download Card */
 .footer-app-download-box {
