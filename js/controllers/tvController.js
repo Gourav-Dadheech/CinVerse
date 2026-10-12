@@ -64,7 +64,17 @@
         vm.adShieldActive = !vm.adShieldActive;
       };
 
-      // ---------------- 3 CLEAN STREAMING SERVERS ----------------
+      // ---------------- 5 HIGH-SPEED STREAMING SERVERS (MULTI-AUDIO & GLOBAL) ----------------
+      vm.gestureOverlayEnabled = true;
+      vm.showPlayerHud = false;
+      vm.isPlaying = true;
+      vm.showRewindRipple = false;
+      vm.showForwardRipple = false;
+
+      var hudTimer = null;
+      var lastTapTime = 0;
+      var lastTapX = 0;
+
       vm.servers = [
         {
           id: 1,
@@ -86,8 +96,26 @@
         },
         {
           id: 3,
-          name: 'College WiFi Bypass (Vidflix Unblocked)',
-          badge: 'Hostel Firewall Proof 🎓',
+          name: 'Server 3 (2Embed Cinema - Multi-Audio)',
+          badge: 'Bollywood & Global Ready 🇮🇳',
+          icon: 'fa-clapperboard',
+          getUrl: function (id, s, e) {
+            return 'https://www.2embed.cc/embedtv/' + id + '&s=' + s + '&e=' + e;
+          }
+        },
+        {
+          id: 4,
+          name: 'Server 4 (SmashyStream Fast Cloud)',
+          badge: 'Buffer-Free Mirror 💨',
+          icon: 'fa-cloud',
+          getUrl: function (id, s, e) {
+            return 'https://embed.smashystream.com/playere.php?tmdb=' + id + '&season=' + s + '&episode=' + e;
+          }
+        },
+        {
+          id: 5,
+          name: 'Server 5 (College WiFi Bypass - Vidflix)',
+          badge: 'Campus Firewall Proof 🎓',
           icon: 'fa-graduation-cap',
           getUrl: function (id, s, e) {
             return 'https://vidsrc.pm/embed/tv?tmdb=' + id + '&season=' + s + '&episode=' + e;
@@ -98,9 +126,108 @@
       vm.currentServer = vm.servers[0];
       vm.currentStreamUrl = null;
 
+      function sendIframeCommand(cmd, val) {
+        var iframes = document.querySelectorAll('.theater-screen-wrap iframe');
+        iframes.forEach(function (iframe) {
+          if (!iframe || !iframe.contentWindow) return;
+          try {
+            iframe.contentWindow.postMessage({ type: cmd, value: val, offset: val, command: cmd }, '*');
+            iframe.contentWindow.postMessage(JSON.stringify({ type: cmd, value: val, offset: val, command: cmd }), '*');
+            var ytFunc = cmd === 'play' ? 'playVideo' : (cmd === 'pause' ? 'pauseVideo' : (cmd === 'seek' ? 'seekTo' : cmd));
+            iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: ytFunc, args: val ? [val] : [] }), '*');
+            iframe.contentWindow.postMessage({ event: 'command', func: ytFunc, args: val ? [val] : [] }, '*');
+            iframe.contentWindow.postMessage(JSON.stringify({ method: cmd, value: val }), '*');
+          } catch (e) {}
+        });
+      }
+
+      vm.showHudTemporarily = function () {
+        vm.showPlayerHud = true;
+        if (hudTimer) $timeout.cancel(hudTimer);
+        hudTimer = $timeout(function () {
+          vm.showPlayerHud = false;
+        }, 3800);
+      };
+
+      // Tap handler: single tap toggles HUD; double tap seeks 10s
+      vm.onOverlayTap = function ($event) {
+        var now = Date.now();
+        var targetEl = $event.currentTarget;
+        var rect = targetEl.getBoundingClientRect();
+        var clientX = $event.clientX || ($event.touches && $event.touches[0] ? $event.touches[0].clientX : ($event.changedTouches && $event.changedTouches[0] ? $event.changedTouches[0].clientX : rect.width / 2));
+        var xPos = clientX - rect.left;
+        var relX = rect.width ? (xPos / rect.width) : 0.5;
+
+        // Double tap detection (under 320ms and within 110px)
+        if (now - lastTapTime < 320 && Math.abs(xPos - lastTapX) < 110) {
+          if (relX < 0.44) {
+            vm.doubleTapSeek(-10);
+          } else if (relX > 0.56) {
+            vm.doubleTapSeek(10);
+          }
+          lastTapTime = 0;
+          return;
+        }
+
+        lastTapTime = now;
+        lastTapX = xPos;
+
+        // Single tap: toggles player HUD without ever pausing the video!
+        vm.showPlayerHud = !vm.showPlayerHud;
+        if (vm.showPlayerHud) {
+          vm.showHudTemporarily();
+        }
+      };
+
+      vm.doubleTapSeek = function (offsetSec) {
+        vm.seekOffset(offsetSec);
+        if (offsetSec < 0) {
+          vm.showRewindRipple = true;
+          $timeout(function () { vm.showRewindRipple = false; }, 650);
+        } else {
+          vm.showForwardRipple = true;
+          $timeout(function () { vm.showForwardRipple = false; }, 650);
+        }
+      };
+
+      vm.seekOffset = function (offsetSec) {
+        sendIframeCommand('seek', offsetSec);
+        vm.showHudTemporarily();
+      };
+
+      vm.togglePlayPause = function () {
+        vm.isPlaying = !vm.isPlaying;
+        sendIframeCommand(vm.isPlaying ? 'play' : 'pause');
+        vm.showHudTemporarily();
+      };
+
+      vm.toggleGestureOverlay = function () {
+        vm.gestureOverlayEnabled = !vm.gestureOverlayEnabled;
+        if (!vm.gestureOverlayEnabled) {
+          vm.showPlayerHud = false;
+        }
+      };
+
+      vm.toggleFullscreen = function () {
+        var wrap = document.getElementById('tv-player-section') || document.querySelector('.theater-screen-wrap');
+        if (!wrap) return;
+        if (!document.fullscreenElement) {
+          if (wrap.requestFullscreen) wrap.requestFullscreen();
+          else if (wrap.webkitRequestFullscreen) wrap.webkitRequestFullscreen();
+        } else {
+          if (document.exitFullscreen) document.exitFullscreen();
+        }
+      };
+
+      vm.nextServer = function () {
+        var idx = vm.servers.indexOf(vm.currentServer);
+        var nextIdx = (idx + 1) % vm.servers.length;
+        vm.selectServer(vm.servers[nextIdx]);
+      };
+
       vm.selectServer = function (server) {
         vm.currentServer = server;
-        vm.collegeBypassActive = (server.id === 3);
+        vm.collegeBypassActive = (server.id === 5);
         if (vm.show && vm.show.id) {
           var url = server.getUrl(vm.show.id, vm.currentSeasonNumber, vm.currentEpisodeNumber);
           vm.currentStreamUrl = $sce.trustAsResourceUrl(url);

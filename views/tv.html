@@ -131,13 +131,16 @@
           <div class="server-pill-list">
             <button class="server-pill"
                     ng-repeat="server in tvCtrl.servers"
-                    ng-class="{ 'active': tvCtrl.currentServer.id === server.id, 'campus-pill': server.id === 3 }"
+                    ng-class="{ 'active': tvCtrl.currentServer.id === server.id, 'campus-pill': server.id === 5, 'bollywood-pill': server.id === 3 }"
                     ng-click="tvCtrl.selectServer(server)">
               <i class="fa-solid" ng-class="server.icon || 'fa-bolt'"></i>
               <span>{{ server.name }}</span>
               <span class="server-badge" ng-if="server.badge">{{ server.badge }}</span>
             </button>
           </div>
+          <button class="btn-quick-next" ng-click="tvCtrl.nextServer()" title="Switch to Next Server (Hotkey: N)">
+            <i class="fa-solid fa-rotate"></i> Next Server
+          </button>
         </div>
 
         <!-- In-Player Audio & Subtitles Note -->
@@ -149,7 +152,7 @@
         </div>
 
         <!-- Video Screen Container -->
-        <div class="theater-screen-wrap">
+        <div class="theater-screen-wrap" id="tv-theater-screen-container">
           <iframe
             ng-src="{{ tvCtrl.currentStreamUrl }}"
             title="{{ tvCtrl.show.name }} Episode Stream"
@@ -159,6 +162,100 @@
             mozallowfullscreen
             allowfullscreen>
           </iframe>
+
+          <!-- SMART GESTURE & TOUCH SHIELD OVERLAY (Anti-Accidental Pause & Double-Tap ±10s Seek) -->
+          <div class="player-smart-overlay"
+               ng-if="tvCtrl.gestureOverlayEnabled"
+               ng-click="tvCtrl.onOverlayTap($event)"
+               ng-class="{ 'hud-visible': tvCtrl.showPlayerHud }">
+
+            <!-- Double Tap Left Seek Ripple (-10s) -->
+            <div class="seek-ripple-indicator ripple-left" ng-if="tvCtrl.showRewindRipple">
+              <div class="ripple-glow"></div>
+              <div class="ripple-content">
+                <div class="ripple-icon-row">
+                  <i class="fa-solid fa-backward-step"></i>
+                  <i class="fa-solid fa-backward"></i>
+                </div>
+                <span class="ripple-seconds">-10s</span>
+                <span class="ripple-sub">REWIND</span>
+              </div>
+            </div>
+
+            <!-- Double Tap Right Seek Ripple (+10s) -->
+            <div class="seek-ripple-indicator ripple-right" ng-if="tvCtrl.showForwardRipple">
+              <div class="ripple-glow"></div>
+              <div class="ripple-content">
+                <div class="ripple-icon-row">
+                  <i class="fa-solid fa-forward"></i>
+                  <i class="fa-solid fa-forward-step"></i>
+                </div>
+                <span class="ripple-seconds">+10s</span>
+                <span class="ripple-sub">FORWARD</span>
+              </div>
+            </div>
+
+            <!-- Floating Heads-Up Display (Toggled on single tap, never accidentally pauses) -->
+            <div class="player-floating-hud" ng-class="{ 'visible': tvCtrl.showPlayerHud }" ng-click="$event.stopPropagation()">
+              <div class="hud-top-bar">
+                <div class="hud-title-box">
+                  <span class="hud-live-tag"><i class="fa-solid fa-shield-halved"></i> Anti-Accidental Pause Active</span>
+                  <span class="hud-server-info"><i class="fa-solid fa-server"></i> {{ tvCtrl.currentServer.name }}</span>
+                </div>
+                <button class="btn-unlock-embed" ng-click="tvCtrl.toggleGestureOverlay()" title="Tap to interact directly with native player gear, subtitles & tracks">
+                  <i class="fa-solid fa-arrow-pointer"></i>
+                  <span>Direct Player Mode</span>
+                </button>
+              </div>
+
+              <!-- Center Play / Seek Controls -->
+              <div class="hud-center-controls">
+                <button class="hud-btn hud-seek-btn" ng-click="tvCtrl.doubleTapSeek(-10)" title="Rewind 10 Seconds">
+                  <i class="fa-solid fa-rotate-left"></i>
+                  <span class="btn-caption">-10s</span>
+                </button>
+
+                <button class="hud-btn hud-play-pause-btn" ng-click="tvCtrl.togglePlayPause()" title="{{ tvCtrl.isPlaying ? 'Pause Video' : 'Play Video' }}">
+                  <i class="fa-solid" ng-class="tvCtrl.isPlaying ? 'fa-pause' : 'fa-play'"></i>
+                </button>
+
+                <button class="hud-btn hud-seek-btn" ng-click="tvCtrl.doubleTapSeek(10)" title="Fast Forward 10 Seconds">
+                  <i class="fa-solid fa-rotate-right"></i>
+                  <span class="btn-caption">+10s</span>
+                </button>
+              </div>
+
+              <!-- Bottom Bar -->
+              <div class="hud-bottom-bar">
+                <div class="hud-gesture-hint">
+                  <i class="fa-solid fa-hand-pointer"></i> Double-tap left/right to skip 10s • Tap screen to show/hide controls
+                </div>
+                <div class="hud-actions-group">
+                  <button class="hud-action-pill" ng-click="tvCtrl.nextServer()" title="Switch Server">
+                    <i class="fa-solid fa-rotate"></i> Next Server
+                  </button>
+                  <button class="hud-action-pill" ng-click="tvCtrl.toggleFullscreen()" title="Fullscreen Player">
+                    <i class="fa-solid fa-expand"></i> Fullscreen
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Idle Floating Gestures Guide (Visible when HUD is closed) -->
+            <div class="player-gesture-guide-watermark" ng-if="!tvCtrl.showPlayerHud">
+              <span class="guide-zone guide-left"><i class="fa-solid fa-angles-left"></i> Double-tap -10s</span>
+              <span class="guide-zone guide-center"><i class="fa-solid fa-fingerprint"></i> Tap for Controls</span>
+              <span class="guide-zone guide-right">Double-tap +10s <i class="fa-solid fa-angles-right"></i></span>
+            </div>
+          </div>
+
+          <!-- Floating button to re-enable smart gestures if Direct Player Mode was turned on -->
+          <button class="btn-re-enable-gestures"
+                  ng-if="!tvCtrl.gestureOverlayEnabled"
+                  ng-click="tvCtrl.toggleGestureOverlay()"
+                  title="Turn on Anti-Accidental Pause & Double-Tap Seeking">
+            <i class="fa-solid fa-shield-halved"></i> Turn On Double-Tap & Anti-Pause
+          </button>
         </div>
 
         <!-- Theater Footer -->
