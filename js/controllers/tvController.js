@@ -208,6 +208,139 @@
         }
       };
 
+      // ---------------- SLIDE FOR BRIGHTNESS & VOLUME (MX PLAYER / VLC GESTURES) ----------------
+      vm.brightnessLevel = 100;
+      vm.volumeLevel = 100;
+      vm.showBrightnessGauge = false;
+      vm.showVolumeGauge = false;
+      vm.aspectRatioMode = 'fit'; // 'fit' | 'fill' | 'stretch'
+      vm.playbackSpeed = 1.0;
+      vm.isScreenLocked = false;
+      var gaugeTimer = null;
+      var wakeLockObj = null;
+
+      vm.hideGaugesSoon = function () {
+        if (gaugeTimer) $timeout.cancel(gaugeTimer);
+        gaugeTimer = $timeout(function () {
+          vm.showBrightnessGauge = false;
+          vm.showVolumeGauge = false;
+        }, 1200);
+      };
+
+      vm.setBrightness = function (val) {
+        val = Math.max(20, Math.min(130, parseInt(val, 10) || 100));
+        vm.brightnessLevel = val;
+        vm.showBrightnessGauge = true;
+        vm.showVolumeGauge = false;
+
+        // Physical screen backlight on Android hardware if running inside APK
+        if (window.CinVerseNative && window.CinVerseNative.setBrightness) {
+          try {
+            window.CinVerseNative.setBrightness(val / 100);
+          } catch (e) {}
+        }
+
+        // CSS brightness boost on video element if over 100%
+        try {
+          var iframe = document.querySelector('.theater-screen-wrap iframe');
+          if (iframe) {
+            iframe.style.filter = val > 100 ? ('brightness(' + val + '%)') : 'none';
+          }
+        } catch (e) {}
+
+        vm.hideGaugesSoon();
+      };
+
+      vm.setVolume = function (val) {
+        val = Math.max(0, Math.min(200, parseInt(val, 10) || 0));
+        vm.volumeLevel = val;
+        sendIframeCommand('volume', val / 100);
+        sendIframeCommand('setVolume', Math.min(100, val));
+        vm.showVolumeGauge = true;
+        vm.showBrightnessGauge = false;
+
+        // Hardware speaker volume if running inside CinVerse Android APK
+        if (window.CinVerseNative && window.CinVerseNative.setVolume) {
+          try {
+            window.CinVerseNative.setVolume(Math.min(100, val));
+          } catch (e) {}
+        }
+
+        vm.hideGaugesSoon();
+      };
+
+      vm.getBrightnessTintOpacity = function () {
+        if (vm.brightnessLevel < 100) {
+          return ((100 - vm.brightnessLevel) / 100) * 0.82;
+        }
+        return 0;
+      };
+
+      vm.toggleAspectRatio = function () {
+        if (vm.aspectRatioMode === 'fit') {
+          vm.aspectRatioMode = 'fill';
+        } else if (vm.aspectRatioMode === 'fill') {
+          vm.aspectRatioMode = 'stretch';
+        } else {
+          vm.aspectRatioMode = 'fit';
+        }
+        if (window.CinVerseNative && window.CinVerseNative.vibrate) {
+          try { window.CinVerseNative.vibrate(25); } catch (e) {}
+        }
+      };
+
+      vm.getAspectLabel = function () {
+        if (vm.aspectRatioMode === 'fill') return 'Fill 20:9';
+        if (vm.aspectRatioMode === 'stretch') return 'Stretch';
+        return 'Fit 16:9';
+      };
+
+      vm.togglePlaybackSpeed = function () {
+        var speeds = [1.0, 1.25, 1.5, 0.75];
+        var idx = speeds.indexOf(vm.playbackSpeed);
+        vm.playbackSpeed = speeds[(idx + 1) % speeds.length];
+        sendIframeCommand('setPlaybackRate', vm.playbackSpeed);
+        sendIframeCommand('playbackRate', vm.playbackSpeed);
+        if (window.CinVerseNative && window.CinVerseNative.vibrate) {
+          try { window.CinVerseNative.vibrate(25); } catch (e) {}
+        }
+      };
+
+      vm.toggleScreenLock = function () {
+        vm.isScreenLocked = !vm.isScreenLocked;
+        if (vm.isScreenLocked) {
+          vm.showPlayerHud = false;
+        } else {
+          vm.showHudTemporarily();
+        }
+        if (window.CinVerseNative && window.CinVerseNative.vibrate) {
+          try { window.CinVerseNative.vibrate(35); } catch (e) {}
+        }
+      };
+
+      function acquireWakeLock() {
+        if ('wakeLock' in navigator) {
+          try {
+            navigator.wakeLock.request('screen').then(function (wl) {
+              wakeLockObj = wl;
+            }).catch(function () {});
+          } catch (e) {}
+        }
+        if (window.CinVerseNative && window.CinVerseNative.setKeepScreenOn) {
+          try { window.CinVerseNative.setKeepScreenOn(true); } catch (e) {}
+        }
+      }
+
+      function releaseWakeLock() {
+        if (wakeLockObj) {
+          try { wakeLockObj.release(); } catch (e) {}
+          wakeLockObj = null;
+        }
+        if (window.CinVerseNative && window.CinVerseNative.setKeepScreenOn) {
+          try { window.CinVerseNative.setKeepScreenOn(false); } catch (e) {}
+        }
+      }
+
       vm.toggleFullscreen = function () {
         var wrap = document.getElementById('tv-player-section') || document.querySelector('.theater-screen-wrap');
         if (!wrap) return;
@@ -238,6 +371,7 @@
       vm.playEpisode = function (seasonNum, epNum) {
         vm.currentSeasonNumber = parseInt(seasonNum, 10) || 1;
         vm.currentEpisodeNumber = parseInt(epNum, 10) || 1;
+        acquireWakeLock();
 
         // Find episode in current list if available
         if (vm.episodes && vm.episodes.length) {
@@ -287,6 +421,7 @@
         vm.showPlayer = false;
         vm.theaterMode = false;
         vm.currentStreamUrl = null;
+        releaseWakeLock();
       };
 
       vm.nextEpisode = function () {

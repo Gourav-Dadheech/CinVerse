@@ -297,6 +297,11 @@
 
       // Android App Download Modal State
       vm.showAppModal = false;
+      vm.isNativeApp = !!(window.CinVerseNative || (navigator.userAgent && navigator.userAgent.indexOf('CinVerseApp') !== -1));
+      if (vm.isNativeApp) {
+        document.body.classList.add('is-native-app');
+      }
+
       vm.openAppDownloadModal = function () {
         vm.showAppModal = true;
       };

@@ -41,6 +41,7 @@ jobs:
           mkdir -p output_apk
           APK_FILE=$(find android/app/build/outputs/apk -name "*.apk" | head -n 1)
           if [ -n "$APK_FILE" ]; then
+            cp "$APK_FILE" output_apk/CinVerse-v1.1.0.apk
             cp "$APK_FILE" output_apk/CinVerse-v1.0.0.apk
             echo "Found APK: $APK_FILE"
           else
@@ -51,26 +52,31 @@ jobs:
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: CinVerse-v1.0.0.apk
-          path: output_apk/CinVerse-v1.0.0.apk
+          name: CinVerse-v1.1.0.apk
+          path: output_apk/CinVerse-v1.1.0.apk
           retention-days: 90
 
       - name: Create or Update GitHub Release
         uses: softprops/action-gh-release@v2
         if: github.ref == 'refs/heads/main'
         with:
-          tag_name: v1.0.0
-          name: "CinVerse Android App v1.0.0"
+          tag_name: v1.1.0
+          name: "CinVerse Android App v1.1.0 (Gesture Controls)"
           body: |
-            ### 🎬 CinVerse Official Android Release (v1.0.0)
+            ### 🎬 CinVerse Official Android Release (v1.1.0)
 
-            - 🚀 **100% Ad-Free & Pop-Up Blocked**
-            - ⚡ **Buffer-Free 1080p & 4K Streaming** (Multi-Audio: Hindi, English, Regional)
-            - 📱 **Double-Tap 10s Seek Gestures** (YouTube / Netflix style)
-            - 🍿 **True Full-Screen Cinema & Immersive Video Playback**
+            - ☀️ **Slide for Brightness**: Vertical swipe on left side adjusts physical screen backlight / brightness with MX Player style HUD!
+            - 🔊 **Slide for Volume**: Vertical swipe on right side adjusts hardware media volume!
+            - ⏩ **Double-Tap ±10s Seek**: YouTube / Netflix style rewind and forward with neon wave ripples.
+            - 🚫 **Anti-Accidental Pause**: Single tap shows control HUD — video never stops unintentionally.
+            - 🚀 **100% Ad-Free & Pop-Up Blocked**: Malicious redirects and external spam windows blocked.
+            - ⚡ **Buffer-Free 1080p & 4K Streaming**: 5 high-speed cloud mirrors with Hindi & Multi-Audio.
+            - 🍿 **True Fullscreen Landscape**: Auto-rotates to landscape with screen wake-lock enabled.
 
             #### 📥 Download:
-            Download **`CinVerse-v1.0.0.apk`** below and install on any Android 7.0+ device!
-          files: output_apk/CinVerse-v1.0.0.apk
+            Download **`CinVerse-v1.1.0.apk`** below and install on any Android 7.0+ device!
+          files: |
+            output_apk/CinVerse-v1.1.0.apk
+            output_apk/CinVerse-v1.0.0.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

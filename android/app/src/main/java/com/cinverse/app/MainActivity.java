@@ -1,14 +1,20 @@
 package com.cinverse.app;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
+import android.media.AudioManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
@@ -76,10 +82,87 @@ public class MainActivity extends AppCompatActivity {
 
         // Custom User Agent
         String defaultUa = settings.getUserAgentString();
-        settings.setUserAgentString(defaultUa + " CinVerseApp/1.0.0");
+        settings.setUserAgentString(defaultUa + " CinVerseApp/1.1.0");
+
+        // Native Hardware Bridge for Gesture Controls (Slide Brightness, Volume & WakeLock)
+        webView.addJavascriptInterface(new CinVerseNativeBridge(), "CinVerseNative");
 
         webView.setWebViewClient(new CinVerseWebViewClient());
         webView.setWebChromeClient(new CinVerseChromeClient());
+    }
+
+    /**
+     * Native Bridge exposed to JavaScript for hardware-level controls
+     * matching premium media players like VLC and MX Player.
+     */
+    public class CinVerseNativeBridge {
+
+        @JavascriptInterface
+        public boolean isNativeApp() {
+            return true;
+        }
+
+        @JavascriptInterface
+        public void setBrightness(final float brightnessRatio) {
+            // brightnessRatio: 0.05f to 1.0f
+            runOnUiThread(() -> {
+                try {
+                    WindowManager.LayoutParams layoutParams = getWindow().getAttributes();
+                    layoutParams.screenBrightness = Math.max(0.05f, Math.min(1.0f, brightnessRatio));
+                    getWindow().setAttributes(layoutParams);
+                } catch (Exception e) {
+                    // Fallback handled gracefully in webview
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void setVolume(final int volumePercent) {
+            // volumePercent: 0 to 100
+            runOnUiThread(() -> {
+                try {
+                    AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                    if (audioManager != null) {
+                        int maxVol = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+                        int targetVol = Math.round((Math.max(0, Math.min(100, volumePercent)) / 100.0f) * maxVol);
+                        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, targetVol, 0);
+                    }
+                } catch (Exception e) {
+                    // Fallback handled gracefully in webview
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void setKeepScreenOn(final boolean keepOn) {
+            runOnUiThread(() -> {
+                try {
+                    if (keepOn) {
+                        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                    } else {
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                    }
+                } catch (Exception e) {
+                    // Ignored
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void vibrate(final int durationMs) {
+            runOnUiThread(() -> {
+                try {
+                    Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                    if (v != null && v.hasVibrator()) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            v.vibrate(VibrationEffect.createOneShot(Math.min(100, Math.max(10, durationMs)), VibrationEffect.DEFAULT_AMPLITUDE));
+                        } else {
+                            v.vibrate(durationMs);
+                        }
+                    }
+                } catch (Exception ignored) {}
+            });
+        }
     }
 
     private class CinVerseWebViewClient extends WebViewClient {

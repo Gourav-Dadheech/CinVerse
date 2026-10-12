@@ -152,7 +152,10 @@
         </div>
 
         <!-- Video Screen Container -->
-        <div class="theater-screen-wrap" id="tv-theater-screen-container">
+        <div class="theater-screen-wrap" id="tv-theater-screen-container" ng-class="'aspect-' + (tvCtrl.aspectRatioMode || 'fit')">
+          <!-- Screen Brightness Tint Layer (Adjusted via Left-Side Vertical Swipe) -->
+          <div class="player-brightness-tint" ng-style="{ opacity: tvCtrl.getBrightnessTintOpacity() }"></div>
+
           <iframe
             ng-src="{{ tvCtrl.currentStreamUrl }}"
             title="{{ tvCtrl.show.name }} Episode Stream"
@@ -163,11 +166,31 @@
             allowfullscreen>
           </iframe>
 
-          <!-- SMART GESTURE & TOUCH SHIELD OVERLAY (Anti-Accidental Pause & Double-Tap ±10s Seek) -->
+          <!-- SMART GESTURE & TOUCH SHIELD OVERLAY (Anti-Accidental Pause, Double-Tap Seek, Slide Brightness & Volume) -->
           <div class="player-smart-overlay"
                ng-if="tvCtrl.gestureOverlayEnabled"
-               ng-click="tvCtrl.onOverlayTap($event)"
+               player-gestures="tvCtrl"
                ng-class="{ 'hud-visible': tvCtrl.showPlayerHud }">
+
+            <!-- Vertical Slide Brightness Gauge (Left Screen Gesture) -->
+            <div class="player-gesture-gauge gauge-brightness" ng-if="tvCtrl.showBrightnessGauge">
+              <i class="fa-solid fa-sun gauge-icon"></i>
+              <div class="gauge-track">
+                <div class="gauge-fill" ng-style="{ height: tvCtrl.brightnessLevel + '%' }"></div>
+              </div>
+              <span class="gauge-pct">{{ tvCtrl.brightnessLevel }}%</span>
+              <span class="gauge-label">BRIGHT</span>
+            </div>
+
+            <!-- Vertical Slide Volume Gauge (Right Screen Gesture) -->
+            <div class="player-gesture-gauge gauge-volume" ng-if="tvCtrl.showVolumeGauge" ng-class="{ 'super-boost': tvCtrl.volumeLevel > 100 }">
+              <i class="fa-solid gauge-icon" ng-class="tvCtrl.volumeLevel > 100 ? 'fa-fire-flame-curved' : (tvCtrl.volumeLevel == 0 ? 'fa-volume-xmark' : 'fa-volume-high')"></i>
+              <div class="gauge-track">
+                <div class="gauge-fill" ng-style="{ height: (tvCtrl.volumeLevel / 2) + '%' }"></div>
+              </div>
+              <span class="gauge-pct">{{ tvCtrl.volumeLevel }}%</span>
+              <span class="gauge-label">{{ tvCtrl.volumeLevel > 100 ? 'BOOST' : 'VOL' }}</span>
+            </div>
 
             <!-- Double Tap Left Seek Ripple (-10s) -->
             <div class="seek-ripple-indicator ripple-left" ng-if="tvCtrl.showRewindRipple">
@@ -228,9 +251,18 @@
               <!-- Bottom Bar -->
               <div class="hud-bottom-bar">
                 <div class="hud-gesture-hint">
-                  <i class="fa-solid fa-hand-pointer"></i> Double-tap left/right to skip 10s • Tap screen to show/hide controls
+                  <i class="fa-solid fa-hand-pointer"></i> Slide left: Brightness • Slide right: Volume • Double-tap: ±10s
                 </div>
                 <div class="hud-actions-group">
+                  <button class="hud-action-pill" ng-click="tvCtrl.toggleAspectRatio()" title="Aspect Ratio: Fit / Fill (No Black Bars) / Stretch">
+                    <i class="fa-solid fa-arrows-to-eye"></i> {{ tvCtrl.getAspectLabel() }}
+                  </button>
+                  <button class="hud-action-pill" ng-click="tvCtrl.togglePlaybackSpeed()" title="Playback Speed">
+                    <i class="fa-solid fa-gauge-high"></i> {{ tvCtrl.playbackSpeed }}x
+                  </button>
+                  <button class="hud-action-pill" ng-click="tvCtrl.toggleScreenLock()" title="Screen Lock (Avoid Accidental Touches)">
+                    <i class="fa-solid fa-lock"></i> Lock
+                  </button>
                   <button class="hud-action-pill" ng-click="tvCtrl.nextServer()" title="Switch Server">
                     <i class="fa-solid fa-rotate"></i> Next Server
                   </button>
@@ -243,10 +275,17 @@
 
             <!-- Idle Floating Gestures Guide (Visible when HUD is closed) -->
             <div class="player-gesture-guide-watermark" ng-if="!tvCtrl.showPlayerHud">
-              <span class="guide-zone guide-left"><i class="fa-solid fa-angles-left"></i> Double-tap -10s</span>
+              <span class="guide-zone guide-left"><i class="fa-solid fa-sun"></i> Slide Brightness</span>
               <span class="guide-zone guide-center"><i class="fa-solid fa-fingerprint"></i> Tap for Controls</span>
-              <span class="guide-zone guide-right">Double-tap +10s <i class="fa-solid fa-angles-right"></i></span>
+              <span class="guide-zone guide-right"><i class="fa-solid fa-volume-high"></i> Slide Volume</span>
             </div>
+          </div>
+
+          <!-- Screen Lock Touch Barrier & Floating Unlock Pill -->
+          <div class="player-screen-locked-barrier" ng-if="tvCtrl.isScreenLocked">
+            <button type="button" class="btn-unlock-screen" ng-click="tvCtrl.toggleScreenLock()" title="Unlock Player">
+              <i class="fa-solid fa-lock-open"></i> Screen Locked • Tap to Unlock
+            </button>
           </div>
 
           <!-- Floating button to re-enable smart gestures if Direct Player Mode was turned on -->

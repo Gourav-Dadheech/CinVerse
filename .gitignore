@@ -3,4 +3,7 @@ scratch/
 .DS_Store
 Thumbs.db
 *.apk
+.gradle/
+android/.gradle/
+**/build/
 

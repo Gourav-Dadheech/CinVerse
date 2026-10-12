@@ -161,6 +161,7 @@
             <i class="fa-brands fa-android"></i>
             <span class="app-pill-text">Get App</span>
             <span class="app-pill-badge">APK</span>
+            <span class="mobile-app-dot"></span>
           </button>
 
           <!-- Mobile Search Trigger Button (Visible only on mobile/tablet screens <= 900px) -->
@@ -471,6 +472,20 @@
         <!-- App Superpower Highlights -->
         <div class="app-features-grid">
           <div class="app-feature-card">
+            <div class="feature-icon-box"><i class="fa-solid fa-sliders"></i></div>
+            <div class="feature-text">
+              <strong>Slide for Brightness &amp; Volume</strong>
+              <span>MX Player style vertical swipe gestures directly on video screen.</span>
+            </div>
+          </div>
+          <div class="app-feature-card">
+            <div class="feature-icon-box"><i class="fa-solid fa-hand-pointer"></i></div>
+            <div class="feature-text">
+              <strong>Double-Tap ±10s Seek</strong>
+              <span>YouTube &amp; Netflix style seeking with neon ripple waves.</span>
+            </div>
+          </div>
+          <div class="app-feature-card">
             <div class="feature-icon-box"><i class="fa-solid fa-shield-halved"></i></div>
             <div class="feature-text">
               <strong>100% Ad &amp; Pop-Up Proof</strong>
@@ -478,39 +493,25 @@
             </div>
           </div>
           <div class="app-feature-card">
-            <div class="feature-icon-box"><i class="fa-solid fa-bolt"></i></div>
-            <div class="feature-text">
-              <strong>Buffer-Free 1080p &amp; 4K</strong>
-              <span>5 high-speed cloud servers with multi-audio &amp; subtitles.</span>
-            </div>
-          </div>
-          <div class="app-feature-card">
-            <div class="feature-icon-box"><i class="fa-solid fa-hand-pointer"></i></div>
-            <div class="feature-text">
-              <strong>Double-Tap Seek Gestures</strong>
-              <span>YouTube &amp; Netflix style ±10s seeking with touch safety.</span>
-            </div>
-          </div>
-          <div class="app-feature-card">
             <div class="feature-icon-box"><i class="fa-solid fa-expand"></i></div>
             <div class="feature-text">
-              <strong>Immersive Full-Screen Cinema</strong>
-              <span>No browser address bar or cluttered UI — pure screen enjoyment.</span>
+              <strong>Immersive Cinema &amp; Screen WakeLock</strong>
+              <span>Auto-rotates to landscape, phone screen never sleeps while streaming.</span>
             </div>
           </div>
         </div>
 
         <!-- Download Action Box -->
         <div class="app-download-action-box">
-          <a href="https://github.com/Gourav-Dadheech/CinVerse/releases/download/v1.0.0/CinVerse-v1.0.0.apk"
+          <a href="https://github.com/Gourav-Dadheech/CinVerse/releases/download/v1.1.0/CinVerse-v1.1.0.apk"
              class="btn-primary-apk-download"
-             download="CinVerse-v1.0.0.apk">
+             download="CinVerse-v1.1.0.apk">
             <i class="fa-brands fa-android"></i>
             <div class="btn-apk-label">
               <span class="btn-apk-title">Download APK Directly</span>
-              <span class="btn-apk-meta">Version 1.0.0 • ~8 MB • Android 7.0+</span>
+              <span class="btn-apk-meta">Version 1.1.0 • ~5.4 MB • Android 7.0+</span>
             </div>
-            <span class="btn-apk-badge">FAST CDN</span>
+            <span class="btn-apk-badge">V1.1 FAST</span>
           </a>
           <div class="app-download-mirror-row">
             <span class="mirror-label"><i class="fa-solid fa-cloud"></i> Official GitHub Source:</span>
@@ -524,9 +525,9 @@
         <div class="app-install-steps">
           <h4 class="steps-heading"><i class="fa-solid fa-circle-info"></i> How to Install on Android:</h4>
           <ol class="steps-list">
-            <li><strong>Download:</strong> Tap the button above to download <code>CinVerse-v1.0.0.apk</code>.</li>
-            <li><strong>Allow:</strong> When prompted by Chrome, tap <em>"Download anyway"</em> and allow <em>"Install unknown apps"</em>.</li>
-            <li><strong>Stream:</strong> Open CinVerse and start enjoying your favorite movies &amp; series!</li>
+            <li><strong>Download:</strong> Tap the button above to download <code>CinVerse-v1.1.0.apk</code>.</li>
+            <li><strong>Allow:</strong> When prompted by Chrome or your browser, tap <em>"Download anyway"</em> and allow <em>"Install unknown apps"</em>.</li>
+            <li><strong>Stream:</strong> Open CinVerse and enjoy movies &amp; series with full gesture controls!</li>
           </ol>
         </div>
       </div>
@@ -784,6 +785,7 @@
 
   <!-- Directives -->
   <script src="js/directives/movieCard.js"></script>
+  <script src="js/directives/playerGestures.js"></script>
 
   <!-- Controllers -->
   <script src="js/controllers/homeController.js"></script>
