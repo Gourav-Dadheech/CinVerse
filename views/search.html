@@ -19,8 +19,7 @@
         ng-change="searchCtrl.onQueryChange()"
         ng-focus="searchCtrl.onInputFocus()"
         ng-blur="searchCtrl.closeSuggestions()"
-        autocomplete="off"
-        autofocus />
+        autocomplete="off" />
       <i class="fa-solid fa-xmark clear-icon" ng-if="searchCtrl.query" ng-click="searchCtrl.clearQuery()" title="Clear"></i>
 
       <!-- Instant Live Suggestions Dropdown on Search Page -->

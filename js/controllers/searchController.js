@@ -12,14 +12,15 @@
   'use strict';
 
   angular.module('cinVerseApp').controller('SearchController', [
+    '$scope',
     '$location',
     '$timeout',
     'MovieService',
-    function ($location, $timeout, MovieService) {
+    function ($scope, $location, $timeout, MovieService) {
       var vm = this;
 
       var debounceTimer = null;
-      var DEBOUNCE_DELAY = 450; // ms
+      var DEBOUNCE_DELAY = 350; // ms
 
       // ---------------- STATE ----------------
       vm.query = ($location.search().q || '');
@@ -169,6 +170,15 @@
         // Keep the URL in sync so searches are shareable/bookmarkable
         $location.search('q', vm.query || null).replace();
       };
+
+      // Listen for query changes arriving via URL (e.g. from navbar search) without full route reload
+      $scope.$on('$routeUpdate', function () {
+        var urlQ = ($location.search().q || '').trim();
+        if (urlQ !== (vm.query || '').trim()) {
+          vm.query = urlQ;
+          performSearch();
+        }
+      });
 
       // ---------------- FILTERS ----------------
 

@@ -26,7 +26,7 @@
           templateUrl: 'views/search.html',
           controller: 'SearchController',
           controllerAs: 'searchCtrl',
-          reloadOnSearch: true // re-run controller when ?q= changes
+          reloadOnSearch: false // keep view stable while typing so mobile keyboard never closes
         })
 
         // ---------------- MOVIE DETAILS ----------------

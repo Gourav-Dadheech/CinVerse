@@ -112,38 +112,38 @@
 
         <!-- Nav Links (FLIQ TV Floating Pill Nav) -->
         <nav class="navbar-links" ng-class="{'nav-open': navCtrl.menuOpen}">
-          <a href="#!/home" class="nav-link" ng-class="{'active': navCtrl.isActive('/home')}">
+          <a href="#!/home" class="nav-link" ng-click="navCtrl.closeMenu()" ng-class="{'active': navCtrl.isActive('/home')}">
             <i class="fa-solid fa-house"></i> Home
           </a>
-          <a href="#!/search" class="nav-link" ng-class="{'active': navCtrl.isActive('/search')}">
-            Movies
+          <a href="#!/search" class="nav-link" ng-click="navCtrl.closeMenu()" ng-class="{'active': navCtrl.isActive('/search')}">
+            <i class="fa-solid fa-magnifying-glass"></i> Search
           </a>
-          <a href="#!/shows" class="nav-link" ng-class="{'active': navCtrl.isActive('/shows')}">
+          <a href="#!/shows" class="nav-link" ng-click="navCtrl.closeMenu()" ng-class="{'active': navCtrl.isActive('/shows')}">
             TV Shows
           </a>
-          <a href="#!/anime" class="nav-link" ng-class="{'active': navCtrl.isActive('/anime')}">
+          <a href="#!/anime" class="nav-link" ng-click="navCtrl.closeMenu()" ng-class="{'active': navCtrl.isActive('/anime')}">
             Anime
           </a>
-          <a href="#!/kdrama" class="nav-link" ng-class="{'active': navCtrl.isActive('/kdrama')}">
+          <a href="#!/kdrama" class="nav-link" ng-click="navCtrl.closeMenu()" ng-class="{'active': navCtrl.isActive('/kdrama')}">
             K-Drama
           </a>
-          <a href="#!/home#trending" class="nav-link">
+          <a href="#!/home#trending" class="nav-link" ng-click="navCtrl.closeMenu()">
             Trending
           </a>
-          <a href="#!/ott/netflix" class="nav-link" ng-class="{'active': navCtrl.isActive('/ott')}">
+          <a href="#!/ott/netflix" class="nav-link" ng-click="navCtrl.closeMenu()" ng-class="{'active': navCtrl.isActive('/ott')}">
             OTT Hub
           </a>
-          <a href="#!/franchise/marvel" class="nav-link" ng-class="{'active': navCtrl.isActive('/franchise')}">
+          <a href="#!/franchise/marvel" class="nav-link" ng-click="navCtrl.closeMenu()" ng-class="{'active': navCtrl.isActive('/franchise')}">
             Universes
           </a>
-          <a href="#!/movie-match" class="nav-link" ng-class="{'active': navCtrl.isActive('/movie-match')}">
+          <a href="#!/movie-match" class="nav-link" ng-click="navCtrl.closeMenu()" ng-class="{'active': navCtrl.isActive('/movie-match')}">
             Match
           </a>
-          <a href="#!/favorites" class="nav-link" ng-class="{'active': navCtrl.isActive('/favorites')}"
+          <a href="#!/favorites" class="nav-link" ng-click="navCtrl.closeMenu()" ng-class="{'active': navCtrl.isActive('/favorites')}"
             title="Favorites">
             <i class="fa-solid fa-heart"></i>
           </a>
-          <a href="#!/watchlist" class="nav-link" ng-class="{'active': navCtrl.isActive('/watchlist')}"
+          <a href="#!/watchlist" class="nav-link" ng-click="navCtrl.closeMenu()" ng-class="{'active': navCtrl.isActive('/watchlist')}"
             title="Watchlist">
             <i class="fa-solid fa-bookmark"></i>
           </a>
@@ -262,6 +262,71 @@
           </button>
         </div>
     </header>
+
+    <!-- ============================= -->
+    <!-- MOBILE MENU BACKDROP (CLOSES MENU ON BLANK / HOMEPAGE CLICK) -->
+    <!-- ============================= -->
+    <div class="mobile-menu-backdrop" ng-if="navCtrl.menuOpen" ng-click="navCtrl.closeMenu()"></div>
+
+    <!-- ============================= -->
+    <!-- DEDICATED MOBILE SEARCH DRAWER (DETACHED TO PREVENT CLIPPING) -->
+    <!-- ============================= -->
+    <div class="mobile-search-backdrop" ng-if="navCtrl.mobileSearchOpen" ng-click="navCtrl.closeMobileSearch()"></div>
+    <div class="mobile-search-drawer" ng-if="navCtrl.mobileSearchOpen" ng-click="$event.stopPropagation()">
+      <div class="mobile-search-header-row">
+        <button type="button" class="btn-mobile-search-back" ng-click="navCtrl.closeMobileSearch()" aria-label="Close search">
+          <i class="fa-solid fa-arrow-left"></i>
+        </button>
+        <form class="mobile-search-form" ng-submit="navCtrl.goToSearch()">
+          <i class="fa-solid fa-magnifying-glass mobile-search-form-icon"></i>
+          <input type="text" id="mobileSearchInputOverlay" placeholder="Search movies, TV series, anime..."
+            ng-model="navCtrl.quickQuery" ng-change="navCtrl.onSearchInput()"
+            ng-focus="navCtrl.onSearchFocus()" autocomplete="off" />
+          <button type="button" class="btn-clear-search" ng-if="navCtrl.quickQuery"
+            ng-click="navCtrl.clearQuickSearch()" title="Clear">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </form>
+      </div>
+
+      <!-- Live Instant Suggestions Dropdown in Mobile Drawer -->
+      <div class="mobile-search-suggestions" ng-if="navCtrl.showSuggestions" ng-mousedown="$event.preventDefault()">
+        <div class="suggestions-loading" ng-if="navCtrl.isLoadingSuggestions">
+          <i class="fa-solid fa-circle-notch fa-spin"></i> Searching CinVerse...
+        </div>
+
+        <div class="suggestions-list" ng-if="!navCtrl.isLoadingSuggestions && navCtrl.suggestions.length > 0">
+          <a class="suggestion-item" ng-repeat="item in navCtrl.suggestions track by (item.media_type + '-' + item.id)"
+            ng-href="{{ item.targetUrl }}" ng-click="navCtrl.selectSuggestion(item)">
+            <img class="suggestion-poster" ng-src="{{ navCtrl.getPosterUrl(item.poster_path) }}" alt="{{ item.displayTitle }}" />
+            <div class="suggestion-info">
+              <span class="suggestion-title">
+                {{ item.displayTitle }}
+                <span class="suggestion-tag-series" ng-if="item.isTv">SERIES</span>
+              </span>
+              <div class="suggestion-meta">
+                <span class="suggestion-year">{{ item.displayDate ? item.displayDate.slice(0,4) : 'TBA' }}</span>
+                <span class="suggestion-rating" ng-if="item.vote_average">
+                  <i class="fa-solid fa-star"></i> {{ item.vote_average.toFixed(1) }}
+                </span>
+                <span class="suggestion-lang" ng-if="item.original_language">{{ item.original_language.toUpperCase() }}</span>
+              </div>
+            </div>
+            <i class="fa-solid fa-chevron-right suggestion-arrow"></i>
+          </a>
+
+          <div class="suggestion-footer" ng-click="navCtrl.goToSearch()">
+            <span>View all results for "<strong>{{ navCtrl.quickQuery }}</strong>"</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </div>
+        </div>
+
+        <div class="suggestions-empty"
+          ng-if="!navCtrl.isLoadingSuggestions && navCtrl.suggestions.length === 0 && navCtrl.quickQuery.length >= 2">
+          <i class="fa-solid fa-film"></i> No results found for "{{ navCtrl.quickQuery }}"
+        </div>
+      </div>
+    </div>
 
     <!-- ============================= -->
     <!-- AUTH MODAL (DETACHED FROM NAVBAR TO PREVENT CLIPPING GLITCH) -->

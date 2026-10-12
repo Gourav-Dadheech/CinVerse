@@ -272,6 +272,15 @@
       // Toggle hamburger menu (mobile)
       vm.toggleMenu = function () {
         vm.menuOpen = !vm.menuOpen;
+        if (vm.menuOpen) {
+          vm.mobileSearchOpen = false;
+          vm.showSuggestions = false;
+        }
+      };
+
+      // Explicitly close hamburger menu (e.g. clicking outside or on a link)
+      vm.closeMenu = function () {
+        vm.menuOpen = false;
       };
 
       // Navigate to the search page carrying the typed query
@@ -285,6 +294,14 @@
         vm.showSuggestions = false;
         $location.path('/search').search({ q: query });
       };
+
+      // Automatically close mobile menu and overlays on route transitions
+      $rootScope.$on('$routeChangeStart', function () {
+        vm.menuOpen = false;
+        vm.mobileSearchOpen = false;
+        vm.showSuggestions = false;
+        vm.userDropdownOpen = false;
+      });
 
       vm.isActive = function (path) {
         var current = $location.path();
