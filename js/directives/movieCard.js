@@ -1,5 +1,5 @@
 /* ============================================================
-   CineVerse - movieCard.js
+   CinVerse - movieCard.js
    ------------------------------------------------------------
    Reusable <movie-card> directive.
    Renders a poster, title, rating, and SERIES badge if it's
@@ -10,7 +10,7 @@
 (function () {
   'use strict';
 
-  angular.module('cineVerseApp').directive('movieCard', [
+  angular.module('cinVerseApp').directive('movieCard', [
     '$location',
     'MovieService',
     'StorageService',

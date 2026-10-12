@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  angular.module('cineVerseApp')
+  angular.module('cinVerseApp')
     .controller('MovieMatchController', [
       '$timeout',
       '$window',

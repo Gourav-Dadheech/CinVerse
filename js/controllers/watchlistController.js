@@ -1,5 +1,5 @@
 /* ============================================================
-   CineVerse - watchlistController.js
+   CinVerse - watchlistController.js
    ------------------------------------------------------------
    Powers the Watchlist page:
      - Lists all movies saved to the Watchlist (from localStorage)
@@ -12,7 +12,7 @@
 (function () {
   'use strict';
 
-  angular.module('cineVerseApp').controller('WatchlistController', [
+  angular.module('cinVerseApp').controller('WatchlistController', [
     'StorageService',
     'MovieService',
     function (StorageService, MovieService) {

@@ -1,4 +1,4 @@
-# 🎬 CineVerse
+# 🎬 CinVerse
 
 A modern, Netflix + IMDb inspired **Movie Recommendation Website** built entirely with **AngularJS 1.8.x**, vanilla **ES6 JavaScript**, **HTML5**, and **CSS3** — no React, no Vue, no Angular 2+, no TypeScript, no Bootstrap/Tailwind, no jQuery.
 
@@ -8,7 +8,7 @@ Powered by **The Movie Database (TMDB) API**.
 
 ## ✨ Project Description
 
-CineVerse lets users discover trending, popular, top-rated, upcoming, and **Indian cinema** (Bollywood + regional) movies, search the full TMDB catalog in real time, view rich movie detail pages (cast, trailer, similar titles, recommendations), and build a personal **Favorites** and **Watchlist** — all persisted locally in the browser via `localStorage`.
+CinVerse lets users discover trending, popular, top-rated, upcoming, and **Indian cinema** (Bollywood + regional) movies, search the full TMDB catalog in real time, view rich movie detail pages (cast, trailer, similar titles, recommendations), and build a personal **Favorites** and **Watchlist** — all persisted locally in the browser via `localStorage`.
 
 The UI uses a dark, glassmorphism-inspired design language with smooth hover animations, skeleton loading states, horizontal movie sliders, and a fully responsive layout for desktop, tablet and mobile.
 
@@ -95,7 +95,7 @@ This means the project runs **fully offline**, with zero dependency on any exter
 2. Open `app.js` and replace the placeholder token:
 
    ```javascript
-   angular.module('cineVerseApp').constant('APP_CONFIG', {
+   angular.module('cinVerseApp').constant('APP_CONFIG', {
      TMDB_READ_TOKEN: 'YOUR_TMDB_V4_READ_ACCESS_TOKEN_HERE', // <-- paste your real token here
      ...
    });

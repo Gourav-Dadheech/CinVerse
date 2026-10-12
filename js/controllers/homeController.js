@@ -1,5 +1,5 @@
 /* ============================================================
-   CineVerse - homeController.js
+   CinVerse - homeController.js
    ------------------------------------------------------------
    Powers the Home page:
      - Hero Billboard Carousel (auto-rotating across Hollywood,
@@ -11,7 +11,7 @@
 (function () {
   'use strict';
 
-  angular.module('cineVerseApp').controller('HomeController', [
+  angular.module('cinVerseApp').controller('HomeController', [
     '$interval',
     '$scope',
     '$location',

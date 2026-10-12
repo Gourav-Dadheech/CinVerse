@@ -1,5 +1,5 @@
 /* ============================================================
-   CineVerse - app.js
+   CinVerse - app.js
    Main AngularJS Module Definition
    This file bootstraps the entire application, wires up
    global config values (like the TMDB API key) and defines
@@ -16,8 +16,8 @@
        - ngRoute   -> for client side routing ($routeProvider)
        - ngAnimate -> for smooth enter/leave animations
      ------------------------------------------------------------ */
-  angular.module('cineVerseApp', ['ngRoute', 'ngAnimate']);
-  angular.module('cinVerseApp', ['cineVerseApp']);
+  angular.module('cinVerseApp', ['ngRoute', 'ngAnimate']);
+  angular.module('cineVerseApp', ['cinVerseApp']);
 
   /* ------------------------------------------------------------
      2. GLOBAL APP CONFIGURATION (CONSTANTS)
@@ -25,7 +25,7 @@
      Every service reads from this constant, nothing else
      should hard-code a URL or key.
      ------------------------------------------------------------ */
-  angular.module('cineVerseApp').constant('APP_CONFIG', {
+  angular.module('cinVerseApp').constant('APP_CONFIG', {
     // TODO: Replace with your own TMDB v4 Read Access Token. See README.md
     // This is sent as a "Bearer" token in the Authorization header,
     // NOT as a URL query parameter - keeps it out of logs/browser history.
@@ -44,7 +44,7 @@
        spinner in index.html can react to route changes.
      - Handles route change errors -> redirect to 404.
      ------------------------------------------------------------ */
-  angular.module('cineVerseApp').run([
+  angular.module('cinVerseApp').run([
     '$rootScope',
     '$location',
     function ($rootScope, $location) {
@@ -73,7 +73,7 @@
      Controls the top navigation bar: mobile menu toggle,
      shrink-on-scroll effect, and the quick-search form.
      ------------------------------------------------------------ */
-  angular.module('cineVerseApp').controller('NavbarController', [
+  angular.module('cinVerseApp').controller('NavbarController', [
     '$location',
     '$window',
     '$rootScope',
@@ -269,7 +269,7 @@
      Powers the floating "Back to Top" button. Shows the
      button once the user scrolls past a threshold.
      ------------------------------------------------------------ */
-  angular.module('cineVerseApp').controller('ScrollController', [
+  angular.module('cinVerseApp').controller('ScrollController', [
     '$window',
     '$rootScope',
     function ($window, $rootScope) {

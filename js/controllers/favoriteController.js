@@ -1,5 +1,5 @@
 /* ============================================================
-   CineVerse - favoriteController.js
+   CinVerse - favoriteController.js
    ------------------------------------------------------------
    Powers the Favorites page:
      - Lists all movies saved to Favorites (from localStorage)
@@ -9,7 +9,7 @@
 (function () {
   'use strict';
 
-  angular.module('cineVerseApp').controller('FavoriteController', [
+  angular.module('cinVerseApp').controller('FavoriteController', [
     'StorageService',
     'MovieService',
     function (StorageService, MovieService) {

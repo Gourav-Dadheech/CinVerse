@@ -1,5 +1,5 @@
 /* ============================================================
-   CineVerse - catalogController.js
+   CinVerse - catalogController.js
    ------------------------------------------------------------
    Powers:
      - /franchise/:franchiseId (Marvel, DC, Star Wars, Pixar)
@@ -15,7 +15,7 @@
 (function () {
   'use strict';
 
-  angular.module('cineVerseApp').controller('CatalogController', [
+  angular.module('cinVerseApp').controller('CatalogController', [
     '$scope',
     '$routeParams',
     '$location',

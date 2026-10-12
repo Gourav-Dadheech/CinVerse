@@ -1,5 +1,5 @@
 /* ============================================================
-   CineVerse - routes.js
+   CinVerse - routes.js
    Client-side routing configuration using ngRoute.
    Maps every URL path to a view template + controller.
    ============================================================ */
@@ -7,7 +7,7 @@
 (function () {
   'use strict';
 
-  angular.module('cineVerseApp').config([
+  angular.module('cinVerseApp').config([
     '$routeProvider',
     '$locationProvider',
     function ($routeProvider, $locationProvider) {

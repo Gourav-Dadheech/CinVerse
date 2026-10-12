@@ -1,5 +1,5 @@
 /* ============================================================
-   CineVerse - searchController.js
+   CinVerse - searchController.js
    ------------------------------------------------------------
    Powers the Search page:
      - Live search-as-you-type (debounced)
@@ -11,7 +11,7 @@
 (function () {
   'use strict';
 
-  angular.module('cineVerseApp').controller('SearchController', [
+  angular.module('cinVerseApp').controller('SearchController', [
     '$location',
     '$timeout',
     'MovieService',

@@ -1,5 +1,5 @@
 /* ============================================================
-   CineVerse - tvController.js
+   CinVerse - tvController.js
    ------------------------------------------------------------
    Powers the TV Show & Web Series Details page:
      - Backdrop + poster + series metadata (seasons count,
@@ -19,7 +19,7 @@
 (function () {
   'use strict';
 
-  angular.module('cineVerseApp').controller('TvController', [
+  angular.module('cinVerseApp').controller('TvController', [
     '$scope',
     '$routeParams',
     '$location',

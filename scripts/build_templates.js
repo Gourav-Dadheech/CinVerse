@@ -13,7 +13,7 @@ const templates = {
 };
 
 let code = '/* Pre-cached AngularJS Templates for 100% offline & fast routing */\n';
-code += '(function() {\n  "use strict";\n  angular.module("cineVerseApp").run(["$templateCache", function($templateCache) {\n';
+code += '(function() {\n  "use strict";\n  angular.module("cinVerseApp").run(["$templateCache", function($templateCache) {\n';
 
 for (const [k, v] of Object.entries(templates)) {
   code += '    $templateCache.put(' + JSON.stringify(k) + ', ' + JSON.stringify(v) + ');\n';

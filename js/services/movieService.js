@@ -1,5 +1,5 @@
 /* ============================================================
-   CineVerse - movieService.js
+   CinVerse - movieService.js
    ------------------------------------------------------------
    SINGLE SOURCE OF TRUTH for all TMDB API communication.
    No controller should ever call $http directly - everything
@@ -10,7 +10,7 @@
 (function () {
   'use strict';
 
-  angular.module('cineVerseApp').factory('MovieService', [
+  angular.module('cinVerseApp').factory('MovieService', [
     '$http',
     '$q',
     'APP_CONFIG',

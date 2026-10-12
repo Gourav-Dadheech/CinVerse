@@ -1,5 +1,5 @@
 /* ============================================================
-   CineVerse - movieController.js
+   CinVerse - movieController.js
    ------------------------------------------------------------
    Powers the Movie Details page:
      - Backdrop + poster + core info (title, overview, genres,
@@ -13,7 +13,7 @@
 (function () {
   'use strict';
 
-  angular.module('cineVerseApp').controller('MovieController', [
+  angular.module('cinVerseApp').controller('MovieController', [
     '$scope',
     '$routeParams',
     '$location',

@@ -1,5 +1,5 @@
 /* ============================================================
-   CineVerse - storageService.js
+   CinVerse - storageService.js
    ------------------------------------------------------------
    Wraps window.localStorage so Favorites & Watchlist data is
    persisted across page reloads. Nothing outside this service
@@ -9,11 +9,11 @@
 (function () {
   'use strict';
 
-  angular.module('cineVerseApp').factory('StorageService', [
+  angular.module('cinVerseApp').factory('StorageService', [
     function () {
 
-      var FAVORITES_KEY = 'cineverse_favorites';
-      var WATCHLIST_KEY = 'cineverse_watchlist';
+      var FAVORITES_KEY = 'cinverse_favorites';
+      var WATCHLIST_KEY = 'cinverse_watchlist';
 
       var service = {};
 
@@ -23,6 +23,9 @@
       function readList(key) {
         try {
           var raw = window.localStorage.getItem(key);
+          if (!raw && key.indexOf('cinverse_') === 0) {
+            raw = window.localStorage.getItem(key.replace('cinverse_', 'cineverse_'));
+          }
           return raw ? JSON.parse(raw) : [];
         } catch (e) {
           // Corrupt data or storage unavailable - fail safe with empty list
@@ -120,7 +123,7 @@
       /* ----------------------------------------------------------
          WATCH HISTORY & RESUME (OTT MODE)
          ---------------------------------------------------------- */
-      var HISTORY_KEY = 'cineverse_watch_history';
+      var HISTORY_KEY = 'cinverse_watch_history';
 
       service.getWatchHistory = function () {
         return readList(HISTORY_KEY);
@@ -177,8 +180,8 @@
       /* ----------------------------------------------------------
          USER AUTH & PROFILES (NETMIRROR STYLE)
          ---------------------------------------------------------- */
-      var USER_KEY = 'cineverse_current_user';
-      var USERS_KEY = 'cineverse_registered_users';
+      var USER_KEY = 'cinverse_current_user';
+      var USERS_KEY = 'cinverse_registered_users';
 
       var DEFAULT_USER = {
         id: 'usr_member',
