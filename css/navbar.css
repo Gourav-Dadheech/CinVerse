@@ -152,13 +152,13 @@
 }
 
 .navbar-scrolled .navbar-links {
-  background: rgba(13, 18, 30, 0.82);
+  background: rgba(13, 18, 30, 0.85);
   backdrop-filter: blur(28px);
   -webkit-backdrop-filter: blur(28px);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.7), 0 0 25px rgba(139, 92, 246, 0.28);
-  padding: 6px 14px;
-  transform: scale(1.03);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(139, 92, 246, 0.22);
+  padding: 5px 8px;
+  transform: none;
 }
 
 .nav-link {
@@ -649,6 +649,15 @@
     display: none !important;
   }
 
+  .navbar.menu-open {
+    z-index: 100000 !important;
+  }
+
+  .navbar.menu-open .hamburger-btn {
+    z-index: 100005 !important;
+    position: relative;
+  }
+
   /* Mobile Drawer Menu (Sliding from right) */
   .navbar-links.nav-open {
     display: flex !important;
@@ -656,26 +665,41 @@
     top: 0;
     right: 0;
     height: 100vh;
-    width: 280px;
-    background: rgba(13, 18, 30, 0.98);
+    width: 290px;
+    max-width: 85vw;
+    background: rgba(11, 15, 25, 0.98);
     backdrop-filter: blur(28px);
     -webkit-backdrop-filter: blur(28px);
     flex-direction: column;
     align-items: stretch;
-    padding: 85px 20px 40px;
-    gap: 8px;
-    box-shadow: -15px 0 45px rgba(0, 0, 0, 0.85);
-    z-index: 99995;
+    padding: 85px 18px 40px;
+    gap: 6px;
+    box-shadow: -15px 0 45px rgba(0, 0, 0, 0.92);
+    z-index: 100002 !important;
     overflow-y: auto;
-    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    -webkit-overflow-scrolling: touch;
+    border-left: 1px solid rgba(255, 255, 255, 0.14);
     animation: drawerSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: auto !important;
   }
 
   .navbar-links.nav-open .nav-link {
     width: 100%;
-    padding: 10px 16px;
-    font-size: 0.92rem;
+    padding: 11px 16px;
+    font-size: 0.94rem;
+    font-weight: 500;
     justify-content: flex-start;
+    border-radius: 12px;
+    pointer-events: auto !important;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.18s ease, transform 0.18s ease, color 0.18s ease;
+  }
+
+  .navbar-links.nav-open .nav-link:active {
+    transform: scale(0.98);
+    background: rgba(139, 92, 246, 0.22);
   }
 
   .navbar-links.nav-open .nav-link-search {
@@ -688,18 +712,19 @@
   }
 }
 
-/* Mobile Menu Backdrop (Click outside / blank area to close, NO BLUR on homepage) */
+/* Mobile Menu Backdrop (Click outside / blank area to close) */
 .mobile-menu-backdrop {
   position: fixed;
   inset: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.25);
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   z-index: 99990;
   animation: fadeIn 0.2s ease;
   cursor: pointer;
+  pointer-events: auto;
 }
 
 /* Detached Mobile Search Drawer & Backdrop */

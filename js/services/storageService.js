@@ -137,31 +137,54 @@
           return item.id !== movie.id;
         });
 
-        // Determine realistic watch progress (if not specified, set 35% - 75%)
-        var pct = progressPct || Math.floor(Math.random() * 40) + 30;
+        // Determine realistic watch progress
+        var pct = (progressPct !== undefined && progressPct !== null) ? progressPct : (Math.floor(Math.random() * 40) + 30);
+
+        var isTv = !!(movie.isTv || movie.first_air_date || movie.season || movie.episode);
+        var sNum = parseInt(movie.season, 10) || 1;
+        var epNum = parseInt(movie.episode, 10) || 1;
+
+        var displayTitle = movie.title || movie.name || 'Untitled';
+        if (isTv && movie.name && displayTitle.indexOf('S' + sNum) === -1) {
+          displayTitle = movie.name + ' (S' + sNum + ':E' + epNum + ')';
+        }
 
         var entry = {
           id: movie.id,
-          title: movie.title,
+          title: displayTitle,
+          name: movie.name || movie.title,
           poster_path: movie.poster_path,
           backdrop_path: movie.backdrop_path,
           vote_average: movie.vote_average,
-          release_date: movie.release_date,
+          release_date: movie.release_date || movie.first_air_date || '',
           runtime: movie.runtime,
           watchedAt: Date.now(),
           progressPct: pct,
-          serverName: serverName || 'Server 1 (VidLink HD)',
+          serverName: serverName || 'Server 1 (VidBolt Multi-Audio)',
           serverId: serverId || 1,
           audioTrack: audioTrackName || 'English (Original)',
-          trackId: trackId || 'en'
+          trackId: trackId || 'en',
+          isTv: isTv,
+          media_type: isTv ? 'tv' : 'movie',
+          season: sNum,
+          episode: epNum
         };
 
         history.unshift(entry);
-        if (history.length > 20) {
-          history = history.slice(0, 20);
+        if (history.length > 25) {
+          history = history.slice(0, 25);
         }
         writeList(HISTORY_KEY, history);
         return history;
+      };
+
+      service.getWatchEntry = function (id) {
+        if (!id) return null;
+        var numericId = parseInt(id, 10);
+        var history = readList(HISTORY_KEY);
+        return history.find(function (item) {
+          return item.id === numericId || item.id === id;
+        }) || null;
       };
 
       service.removeFromHistory = function (movieId) {

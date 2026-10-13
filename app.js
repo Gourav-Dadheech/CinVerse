@@ -278,9 +278,32 @@
         }
       };
 
-      // Explicitly close hamburger menu (e.g. clicking outside or on a link)
+      // Safely close mobile menu after brief delay so tap/route event completes smoothly
       vm.closeMenu = function () {
+        $timeout(function () {
+          vm.menuOpen = false;
+        }, 120);
+      };
+
+      // Instantly close hamburger menu (e.g. clicking outside on backdrop)
+      vm.closeMenuImmediately = function () {
         vm.menuOpen = false;
+      };
+
+      // Direct navigation handler for mobile drawer options
+      vm.navTo = function (path) {
+        if (path) {
+          var clean = path.replace('#!', '');
+          if (clean.indexOf('#') !== -1) {
+            var parts = clean.split('#');
+            $location.path(parts[0] || '/home').hash(parts[1]);
+          } else {
+            $location.url(clean);
+          }
+        }
+        $timeout(function () {
+          vm.menuOpen = false;
+        }, 100);
       };
 
       // Navigate to the search page carrying the typed query

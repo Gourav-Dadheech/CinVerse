@@ -8,9 +8,10 @@
     "start": "npx http-server -p 8080"
   },
   "dependencies": {
+    "@consumet/extensions": "^1.8.8",
     "angular": "1.8.3",
-    "angular-route": "1.8.3",
-    "angular-animate": "1.8.3"
+    "angular-animate": "1.8.3",
+    "angular-route": "1.8.3"
   },
   "notes": [
     "This project does NOT require running 'npm install' to work — the three AngularJS",

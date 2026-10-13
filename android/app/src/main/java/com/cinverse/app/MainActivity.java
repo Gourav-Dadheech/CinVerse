@@ -40,6 +40,10 @@ public class MainActivity extends AppCompatActivity {
     private WebChromeClient.CustomViewCallback customViewCallback;
     private long backPressedTime = 0;
 
+    private WebView extractorWebView;
+    private Runnable extractionTimeoutRunnable;
+    private final android.os.Handler mainHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+
     @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -163,6 +167,16 @@ public class MainActivity extends AppCompatActivity {
                 } catch (Exception ignored) {}
             });
         }
+
+        @JavascriptInterface
+        public void extractStream(final String embedUrl, final String mediaTitle) {
+            runOnUiThread(() -> startStreamExtraction(embedUrl, mediaTitle));
+        }
+
+        @JavascriptInterface
+        public void cancelExtraction() {
+            runOnUiThread(() -> stopStreamExtraction());
+        }
     }
 
     private class CinVerseWebViewClient extends WebViewClient {
@@ -203,9 +217,10 @@ public class MainActivity extends AppCompatActivity {
             }
 
             // Allow reputable video stream providers inside player
-            if (url.contains("vidbolt.xyz") || url.contains("vidfast.vc") ||
-                url.contains("2embed.cc") || url.contains("smashystream.com") ||
-                url.contains("vidsrc") || url.contains("youtube.com")) {
+            if (url.contains("vidbolt.xyz") || url.contains("superembed.stream") || url.contains("seapi.link") ||
+                url.contains("2embed.cc") || url.contains("smashystream") || url.contains("smashy.stream") ||
+                url.contains("vidsrc") || url.contains("youtube.com") || url.contains("streamwish") || url.contains("filemoon") ||
+                url.contains("streamtape") || url.contains("dood") || url.contains("mixdrop")) {
                 return false;
             }
 
@@ -265,6 +280,130 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Start background headless stream extraction for the given embed URL.
+     * Intercepts .m3u8, .mp4, and HLS manifest streams directly from the network layer.
+     */
+    @SuppressLint("SetJavaScriptEnabled")
+    private void startStreamExtraction(final String embedUrl, final String mediaTitle) {
+        stopStreamExtraction();
+
+        if (embedUrl == null || embedUrl.trim().isEmpty()) {
+            return;
+        }
+
+        if (extractorWebView == null) {
+            extractorWebView = new WebView(this);
+            WebSettings extractorSettings = extractorWebView.getSettings();
+            extractorSettings.setJavaScriptEnabled(true);
+            extractorSettings.setDomStorageEnabled(true);
+            extractorSettings.setDatabaseEnabled(true);
+            extractorSettings.setMediaPlaybackRequiresUserGesture(false);
+            extractorSettings.setUserAgentString("Mozilla/5.0 (Linux; Android 13; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36 CinVerseStreamExtractor/1.0");
+        }
+
+        final boolean[] streamCaptured = {false};
+
+        extractorWebView.setWebViewClient(new WebViewClient() {
+            @Override
+            public android.webkit.WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                if (request != null && request.getUrl() != null) {
+                    String reqUrl = request.getUrl().toString();
+                    if (!streamCaptured[0] && isCandidateStreamUrl(reqUrl)) {
+                        streamCaptured[0] = true;
+                        onStreamCapturedSuccess(reqUrl, mediaTitle);
+                    }
+                }
+                return super.shouldInterceptRequest(view, request);
+            }
+
+            @Override
+            public void onLoadResource(WebView view, String url) {
+                super.onLoadResource(view, url);
+                if (!streamCaptured[0] && isCandidateStreamUrl(url)) {
+                    streamCaptured[0] = true;
+                    onStreamCapturedSuccess(url, mediaTitle);
+                }
+            }
+        });
+
+        // 18-second safety timeout
+        extractionTimeoutRunnable = () -> {
+            if (!streamCaptured[0]) {
+                stopStreamExtraction();
+                notifyStreamCaptureFailed(embedUrl, "Extraction timed out. Falling back.");
+            }
+        };
+        mainHandler.postDelayed(extractionTimeoutRunnable, 18000);
+
+        extractorWebView.loadUrl(embedUrl);
+    }
+
+    private void stopStreamExtraction() {
+        if (extractionTimeoutRunnable != null) {
+            mainHandler.removeCallbacks(extractionTimeoutRunnable);
+            extractionTimeoutRunnable = null;
+        }
+        if (extractorWebView != null) {
+            try {
+                extractorWebView.stopLoading();
+                extractorWebView.loadUrl("about:blank");
+            } catch (Exception ignored) {}
+        }
+    }
+
+    private boolean isCandidateStreamUrl(String url) {
+        if (url == null) return false;
+        String lower = url.toLowerCase();
+
+        // Filter out advertising, analytics, tracking, telemetry, static assets
+        if (lower.contains("google-analytics") || lower.contains("googlesyndication") ||
+            lower.contains("doubleclick") || lower.contains("facebook.com") ||
+            lower.contains("cloudflareinsights") || lower.contains("/beacon") ||
+            lower.contains("stats") || lower.contains("clarity.ms") || lower.contains(".css") ||
+            lower.contains(".png") || lower.contains(".jpg") || lower.contains(".svg") ||
+            lower.contains(".woff") || lower.contains(".woff2") || lower.contains(".ico")) {
+            return false;
+        }
+
+        // Catch HLS playlists or MP4 video streams
+        return lower.contains(".m3u8") || lower.contains(".mp4") ||
+               lower.contains("/master.m3u8") || lower.contains("/index.m3u8") ||
+               lower.contains("/playlist.m3u8") || lower.contains("chunklist") ||
+               lower.contains("/manifest/") || (lower.contains("/hls/") && !lower.contains(".js"));
+    }
+
+    private void onStreamCapturedSuccess(final String streamUrl, final String mediaTitle) {
+        runOnUiThread(() -> {
+            stopStreamExtraction();
+            try {
+                String safeUrl = org.json.JSONObject.quote(streamUrl);
+                String safeTitle = org.json.JSONObject.quote(mediaTitle != null ? mediaTitle : "");
+                String js = "if (window.CinVerseNativeBridgeListener && typeof window.CinVerseNativeBridgeListener.onStreamExtracted === 'function') { " +
+                            "  window.CinVerseNativeBridgeListener.onStreamExtracted(" + safeUrl + ", " + safeTitle + "); " +
+                            "}";
+                webView.evaluateJavascript(js, null);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private void notifyStreamCaptureFailed(final String embedUrl, final String reason) {
+        runOnUiThread(() -> {
+            try {
+                String safeUrl = org.json.JSONObject.quote(embedUrl != null ? embedUrl : "");
+                String safeReason = org.json.JSONObject.quote(reason != null ? reason : "");
+                String js = "if (window.CinVerseNativeBridgeListener && typeof window.CinVerseNativeBridgeListener.onStreamFailed === 'function') { " +
+                            "  window.CinVerseNativeBridgeListener.onStreamFailed(" + safeUrl + ", " + safeReason + "); " +
+                            "}";
+                webView.evaluateJavascript(js, null);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
     @Override
     public void onBackPressed() {
         if (customView != null) {
@@ -290,5 +429,19 @@ public class MainActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         webView.saveState(outState);
+    }
+
+    @Override
+    protected void onDestroy() {
+        stopStreamExtraction();
+        if (extractorWebView != null) {
+            extractorWebView.destroy();
+            extractorWebView = null;
+        }
+        if (webView != null) {
+            webView.destroy();
+            webView = null;
+        }
+        super.onDestroy();
     }
 }

@@ -5,6 +5,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
+  <!-- Instant Over-The-Air Update & Cache Control -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  
   <!-- Primary Google SEO Meta Tags -->
   <title>CinVerse - Watch Movies &amp; TV Series Free Online | HD Cinema Streaming</title>
   <meta name="title" content="CinVerse - Watch Movies &amp; TV Series Free Online | HD Cinema Streaming" />
@@ -62,15 +67,15 @@
   <!-- Icon Font (Font Awesome via CDN - no jQuery dependency) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-  <!-- App Styles -->
-  <link rel="stylesheet" href="css/style.css" />
-  <link rel="stylesheet" href="css/navbar.css" />
-  <link rel="stylesheet" href="css/home.css" />
-  <link rel="stylesheet" href="css/movie.css" />
-  <link rel="stylesheet" href="css/search.css" />
-  <link rel="stylesheet" href="css/catalog.css" />
-  <link rel="stylesheet" href="css/responsive.css" />
-  <link rel="stylesheet" href="css/movie-match.css">
+  <!-- App Styles (Version-tagged for instant OTA cache refresh) -->
+  <link rel="stylesheet" href="css/style.css?v=1.2.0" />
+  <link rel="stylesheet" href="css/navbar.css?v=1.2.0" />
+  <link rel="stylesheet" href="css/home.css?v=1.2.0" />
+  <link rel="stylesheet" href="css/movie.css?v=1.2.0" />
+  <link rel="stylesheet" href="css/search.css?v=1.2.0" />
+  <link rel="stylesheet" href="css/catalog.css?v=1.2.0" />
+  <link rel="stylesheet" href="css/responsive.css?v=1.2.0" />
+  <link rel="stylesheet" href="css/movie-match.css?v=1.2.0">
 
   <!-- High-Definition CinVerse Favicon & App Icons (No red icon) -->
   <link rel="icon" type="image/png" sizes="64x64" href="assets/icons/favicon.png?v=2" />
@@ -102,7 +107,7 @@
   <!-- NAVIGATION & AUTH WRAPPER -->
   <!-- ============================= -->
   <div id="navbar-app-wrapper" ng-controller="NavbarController as navCtrl">
-    <header class="navbar" ng-class="{'navbar-scrolled': navCtrl.isScrolled}">
+    <header class="navbar" ng-class="{'navbar-scrolled': navCtrl.isScrolled, 'menu-open': navCtrl.menuOpen}">
       <div class="navbar-container">
 
         <!-- Brand Logo (FLIQ TV 1080p/4K Vector Mark) -->
@@ -110,42 +115,42 @@
           <img src="assets/icons/cinverse-brand.svg" alt="CinVerse 4K" class="navbar-brand-img" />
         </a>
 
-        <!-- Nav Links (FLIQ TV Floating Pill Nav) -->
+        <!-- Nav Links (FLIQ TV Floating Pill Nav & Mobile Drawer) -->
         <nav class="navbar-links" ng-class="{'nav-open': navCtrl.menuOpen}">
-          <a href="#!/home" class="nav-link" ng-click="navCtrl.closeMenu()" ng-class="{'active': navCtrl.isActive('/home')}">
+          <a href="#!/home" class="nav-link" ng-click="navCtrl.navTo('/home')" ng-class="{'active': navCtrl.isActive('/home')}">
             <i class="fa-solid fa-house"></i> Home
           </a>
-          <a href="#!/search" class="nav-link nav-link-search" ng-click="navCtrl.closeMenu()" ng-class="{'active': navCtrl.isActive('/search')}">
+          <a href="#!/search" class="nav-link nav-link-search" ng-click="navCtrl.navTo('/search')" ng-class="{'active': navCtrl.isActive('/search')}">
             <i class="fa-solid fa-magnifying-glass"></i> Search
           </a>
-          <a href="#!/shows" class="nav-link" ng-click="navCtrl.closeMenu()" ng-class="{'active': navCtrl.isActive('/shows')}">
-            TV Shows
+          <a href="#!/shows" class="nav-link" ng-click="navCtrl.navTo('/shows')" ng-class="{'active': navCtrl.isActive('/shows')}">
+            <i class="fa-solid fa-tv"></i> TV Shows
           </a>
-          <a href="#!/anime" class="nav-link" ng-click="navCtrl.closeMenu()" ng-class="{'active': navCtrl.isActive('/anime')}">
-            Anime
+          <a href="#!/anime" class="nav-link" ng-click="navCtrl.navTo('/anime')" ng-class="{'active': navCtrl.isActive('/anime')}">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Anime
           </a>
-          <a href="#!/kdrama" class="nav-link" ng-click="navCtrl.closeMenu()" ng-class="{'active': navCtrl.isActive('/kdrama')}">
-            K-Drama
+          <a href="#!/kdrama" class="nav-link" ng-click="navCtrl.navTo('/kdrama')" ng-class="{'active': navCtrl.isActive('/kdrama')}">
+            <i class="fa-solid fa-heart-pulse"></i> K-Drama
           </a>
-          <a href="#!/home#trending" class="nav-link" ng-click="navCtrl.closeMenu()">
-            Trending
+          <a href="#!/home#trending" class="nav-link" ng-click="navCtrl.navTo('/home#trending')">
+            <i class="fa-solid fa-fire"></i> Trending
           </a>
-          <a href="#!/ott/netflix" class="nav-link" ng-click="navCtrl.closeMenu()" ng-class="{'active': navCtrl.isActive('/ott')}">
-            OTT Hub
+          <a href="#!/ott/netflix" class="nav-link" ng-click="navCtrl.navTo('/ott/netflix')" ng-class="{'active': navCtrl.isActive('/ott')}">
+            <i class="fa-solid fa-layer-group"></i> OTT Hub
           </a>
-          <a href="#!/franchise/marvel" class="nav-link" ng-click="navCtrl.closeMenu()" ng-class="{'active': navCtrl.isActive('/franchise')}">
-            Universes
+          <a href="#!/franchise/marvel" class="nav-link" ng-click="navCtrl.navTo('/franchise/marvel')" ng-class="{'active': navCtrl.isActive('/franchise')}">
+            <i class="fa-solid fa-shield-halved"></i> Universes
           </a>
-          <a href="#!/movie-match" class="nav-link" ng-click="navCtrl.closeMenu()" ng-class="{'active': navCtrl.isActive('/movie-match')}">
-            Match
+          <a href="#!/movie-match" class="nav-link" ng-click="navCtrl.navTo('/movie-match')" ng-class="{'active': navCtrl.isActive('/movie-match')}">
+            <i class="fa-solid fa-shuffle"></i> Match
           </a>
-          <a href="#!/favorites" class="nav-link" ng-click="navCtrl.closeMenu()" ng-class="{'active': navCtrl.isActive('/favorites')}"
+          <a href="#!/favorites" class="nav-link" ng-click="navCtrl.navTo('/favorites')" ng-class="{'active': navCtrl.isActive('/favorites')}"
             title="Favorites">
-            <i class="fa-solid fa-heart"></i>
+            <i class="fa-solid fa-heart"></i> Favorites
           </a>
-          <a href="#!/watchlist" class="nav-link" ng-click="navCtrl.closeMenu()" ng-class="{'active': navCtrl.isActive('/watchlist')}"
+          <a href="#!/watchlist" class="nav-link" ng-click="navCtrl.navTo('/watchlist')" ng-class="{'active': navCtrl.isActive('/watchlist')}"
             title="Watchlist">
-            <i class="fa-solid fa-bookmark"></i>
+            <i class="fa-solid fa-bookmark"></i> Watchlist
           </a>
           <!-- Mobile Drawer Item for App (Only shown inside drawer on mobile) -->
           <a href="javascript:void(0)" class="nav-link nav-link-app-drawer" ng-click="navCtrl.openAppDownloadModal(); navCtrl.closeMenu()" title="Download CinVerse Android App (APK)">
@@ -275,8 +280,8 @@
           </div>
 
           <!-- Hamburger for mobile -->
-          <button class="hamburger-btn" ng-click="navCtrl.toggleMenu()" aria-label="Toggle Menu">
-            <i class="fa-solid fa-bars"></i>
+          <button class="hamburger-btn" ng-click="navCtrl.toggleMenu()" aria-label="Toggle Menu" title="Menu">
+            <i class="fa-solid" ng-class="navCtrl.menuOpen ? 'fa-xmark' : 'fa-bars'"></i>
           </button>
         </div>
     </header>
@@ -284,7 +289,7 @@
     <!-- ============================= -->
     <!-- MOBILE MENU BACKDROP (CLOSES MENU ON BLANK / HOMEPAGE CLICK) -->
     <!-- ============================= -->
-    <div class="mobile-menu-backdrop" ng-if="navCtrl.menuOpen" ng-click="navCtrl.closeMenu()"></div>
+    <div class="mobile-menu-backdrop" ng-if="navCtrl.menuOpen" ng-click="navCtrl.closeMenuImmediately()"></div>
 
     <!-- ============================= -->
     <!-- DEDICATED MOBILE SEARCH DRAWER (DETACHED TO PREVENT CLIPPING) -->
@@ -779,27 +784,33 @@
   <script src="js/lib/angular-route.min.js"></script>
   <script src="js/lib/angular-animate.min.js"></script>
 
-  <!-- App Core -->
-  <script src="app.js"></script>
-  <script src="routes.js"></script>
-  <script src="js/templates.js"></script>
+  <!-- Core Video Streaming Engines (Native HTML5 + HLS.js + Artplayer) -->
+  <script src="js/lib/hls.min.js?v=1.2.0"></script>
+  <script src="js/lib/artplayer.js?v=1.2.0"></script>
+
+  <!-- App Core (Version-tagged for instant OTA updates) -->
+  <script src="app.js?v=1.2.0"></script>
+  <script src="routes.js?v=1.2.0"></script>
+  <script src="js/templates.js?v=1.2.0"></script>
 
   <!-- Services -->
-  <script src="js/services/movieService.js"></script>
-  <script src="js/services/storageService.js"></script>
+  <script src="js/services/movieService.js?v=1.2.0"></script>
+  <script src="js/services/storageService.js?v=1.2.0"></script>
+  <script src="js/services/playerService.js?v=1.2.0"></script>
+  <script src="js/services/streamBridgeService.js?v=1.2.0"></script>
 
   <!-- Directives -->
-  <script src="js/directives/movieCard.js"></script>
+  <script src="js/directives/movieCard.js?v=1.2.0"></script>
 
   <!-- Controllers -->
-  <script src="js/controllers/homeController.js"></script>
-  <script src="js/controllers/movieController.js"></script>
-  <script src="js/controllers/tvController.js"></script>
-  <script src="js/controllers/catalogController.js"></script>
-  <script src="js/controllers/searchController.js"></script>
-  <script src="js/controllers/favoriteController.js"></script>
-  <script src="js/controllers/watchlistController.js"></script>
-  <script src="js/controllers/movieMatchController.js"></script>
+  <script src="js/controllers/homeController.js?v=1.2.0"></script>
+  <script src="js/controllers/movieController.js?v=1.2.0"></script>
+  <script src="js/controllers/tvController.js?v=1.2.0"></script>
+  <script src="js/controllers/catalogController.js?v=1.2.0"></script>
+  <script src="js/controllers/searchController.js?v=1.2.0"></script>
+  <script src="js/controllers/favoriteController.js?v=1.2.0"></script>
+  <script src="js/controllers/watchlistController.js?v=1.2.0"></script>
+  <script src="js/controllers/movieMatchController.js?v=1.2.0"></script>
 
 </body>
 

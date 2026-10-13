@@ -22,7 +22,9 @@
     '$interval',
     'MovieService',
     'StorageService',
-    function ($scope, $routeParams, $location, $sce, $timeout, $interval, MovieService, StorageService) {
+    'PlayerService',
+    'StreamBridgeService',
+    function ($scope, $routeParams, $location, $sce, $timeout, $interval, MovieService, StorageService, PlayerService, StreamBridgeService) {
       var vm = this;
 
       var movieId = parseInt($routeParams.movieId, 10);
@@ -199,7 +201,7 @@
 
       vm.openCloudMirror = function (mirrorNum) {
         var url = mirrorNum === 2
-          ? 'https://vidfast.vc/movie/' + vm.movie.id
+          ? 'https://superembed.stream/?video_id=' + vm.movie.id + '&tmdb=1'
           : 'https://vidbolt.xyz/movie/' + vm.movie.id;
         window.open(url, '_blank');
       };
@@ -371,17 +373,21 @@
       vm.selectAudioTrack = function (track) {
         vm.selectedAudioTrack = track;
         if (track.id === 'hi') {
-          vm.audioNotice = '🇮🇳 Hindi Dual-Audio Active! Video player streams multi-audio. Tap the ⚙️ Settings / Audio menu on the player bar to choose Hindi if it defaults to original audio.';
+          // Switch to Server 3 (2Embed Bollywood / Hindi) or Server 1 (VidBolt Dual Audio)
+          var hindiServer = vm.servers.find(function (s) { return s.id === 3; }) || vm.servers[0];
+          vm.currentServer = hindiServer;
+          vm.audioNotice = '🇮🇳 Hindi Dubbed / Dual-Audio Active on ' + vm.currentServer.name + '! (If stream starts in English, tap the ⚙️ Settings / Audio menu inside the player to switch to Hindi)';
         } else if (track.id === 'en') {
-          vm.audioNotice = '🇬🇧 English Master Track active on ' + vm.currentServer.name + '.';
+          vm.currentServer = vm.servers[0]; // Server 1 VidBolt 1080p English master
+          vm.audioNotice = '🇬🇧 English Master Track (1080p HD) active on ' + vm.currentServer.name + '.';
         } else if (track.id === 'multi') {
-          vm.audioNotice = '🌐 Multi-Language & Subtitles Active. You can select language & subtitle tracks inside the player ⚙️ settings.';
+          vm.audioNotice = '🌐 Multi-Language & Subtitles Active on ' + vm.currentServer.name + '. You can select tracks in the player ⚙️ settings.';
         } else {
-          vm.audioNotice = track.name + ' selected. Server: ' + vm.currentServer.name + '.';
+          vm.audioNotice = track.name + ' selected on ' + vm.currentServer.name + '.';
         }
 
         if (vm.movie && vm.movie.id) {
-          vm.currentStreamUrl = $sce.trustAsResourceUrl(vm.currentServer.getUrl(vm.movie.id, track.id));
+          vm.currentStreamUrl = $sce.trustAsResourceUrl(vm.currentServer.getUrl(vm.movie.id));
         }
       };
 
@@ -566,48 +572,113 @@
         }
       };
 
+      // ---------------- STREAM ENGINE (CINVERSE PRO NATIVE ARTPLAYER + CLOUD INTERCEPTOR) ----------------
+      vm.useNativePlayer = false;
+      vm.isExtractingStream = false;
+      vm.extractionStatus = '';
+      vm.artInstance = null;
+
+      vm.bootNativePlayerWithUrl = function (streamUrl, title, tracks) {
+        if (!vm.showPlayer) return;
+        var container = document.getElementById('cinverse-artplayer-movie');
+        if (!container) return;
+
+        if (vm.artInstance) {
+          PlayerService.destroyPlayer(vm.artInstance);
+          vm.artInstance = null;
+        }
+
+        vm.artInstance = PlayerService.initPlayer({
+          container: container,
+          url: streamUrl,
+          title: title || (vm.movie && vm.movie.title ? vm.movie.title : 'CinVerse Pro Cinema'),
+          poster: vm.movie ? vm.getBackdropUrl(vm.movie.backdrop_path) : '',
+          onTimeUpdate: function (currentTime, duration) {
+            if (vm.movie && vm.movie.id && duration > 0) {
+              var pct = Math.floor((currentTime / duration) * 100);
+              StorageService.recordWatch(
+                vm.movie,
+                'CinVerse Native Player',
+                'Multi-Audio Master',
+                pct,
+                vm.currentServer ? vm.currentServer.id : 1,
+                'multi'
+              );
+            }
+          }
+        });
+      };
+
       // ---------------- 5 HIGH-SPEED STREAMING SERVERS (MULTI-AUDIO & BOLLYWOOD READY) ----------------
       vm.showPlayer = false;
 
       vm.servers = [
         {
           id: 1,
-          name: 'Official Server 1 (VidBolt Multi-Audio)',
-          badge: 'FLIQ / NetMirror Engine ⚡',
+          name: 'Server 1 • VidBolt',
+          badge: 'Multi-Audio ⚡',
           icon: 'fa-bolt',
           getUrl: function (id) { return 'https://vidbolt.xyz/movie/' + id; }
         },
         {
           id: 2,
-          name: 'Official Server 2 (VidFast 4K Multi-Audio)',
-          badge: 'Ultra HD Cinema Backup 🚀',
+          name: 'Server 2 • SuperEmbed',
+          badge: '4K Multi-Cloud 🚀',
           icon: 'fa-film',
-          getUrl: function (id) { return 'https://vidfast.vc/movie/' + id; }
+          getUrl: function (id) { return 'https://superembed.stream/?video_id=' + id + '&tmdb=1'; }
         },
         {
           id: 3,
-          name: 'Server 3 (2Embed Cinema - Bollywood & Global)',
-          badge: 'Bollywood & Hindi Ready 🇮🇳',
+          name: 'Server 3 • 2Embed',
+          badge: 'Bollywood / Hindi 🇮🇳',
           icon: 'fa-clapperboard',
           getUrl: function (id) { return 'https://www.2embed.cc/embed/' + id; }
         },
         {
           id: 4,
-          name: 'Server 4 (SmashyStream Fast Cloud)',
-          badge: 'Buffer-Free Mirror 💨',
+          name: 'Server 4 • SmashyStream',
+          badge: 'Fast Mirror 💨',
           icon: 'fa-cloud',
           getUrl: function (id) { return 'https://embed.smashystream.com/playere.php?tmdb=' + id; }
         },
         {
           id: 5,
-          name: 'Server 5 (College WiFi Bypass - Vidflix)',
-          badge: 'Campus Firewall Proof 🎓',
+          name: 'Server 5 • Vidflix',
+          badge: 'Campus WiFi Proof 🎓',
           icon: 'fa-graduation-cap',
           getUrl: function (id) { return 'https://vidsrc.pm/embed/movie/' + id; }
         }
       ];
       vm.currentServer = vm.servers[0];
       vm.currentStreamUrl = null;
+      vm.isServersOpen = false;
+
+      // ---------------- IN-PLAYER TOOLS & SETTINGS (IN-FRAME) ----------------
+      vm.showInPlayerSettings = false;
+      vm.inPlayerSettingsTab = 'audio';
+      vm.aspectRatio = '16/9';
+
+      vm.openInPlayerSettings = function (tab) {
+        vm.showInPlayerSettings = true;
+        vm.inPlayerSettingsTab = tab || 'audio';
+      };
+
+      vm.closeInPlayerSettings = function () {
+        vm.showInPlayerSettings = false;
+      };
+
+      vm.toggleInPlayerSettings = function (tab) {
+        if (vm.showInPlayerSettings && vm.inPlayerSettingsTab === tab) {
+          vm.showInPlayerSettings = false;
+        } else {
+          vm.showInPlayerSettings = true;
+          vm.inPlayerSettingsTab = tab || 'audio';
+        }
+      };
+
+      vm.setAspectRatio = function (ratio) {
+        vm.aspectRatio = ratio || '16/9';
+      };
 
       var wakeLockObj = null;
 
@@ -671,16 +742,72 @@
         }
       };
 
-      vm.toggleFullscreen = function () {
-        var wrap = document.getElementById('stream-player-section') || document.querySelector('.theater-screen-wrap');
+      // ---------------- FULLSCREEN & ORIENTATION ----------------
+      vm.isFullscreen = false;
+
+      function updateFsState() {
+        vm.isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+        if (!$scope.$$phase) {
+          $scope.$applyAsync();
+        }
+      }
+
+      document.addEventListener('fullscreenchange', updateFsState);
+      document.addEventListener('webkitfullscreenchange', updateFsState);
+      document.addEventListener('mozfullscreenchange', updateFsState);
+
+      vm.toggleFullscreen = function ($event) {
+        if ($event) {
+          $event.stopPropagation();
+        }
+        var wrap = document.getElementById('theater-screen-container') || document.getElementById('stream-player-section') || document.querySelector('.theater-screen-wrap');
         if (!wrap) return;
-        if (!document.fullscreenElement) {
-          if (wrap.requestFullscreen) wrap.requestFullscreen();
-          else if (wrap.webkitRequestFullscreen) wrap.webkitRequestFullscreen();
+
+        var isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+        if (!isFs) {
+          if (wrap.requestFullscreen) {
+            wrap.requestFullscreen().catch(function () {});
+          } else if (wrap.webkitRequestFullscreen) {
+            wrap.webkitRequestFullscreen();
+          } else if (wrap.mozRequestFullScreen) {
+            wrap.mozRequestFullScreen();
+          } else if (wrap.msRequestFullscreen) {
+            wrap.msRequestFullscreen();
+          }
+
+          try {
+            if (screen.orientation && screen.orientation.lock) {
+              screen.orientation.lock('landscape').catch(function () {});
+            }
+          } catch (e) {}
+
+          if (window.CinVerseNative && window.CinVerseNative.lockOrientation) {
+            try { window.CinVerseNative.lockOrientation(true); } catch (e) {}
+          }
         } else {
-          if (document.exitFullscreen) document.exitFullscreen();
+          if (document.exitFullscreen) {
+            document.exitFullscreen().catch(function () {});
+          } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+          } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+          } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+          }
+
+          try {
+            if (screen.orientation && screen.orientation.unlock) {
+              screen.orientation.unlock();
+            }
+          } catch (e) {}
+
+          if (window.CinVerseNative && window.CinVerseNative.lockOrientation) {
+            try { window.CinVerseNative.lockOrientation(false); } catch (e) {}
+          }
         }
       };
+
+
 
       vm.playTrailerInPlayer = function () {
         var trailer = vm.activeTrailer || (vm.allTrailers && vm.allTrailers.length ? vm.allTrailers[0] : null);
@@ -716,30 +843,82 @@
         }
       };
 
+      vm.toggleServersDropdown = function () {
+        vm.isServersOpen = !vm.isServersOpen;
+      };
+
+      vm.selectServerAndClose = function (server) {
+        vm.selectServer(server);
+        vm.isServersOpen = false;
+      };
+
       vm.selectServer = function (server) {
         vm.currentServer = server;
         vm.collegeBypassActive = (server.id === 5);
-        if (vm.movie && vm.movie.id) {
-          vm.currentStreamUrl = $sce.trustAsResourceUrl(server.getUrl(vm.movie.id));
+        if (vm.showPlayer) {
+          vm.playMovie();
         }
         vm.audioNotice = 'Active on ' + server.name + ' • In-player multi-audio tracks & subtitles ready.';
+      };
+
+      vm.resumePlayback = function () {
+        if (vm.resumeEntry && vm.resumeEntry.serverId) {
+          var srv = vm.servers.find(function (s) { return s.id === vm.resumeEntry.serverId; });
+          if (srv) vm.currentServer = srv;
+        }
+        vm.playMovie();
       };
 
       vm.playMovie = function () {
         vm.showPlayer = true;
         acquireWakeLock();
-        if (!vm.currentStreamUrl && vm.movie && vm.movie.id) {
-          vm.currentStreamUrl = $sce.trustAsResourceUrl(vm.currentServer.getUrl(vm.movie.id));
+
+        if (vm.artInstance) {
+          PlayerService.destroyPlayer(vm.artInstance);
+          vm.artInstance = null;
+        }
+
+        vm.isExtractingStream = true;
+        vm.extractionStatus = 'Extracting Direct Master Stream & Multi-Audio Tracks...';
+
+        var embedUrl = vm.currentServer ? vm.currentServer.getUrl(vm.movie ? vm.movie.id : movieId) : '';
+        var mediaTitle = vm.movie ? vm.movie.title : 'CinVerse Cinema';
+
+        try {
+          StreamBridgeService.resolveStream({
+            id: vm.movie ? vm.movie.id : movieId,
+            title: mediaTitle,
+            type: 'movie',
+            embedUrl: embedUrl
+          }).then(function (res) {
+            vm.isExtractingStream = false;
+            vm.useNativePlayer = true;
+            $timeout(function () {
+              vm.bootNativePlayerWithUrl(res.url, res.title, res.tracks);
+            }, 80);
+          }).catch(function (err) {
+            vm.isExtractingStream = false;
+            vm.useNativePlayer = false;
+            if (vm.movie && vm.movie.id && vm.currentServer) {
+              vm.currentStreamUrl = $sce.trustAsResourceUrl(vm.currentServer.getUrl(vm.movie.id));
+            }
+          });
+        } catch (ex) {
+          vm.isExtractingStream = false;
+          vm.useNativePlayer = false;
+          if (vm.movie && vm.movie.id && vm.currentServer) {
+            vm.currentStreamUrl = $sce.trustAsResourceUrl(vm.currentServer.getUrl(vm.movie.id));
+          }
         }
 
         // Record in Watch History for OTT Resume & Continue Watching
         if (vm.movie && vm.movie.id) {
           StorageService.recordWatch(
             vm.movie,
-            vm.currentServer.name,
+            'CinVerse Native Engine',
             'In-Player Multi-Audio',
             45,
-            vm.currentServer.id,
+            vm.currentServer ? vm.currentServer.id : 1,
             'multi'
           );
         }
@@ -762,6 +941,12 @@
         vm.showPlayer = false;
         vm.theaterMode = false;
         vm.currentStreamUrl = null;
+        vm.isExtractingStream = false;
+        StreamBridgeService.cancelExtraction();
+        if (vm.artInstance) {
+          PlayerService.destroyPlayer(vm.artInstance);
+          vm.artInstance = null;
+        }
         releaseWakeLock();
       };
 
@@ -774,6 +959,15 @@
         if (e.key === 't' || e.key === 'T') {
           $scope.$apply(function () {
             vm.toggleTheaterMode();
+          });
+        } else if (e.key === 'f' || e.key === 'F') {
+          $scope.$apply(function () {
+            vm.toggleFullscreen();
+          });
+        } else if (e.key === ' ' || e.code === 'Space') {
+          e.preventDefault();
+          $scope.$apply(function () {
+            vm.togglePlayPause();
           });
         } else if (e.key === 'n' || e.key === 'N') {
           $scope.$apply(function () {
@@ -789,6 +983,11 @@
       window.addEventListener('keydown', onKeyDown);
       $scope.$on('$destroy', function () {
         window.removeEventListener('keydown', onKeyDown);
+        document.removeEventListener('fullscreenchange', updateFsState);
+        document.removeEventListener('webkitfullscreenchange', updateFsState);
+        document.removeEventListener('mozfullscreenchange', updateFsState);
+        if (hideControlsTimer) $timeout.cancel(hideControlsTimer);
+        if (directTouchTimer) $timeout.cancel(directTouchTimer);
       });
 
       // ---------------- STATE ----------------
@@ -797,6 +996,7 @@
       vm.trailerUrl = null;
       vm.similarMovies = [];
       vm.recommendedMovies = [];
+      vm.resumeEntry = null;
 
       vm.isLoading = true;
       vm.errorMessage = null;
@@ -845,8 +1045,21 @@
           vm.isFavorite = StorageService.isFavorite(movieId);
           vm.isWatchlisted = StorageService.isInWatchlist(movieId);
 
+          // Check if previously watched
+          var savedWatch = StorageService.getWatchEntry ? StorageService.getWatchEntry(movieId) : null;
+          vm.resumeEntry = savedWatch;
+
+          var sQuery = $location.search();
+          var reqServerId = parseInt(sQuery.server, 10) || (savedWatch && savedWatch.serverId);
+          if (reqServerId) {
+            var foundSrv = vm.servers.find(function (s) { return s.id === reqServerId; });
+            if (foundSrv) {
+              vm.currentServer = foundSrv;
+            }
+          }
+
           // Auto-launch stream player if ?play=true query param is present
-          if ($location.search().play === 'true') {
+          if (sQuery.play === 'true') {
             vm.playMovie();
           }
         })
@@ -918,6 +1131,19 @@
         .catch(function () {
           vm.recommendedMovies = [];
         });
+
+      // Clean up player and listeners on view destroy
+      $scope.$on('$destroy', function () {
+        releaseWakeLock();
+        if (vm.artInstance) {
+          PlayerService.destroyPlayer(vm.artInstance);
+          vm.artInstance = null;
+        }
+        document.removeEventListener('fullscreenchange', updateFsState);
+        document.removeEventListener('webkitfullscreenchange', updateFsState);
+        document.removeEventListener('mozfullscreenchange', updateFsState);
+        window.removeEventListener('keydown', onKeyDown);
+      });
     }
   ]);
 

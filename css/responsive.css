@@ -726,10 +726,11 @@
   }
 
   /* Mobile Navbar Drawer */
-  .navbar-links {
-    width: 85%;
-    max-width: 320px;
-    padding: 80px 24px 30px;
+  .navbar-links.nav-open {
+    width: 290px;
+    max-width: 85vw;
+    padding: 20px 18px 40px !important;
+    pointer-events: auto !important;
   }
 
   /* Hero Billboard */

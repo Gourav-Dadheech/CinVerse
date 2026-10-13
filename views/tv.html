@@ -62,7 +62,11 @@
 
           <!-- Action buttons -->
           <div class="movie-actions">
-            <button class="btn btn-primary btn-play-movie" ng-click="tvCtrl.playEpisode(tvCtrl.currentSeasonNumber, tvCtrl.currentEpisodeNumber)">
+            <!-- Resume Playback button if previously in watch history -->
+            <button class="btn btn-primary btn-resume-movie" ng-if="tvCtrl.resumeEntry && !tvCtrl.showPlayer" ng-click="tvCtrl.resumePlayback()" title="Resume where you stopped">
+              <i class="fa-solid fa-clock-rotate-left"></i> Resume S{{ tvCtrl.resumeEntry.season || tvCtrl.currentSeasonNumber }}:E{{ tvCtrl.resumeEntry.episode || tvCtrl.currentEpisodeNumber }} ({{ tvCtrl.resumeEntry.progressPct || 45 }}%)
+            </button>
+            <button class="btn btn-play-movie" ng-class="{'btn-primary': !tvCtrl.resumeEntry, 'btn-secondary-play': tvCtrl.resumeEntry}" ng-click="tvCtrl.playEpisode(tvCtrl.currentSeasonNumber, tvCtrl.currentEpisodeNumber)">
               <i class="fa-solid fa-play"></i> Watch S{{ tvCtrl.currentSeasonNumber }}:E{{ tvCtrl.currentEpisodeNumber }}
             </button>
             <button class="btn-download-movie" ng-click="tvCtrl.openDownloadModal()">
@@ -99,6 +103,12 @@
           </div>
 
           <div class="theater-actions">
+            <!-- Cinema Fullscreen Button (Works on all servers including SmashyStream) -->
+            <button class="theater-action-btn fullscreen-action-btn" ng-click="tvCtrl.toggleFullscreen($event)" title="Full Screen Cinema (Hotkey: F)">
+              <i class="fa-solid" ng-class="tvCtrl.isFullscreen ? 'fa-compress' : 'fa-expand'"></i>
+              <span>{{ tvCtrl.isFullscreen ? 'Exit Fullscreen' : 'Fullscreen' }}</span>
+            </button>
+
             <!-- Episode Jump Controls -->
             <button class="theater-action-btn" ng-click="tvCtrl.prevEpisode()" ng-disabled="tvCtrl.currentEpisodeNumber <= 1" title="Previous Episode">
               <i class="fa-solid fa-backward-step"></i> <span>Prev Ep</span>
@@ -134,63 +144,42 @@
           </div>
         </div>
 
-        <!-- Server Switcher Bar -->
-        <div class="theater-servers-bar">
-          <span class="bar-label"><i class="fa-solid fa-server"></i> Server:</span>
-          <div class="server-pill-list">
-            <button class="server-pill"
-                    ng-repeat="server in tvCtrl.servers"
-                    ng-class="{ 'active': tvCtrl.currentServer.id === server.id, 'campus-pill': server.id === 5, 'bollywood-pill': server.id === 3 }"
-                    ng-click="tvCtrl.selectServer(server)">
-              <i class="fa-solid" ng-class="server.icon || 'fa-bolt'"></i>
-              <span>{{ server.name }}</span>
-              <span class="server-badge" ng-if="server.badge">{{ server.badge }}</span>
-            </button>
+        <!-- Video Screen Container: CinVerse Personal Cinema Player (In-Frame Controls & Audio Tools) -->
+        <div class="theater-screen-wrap cinverse-personal-player" id="tv-theater-screen-container">
+          <!-- 1. Top In-Player HUD Bar (Inside Frame) -->          <!-- 1. Stream Extraction & Connecting Radar Overlay -->
+          <div class="stream-extracting-overlay" ng-if="tvCtrl.isExtractingStream">
+            <div class="extractor-radar-spinner">
+              <i class="fa-solid fa-satellite-dish radar-icon"></i>
+              <div class="radar-pulse"></div>
+            </div>
+            <div class="extractor-info">
+              <h4 class="extractor-status-title">{{ tvCtrl.extractionStatus || 'Extracting Direct Stream...' }}</h4>
+              <p class="extractor-status-desc">
+                <i class="fa-solid fa-shield-halved"></i> Intercepting episode stream &amp; multi-audio tracks for CinVerse Native Player
+              </p>
+            </div>
           </div>
-          <button class="btn-quick-next" ng-click="tvCtrl.nextServer()" title="Switch to Next Server (Hotkey: N)">
-            <i class="fa-solid fa-rotate"></i> Next Server
-          </button>
-        </div>
 
-        <!-- In-Player Audio & Subtitles Note -->
-        <div class="theater-inplayer-bar">
-          <div class="inplayer-tip">
-            <i class="fa-solid fa-headphones"></i>
-            <span><strong>In-Player Multi-Audio & Subtitles:</strong> Audio tracks (Hindi, English, Japanese/Original) and subtitles are built directly into this player. Tap the <strong>⚙️ Settings</strong> icon inside the player controls to change audio track!</span>
+          <!-- 2. CinVerse Pro Native Player (Artplayer: Multi-Audio In-Settings, Rewind/Fast Forward 10s) -->
+          <div id="cinverse-artplayer-tv"
+               class="cinverse-artplayer-container"
+               ng-show="tvCtrl.useNativePlayer && !tvCtrl.isExtractingStream">
           </div>
-          <!-- Mobile Touch & Rotation Lock Tool Button (Near Player Settings/Captions) -->
-          <button class="btn-mobile-lock-tool mobile-only-tool"
-                  ng-class="{ 'locked': tvCtrl.isScreenLocked }"
-                  ng-click="tvCtrl.toggleScreenLock()"
-                  title="Lock touches and orientation to avoid mistouch">
-            <i class="fa-solid" ng-class="tvCtrl.isScreenLocked ? 'fa-lock' : 'fa-lock-open'"></i>
-            <span>{{ tvCtrl.isScreenLocked ? 'Screen Locked' : 'Touch & Rotation Lock' }}</span>
-          </button>
-        </div>
 
-        <!-- Video Screen Container (Direct Unblocked Native Playback) -->
-        <div class="theater-screen-wrap" id="tv-theater-screen-container">
+          <!-- 3. Direct Streaming Canvas (Fallback if host restricts browser CORS) -->
           <iframe
+            id="cinema-tv-iframe"
+            ng-if="!tvCtrl.useNativePlayer && !tvCtrl.isExtractingStream"
             ng-src="{{ tvCtrl.currentStreamUrl }}"
             title="{{ tvCtrl.show.name }} Episode Stream"
             frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-            webkitallowfullscreen
-            mozallowfullscreen
-            allowfullscreen>
+            allow="accelerometer *; autoplay *; clipboard-write *; encrypted-media *; gyroscope *; picture-in-picture *; web-share *; fullscreen *"
+            webkitallowfullscreen="true"
+            mozallowfullscreen="true"
+            allowfullscreen="true">
           </iframe>
 
-          <!-- Mobile-Only Floating Screen & Touch Lock Sign Button (Near Player Tools) -->
-          <button class="mobile-player-floating-lock-btn mobile-only-tool"
-                  type="button"
-                  ng-if="!tvCtrl.isScreenLocked"
-                  ng-click="tvCtrl.toggleScreenLock()"
-                  title="Lock touches and orientation to prevent accidental pause">
-            <i class="fa-solid fa-lock"></i>
-            <span>Lock</span>
-          </button>
-
-          <!-- Mobile Screen Locked Barrier (Active Only When Locked - Prevents Mistouch) -->
+          <!-- Mobile Screen Locked Barrier (Active ONLY When Locked - Prevents Mistouch) -->
           <div class="mobile-screen-locked-barrier mobile-only-tool" ng-if="tvCtrl.isScreenLocked">
             <button type="button" class="btn-mobile-unlock-pill" ng-click="tvCtrl.toggleScreenLock()" title="Tap to Unlock Screen">
               <i class="fa-solid fa-lock-open"></i>
@@ -464,7 +453,7 @@
                 <i class="fa-solid fa-bolt"></i> Fast Cloud Mirror
               </button>
               <button class="mirror-btn" ng-click="tvCtrl.openCloudMirror(2)" title="Open Ultra HD Mirror 2">
-                <i class="fa-solid fa-film"></i> Ultra HD VidFast
+                <i class="fa-solid fa-film"></i> Ultra HD SuperEmbed
               </button>
             </div>
           </div>

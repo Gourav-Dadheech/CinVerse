@@ -67,7 +67,7 @@
     </div>
 
     <div class="continue-track">
-      <div class="continue-card" ng-repeat="item in homeCtrl.watchHistory track by item.id">
+      <div class="continue-card" ng-repeat="item in homeCtrl.watchHistory track by (item.id + '-' + (item.season || 1) + '-' + (item.episode || 1))">
         <div class="continue-poster-wrap" ng-click="homeCtrl.resumeMovie(item)">
           <img class="continue-poster"
                ng-src="{{ homeCtrl.getBackdropUrl(item.backdrop_path) || homeCtrl.getPosterUrl(item.poster_path) }}"
@@ -93,11 +93,16 @@
             <span class="continue-pct">{{ item.progressPct }}%</span>
           </div>
           <div class="continue-details">
-            <span class="continue-audio-tag"><i class="fa-solid fa-headphones"></i> {{ item.audioTrack || 'English' }}</span>
+            <span class="continue-audio-tag" ng-if="item.isTv">
+              <i class="fa-solid fa-tv"></i> Season {{ item.season || 1 }}, Ep {{ item.episode || 1 }}
+            </span>
+            <span class="continue-audio-tag" ng-if="!item.isTv">
+              <i class="fa-solid fa-headphones"></i> {{ item.audioTrack || 'English' }}
+            </span>
             <span class="continue-server-tag">{{ item.serverName || 'Server 1' }}</span>
           </div>
           <button class="btn-resume-now" ng-click="homeCtrl.resumeMovie(item)">
-            <i class="fa-solid fa-play"></i> Resume Playback
+            <i class="fa-solid fa-play"></i> {{ item.isTv ? ('Resume S' + (item.season || 1) + ':E' + (item.episode || 1)) : 'Resume Playback' }}
           </button>
         </div>
       </div>

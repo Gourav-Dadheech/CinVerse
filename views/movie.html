@@ -58,7 +58,11 @@
 
           <!-- Action buttons -->
           <div class="movie-actions">
-            <button class="btn btn-primary btn-play-movie" ng-click="movieCtrl.playMovie()">
+            <!-- Resume Playback button if previously in watch history -->
+            <button class="btn btn-primary btn-resume-movie" ng-if="movieCtrl.resumeEntry && !movieCtrl.showPlayer" ng-click="movieCtrl.resumePlayback()" title="Resume where you stopped">
+              <i class="fa-solid fa-clock-rotate-left"></i> Resume ({{ movieCtrl.resumeEntry.progressPct || 45 }}%)
+            </button>
+            <button class="btn btn-play-movie" ng-class="{'btn-primary': !movieCtrl.resumeEntry, 'btn-secondary-play': movieCtrl.resumeEntry}" ng-click="movieCtrl.playMovie()">
               <i class="fa-solid fa-play"></i> Watch Movie
             </button>
             <button class="btn btn-download-movie" ng-click="movieCtrl.openDownloadModal()" title="Download in 4K, 1080p, or 720p">
@@ -95,6 +99,12 @@
           </div>
 
           <div class="theater-actions">
+            <!-- Cinema Fullscreen Button (Works on all servers including SmashyStream) -->
+            <button class="theater-action-btn fullscreen-action-btn" ng-click="movieCtrl.toggleFullscreen($event)" title="Full Screen Cinema (Hotkey: F)">
+              <i class="fa-solid" ng-class="movieCtrl.isFullscreen ? 'fa-compress' : 'fa-expand'"></i>
+              <span>{{ movieCtrl.isFullscreen ? 'Exit Fullscreen' : 'Fullscreen' }}</span>
+            </button>
+
             <!-- Theater Mode Expand -->
             <button class="theater-action-btn" ng-class="{ 'active': movieCtrl.theaterMode }" ng-click="movieCtrl.toggleTheaterMode()" title="Toggle Cinema Theater Width (Hotkey: T)">
               <i class="fa-solid" ng-class="movieCtrl.theaterMode ? 'fa-compress' : 'fa-expand'"></i>
@@ -143,94 +153,42 @@
           </button>
         </div>
 
-        <!-- Sleek Server Switcher Bar (5 High-Speed Servers: Bollywood, 4K & Bypass) -->
-        <div class="theater-servers-bar">
-          <span class="bar-label"><i class="fa-solid fa-server"></i> Server:</span>
-          <div class="server-pill-list">
-            <button class="server-pill"
-                    ng-repeat="server in movieCtrl.servers"
-                    ng-class="{ 'active': movieCtrl.currentServer.id === server.id, 'campus-pill': server.id === 5, 'bollywood-pill': server.id === 3 }"
-                    ng-click="movieCtrl.selectServer(server)">
-              <i class="fa-solid" ng-class="server.icon || 'fa-bolt'"></i>
-              <span>{{ server.name }}</span>
-              <span class="server-badge" ng-if="server.badge">{{ server.badge }}</span>
-            </button>
-          </div>
-          <button class="btn-quick-next" ng-click="movieCtrl.nextServer()" title="Switch to Next Server (Hotkey: N)">
-            <i class="fa-solid fa-rotate"></i> Next Server
-          </button>
-        </div>
-
-        <!-- In-Player Audio & Language Guide (NetMirror & FLIQ Style - Built Directly Into Player) -->
-        <div class="theater-inplayer-bar">
-          <div class="inplayer-tip">
-            <i class="fa-solid fa-headphones"></i>
-            <span><strong>In-Player Multi-Audio & Subtitles:</strong> Audio tracks (Hindi, English, Regional) and subtitles are built directly into this player. Tap the <strong>⚙️ Settings / Audio</strong> icon on the bottom player bar to switch language without changing servers!</span>
-          </div>
-          <!-- Mobile Touch & Rotation Lock Tool Button (Near Player Settings/Captions) -->
-          <button class="btn-mobile-lock-tool mobile-only-tool"
-                  ng-class="{ 'locked': movieCtrl.isScreenLocked }"
-                  ng-click="movieCtrl.toggleScreenLock()"
-                  title="Lock touches and orientation to avoid mistouch">
-            <i class="fa-solid" ng-class="movieCtrl.isScreenLocked ? 'fa-lock' : 'fa-lock-open'"></i>
-            <span>{{ movieCtrl.isScreenLocked ? 'Screen Locked' : 'Touch & Rotation Lock' }}</span>
-          </button>
-          <div class="server-switch-notice" ng-if="movieCtrl.audioNotice">
-            <i class="fa-solid fa-circle-check"></i>
-            <span>{{ movieCtrl.audioNotice }}</span>
-          </div>
-          <div class="regional-audio-note" ng-if="movieCtrl.isRegionalLanguage && movieCtrl.regionalNote">
-            <i class="fa-solid fa-language"></i>
-            <span>{{ movieCtrl.regionalNote }}</span>
-          </div>
-          <div class="inplayer-languages" ng-if="movieCtrl.availableLanguages.length">
-            <span class="meta-lang-tag" ng-repeat="lang in movieCtrl.availableLanguages | limitTo: 4">
-              {{ lang.flag }} {{ lang.name }}
-            </span>
-          </div>
-        </div>
-
-        <!-- Screen / Video Container with Ambient Shadow (Direct Unblocked Native Playback) -->
-        <div class="theater-screen-wrap" id="theater-screen-container">
-          <!-- CineBoost On-Screen HUD Overlay -->
-          <div class="mx-player-osd" ng-class="{ 'visible': movieCtrl.showOsd, 'super-boost': movieCtrl.audioBoostLevel > 100 }">
-            <div class="osd-icon">
-              <i class="fa-solid" ng-class="movieCtrl.audioBoostLevel > 100 ? 'fa-fire-flame-curved' : (movieCtrl.audioBoostLevel == 0 ? 'fa-volume-xmark' : 'fa-volume-high')"></i>
+        <!-- Screen / Video Container: CinVerse Native Cinema Player (Artplayer Engine) -->
+        <div class="theater-screen-wrap cinverse-personal-player" id="theater-screen-container">
+          <!-- 1. Stream Extraction & Connecting Radar Overlay -->
+          <div class="stream-extracting-overlay" ng-if="movieCtrl.isExtractingStream">
+            <div class="extractor-radar-spinner">
+              <i class="fa-solid fa-satellite-dish radar-icon"></i>
+              <div class="radar-pulse"></div>
             </div>
-            <div class="osd-details">
-              <div class="osd-title">
-                {{ movieCtrl.audioBoostLevel > 100 ? 'CINEBOOST 200%' : 'VOLUME' }}
-                <span class="osd-pct">{{ movieCtrl.audioBoostLevel }}%</span>
-              </div>
-              <div class="osd-bar-track">
-                <div class="osd-bar-fill" ng-style="{ 'width': (movieCtrl.audioBoostLevel / 2) + '%' }"></div>
-                <div class="osd-100-mark" title="100% Normal Limit"></div>
-              </div>
+            <div class="extractor-info">
+              <h4 class="extractor-status-title">{{ movieCtrl.extractionStatus || 'Extracting Direct Stream...' }}</h4>
+              <p class="extractor-status-desc">
+                <i class="fa-solid fa-shield-halved"></i> Intercepting master stream &amp; multi-audio tracks for CinVerse Native Player
+              </p>
             </div>
           </div>
 
-          <!-- Pure Native Playback Iframe without Sandbox Blocking -->
+          <!-- 2. CinVerse Pro Native Player (Artplayer: Multi-Audio In-Settings, Rewind/Fast Forward 10s) -->
+          <div id="cinverse-artplayer-movie"
+               class="cinverse-artplayer-container"
+               ng-show="movieCtrl.useNativePlayer && !movieCtrl.isExtractingStream">
+          </div>
+
+          <!-- 3. Direct Streaming Canvas (Fallback if host restricts browser CORS) -->
           <iframe
+            id="cinema-movie-iframe"
+            ng-if="!movieCtrl.useNativePlayer && !movieCtrl.isExtractingStream"
             ng-src="{{ movieCtrl.currentStreamUrl }}"
             title="{{ movieCtrl.movie.title }} Stream"
             frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-            webkitallowfullscreen
-            mozallowfullscreen
-            allowfullscreen>
+            allow="accelerometer *; autoplay *; clipboard-write *; encrypted-media *; gyroscope *; picture-in-picture *; web-share *; fullscreen *"
+            webkitallowfullscreen="true"
+            mozallowfullscreen="true"
+            allowfullscreen="true">
           </iframe>
 
-          <!-- Mobile-Only Floating Screen & Touch Lock Sign Button (Near Player Tools) -->
-          <button class="mobile-player-floating-lock-btn mobile-only-tool"
-                  type="button"
-                  ng-if="!movieCtrl.isScreenLocked"
-                  ng-click="movieCtrl.toggleScreenLock()"
-                  title="Lock touches and orientation to prevent accidental pause">
-            <i class="fa-solid fa-lock"></i>
-            <span>Lock</span>
-          </button>
-
-          <!-- Mobile Screen Locked Barrier (Active Only When Locked - Prevents Mistouch) -->
+          <!-- Mobile Screen Locked Barrier (Active ONLY When Locked - Prevents Mistouch) -->
           <div class="mobile-screen-locked-barrier mobile-only-tool" ng-if="movieCtrl.isScreenLocked">
             <button type="button" class="btn-mobile-unlock-pill" ng-click="movieCtrl.toggleScreenLock()" title="Tap to Unlock Screen">
               <i class="fa-solid fa-lock-open"></i>
@@ -239,10 +197,15 @@
           </div>
         </div>
 
+
         <!-- Theater Footer: Quick Keyboard Hints & Status -->
         <div class="theater-footer-bar">
           <div class="keyboard-hints">
-            <span class="hint-key">T</span> Theater Mode
+            <span class="hint-key">Space</span> Play/Pause
+            <span class="hint-sep">•</span>
+            <span class="hint-key">F</span> Fullscreen
+            <span class="hint-sep">•</span>
+            <span class="hint-key">T</span> Theater
             <span class="hint-sep">•</span>
             <span class="hint-key">N</span> Next Server
             <span class="hint-sep">•</span>
@@ -512,7 +475,7 @@
                 <i class="fa-solid fa-bolt"></i> Fast Cloud Mirror
               </button>
               <button class="mirror-btn" ng-click="movieCtrl.openCloudMirror(2)" title="Open Ultra HD Mirror 2">
-                <i class="fa-solid fa-film"></i> Ultra HD VidFast
+                <i class="fa-solid fa-film"></i> Ultra HD SuperEmbed
               </button>
             </div>
           </div>

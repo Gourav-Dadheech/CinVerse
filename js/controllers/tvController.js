@@ -28,7 +28,9 @@
     '$interval',
     'MovieService',
     'StorageService',
-    function ($scope, $routeParams, $location, $sce, $timeout, $interval, MovieService, StorageService) {
+    'PlayerService',
+    'StreamBridgeService',
+    function ($scope, $routeParams, $location, $sce, $timeout, $interval, MovieService, StorageService, PlayerService, StreamBridgeService) {
       var vm = this;
 
       var tvId = parseInt($routeParams.tvId, 10);
@@ -69,8 +71,8 @@
       vm.servers = [
         {
           id: 1,
-          name: 'Official Server 1 (VidBolt Multi-Audio)',
-          badge: 'FLIQ / NetMirror Engine ⚡',
+          name: 'Server 1 • VidBolt',
+          badge: 'Multi-Audio ⚡',
           icon: 'fa-bolt',
           getUrl: function (id, s, e) {
             return 'https://vidbolt.xyz/tv/' + id + '/' + s + '/' + e;
@@ -78,17 +80,17 @@
         },
         {
           id: 2,
-          name: 'Official Server 2 (VidFast 4K Multi-Audio)',
-          badge: 'Ultra HD Cinema Backup 🚀',
+          name: 'Server 2 • SuperEmbed',
+          badge: '4K Multi-Cloud 🚀',
           icon: 'fa-film',
           getUrl: function (id, s, e) {
-            return 'https://vidfast.vc/tv/' + id + '/' + s + '/' + e;
+            return 'https://superembed.stream/?video_id=' + id + '&tmdb=1&season=' + s + '&episode=' + e;
           }
         },
         {
           id: 3,
-          name: 'Server 3 (2Embed Cinema - Multi-Audio)',
-          badge: 'Bollywood & Global Ready 🇮🇳',
+          name: 'Server 3 • 2Embed',
+          badge: 'Bollywood / Hindi 🇮🇳',
           icon: 'fa-clapperboard',
           getUrl: function (id, s, e) {
             return 'https://www.2embed.cc/embedtv/' + id + '&s=' + s + '&e=' + e;
@@ -96,8 +98,8 @@
         },
         {
           id: 4,
-          name: 'Server 4 (SmashyStream Fast Cloud)',
-          badge: 'Buffer-Free Mirror 💨',
+          name: 'Server 4 • SmashyStream',
+          badge: 'Fast Mirror 💨',
           icon: 'fa-cloud',
           getUrl: function (id, s, e) {
             return 'https://embed.smashystream.com/playere.php?tmdb=' + id + '&season=' + s + '&episode=' + e;
@@ -105,8 +107,8 @@
         },
         {
           id: 5,
-          name: 'Server 5 (College WiFi Bypass - Vidflix)',
-          badge: 'Campus Firewall Proof 🎓',
+          name: 'Server 5 • Vidflix',
+          badge: 'Campus WiFi Proof 🎓',
           icon: 'fa-graduation-cap',
           getUrl: function (id, s, e) {
             return 'https://vidsrc.pm/embed/tv?tmdb=' + id + '&season=' + s + '&episode=' + e;
@@ -116,6 +118,34 @@
 
       vm.currentServer = vm.servers[0];
       vm.currentStreamUrl = null;
+      vm.isServersOpen = false;
+
+      // ---------------- IN-PLAYER TOOLS & SETTINGS (IN-FRAME) ----------------
+      vm.showInPlayerSettings = false;
+      vm.inPlayerSettingsTab = 'audio';
+      vm.aspectRatio = '16/9';
+
+      vm.openInPlayerSettings = function (tab) {
+        vm.showInPlayerSettings = true;
+        vm.inPlayerSettingsTab = tab || 'audio';
+      };
+
+      vm.closeInPlayerSettings = function () {
+        vm.showInPlayerSettings = false;
+      };
+
+      vm.toggleInPlayerSettings = function (tab) {
+        if (vm.showInPlayerSettings && vm.inPlayerSettingsTab === tab) {
+          vm.showInPlayerSettings = false;
+        } else {
+          vm.showInPlayerSettings = true;
+          vm.inPlayerSettingsTab = tab || 'audio';
+        }
+      };
+
+      vm.setAspectRatio = function (ratio) {
+        vm.aspectRatio = ratio || '16/9';
+      };
 
       var wakeLockObj = null;
 
@@ -179,15 +209,223 @@
         }
       };
 
-      vm.toggleFullscreen = function () {
-        var wrap = document.getElementById('tv-player-section') || document.querySelector('.theater-screen-wrap');
-        if (!wrap) return;
-        if (!document.fullscreenElement) {
-          if (wrap.requestFullscreen) wrap.requestFullscreen();
-          else if (wrap.webkitRequestFullscreen) wrap.webkitRequestFullscreen();
-        } else {
-          if (document.exitFullscreen) document.exitFullscreen();
+      // ---------------- FULLSCREEN & ORIENTATION ----------------
+      vm.isFullscreen = false;
+
+      function updateFsState() {
+        vm.isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+        if (!$scope.$$phase) {
+          $scope.$applyAsync();
         }
+      }
+
+      document.addEventListener('fullscreenchange', updateFsState);
+      document.addEventListener('webkitfullscreenchange', updateFsState);
+      document.addEventListener('mozfullscreenchange', updateFsState);
+
+      vm.toggleFullscreen = function ($event) {
+        if ($event) {
+          $event.stopPropagation();
+        }
+        var wrap = document.getElementById('tv-theater-screen-container') || document.getElementById('tv-player-section') || document.querySelector('.theater-screen-wrap');
+        if (!wrap) return;
+
+        var isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+        if (!isFs) {
+          if (wrap.requestFullscreen) {
+            wrap.requestFullscreen().catch(function () {});
+          } else if (wrap.webkitRequestFullscreen) {
+            wrap.webkitRequestFullscreen();
+          } else if (wrap.mozRequestFullScreen) {
+            wrap.mozRequestFullScreen();
+          } else if (wrap.msRequestFullscreen) {
+            wrap.msRequestFullscreen();
+          }
+
+          try {
+            if (screen.orientation && screen.orientation.lock) {
+              screen.orientation.lock('landscape').catch(function () {});
+            }
+          } catch (e) {}
+
+          if (window.CinVerseNative && window.CinVerseNative.lockOrientation) {
+            try { window.CinVerseNative.lockOrientation(true); } catch (e) {}
+          }
+        } else {
+          if (document.exitFullscreen) {
+            document.exitFullscreen().catch(function () {});
+          } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+          } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+          } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+          }
+
+          try {
+            if (screen.orientation && screen.orientation.unlock) {
+              screen.orientation.unlock();
+            }
+          } catch (e) {}
+
+          if (window.CinVerseNative && window.CinVerseNative.lockOrientation) {
+            try { window.CinVerseNative.lockOrientation(false); } catch (e) {}
+          }
+        }
+      };
+
+      // ---------------- LANGUAGE & AUDIO TRACKS ----------------
+      var LANGUAGE_MAP = {
+        'en': { name: 'English', flag: '🇬🇧' },
+        'hi': { name: 'Hindi', flag: '🇮🇳' },
+        'ta': { name: 'Tamil', flag: '🇮🇳' },
+        'te': { name: 'Telugu', flag: '🇮🇳' },
+        'ml': { name: 'Malayalam', flag: '🇮🇳' },
+        'kn': { name: 'Kannada', flag: '🇮🇳' },
+        'es': { name: 'Spanish', flag: '🇪🇸' },
+        'fr': { name: 'French', flag: '🇫🇷' },
+        'de': { name: 'German', flag: '🇩🇪' },
+        'it': { name: 'Italian', flag: '🇮🇹' },
+        'ja': { name: 'Japanese', flag: '🇯🇵' },
+        'ko': { name: 'Korean', flag: '🇰🇷' },
+        'zh': { name: 'Chinese', flag: '🇨🇳' },
+        'ru': { name: 'Russian', flag: '🇷🇺' },
+        'pt': { name: 'Portuguese', flag: '🇧🇷' },
+        'ar': { name: 'Arabic', flag: '🇸🇦' }
+      };
+
+      vm.availableLanguages = [];
+      vm.audioTracks = [];
+      vm.selectedAudioTrack = null;
+      vm.audioNotice = '';
+
+      function setupLanguages(show) {
+        var langs = [];
+        var seen = {};
+
+        if (show.spoken_languages && show.spoken_languages.length > 0) {
+          show.spoken_languages.forEach(function (l) {
+            var code = (l.iso_639_1 || '').toLowerCase();
+            var info = LANGUAGE_MAP[code] || { name: l.english_name || l.name, flag: '🌐' };
+            if (code && !seen[code]) {
+              seen[code] = true;
+              langs.push({
+                code: code,
+                name: info.name,
+                flag: info.flag,
+                isOriginal: code === (show.original_language || '').toLowerCase()
+              });
+            }
+          });
+        }
+
+        var origCode = (show.original_language || 'en').toLowerCase();
+        if (!seen[origCode]) {
+          var origInfo = LANGUAGE_MAP[origCode] || { name: origCode.toUpperCase(), flag: '🌐' };
+          langs.unshift({
+            code: origCode,
+            name: origInfo.name,
+            flag: origInfo.flag,
+            isOriginal: true
+          });
+          seen[origCode] = true;
+        }
+
+        vm.availableLanguages = langs;
+
+        var tracks = [];
+        if (origCode === 'hi') {
+          tracks.push({ id: 'hi', name: 'Hindi (Original)', flag: '🇮🇳', badge: 'Original Audio' });
+          tracks.push({ id: 'en', name: 'English Dubbed', flag: '🇬🇧', badge: 'HD Audio' });
+        } else if (origCode === 'ta' || origCode === 'te' || origCode === 'ml' || origCode === 'kn') {
+          var regInfo = LANGUAGE_MAP[origCode];
+          tracks.push({ id: 'hi', name: 'Hindi Dubbed', flag: '🇮🇳', badge: 'Dual Audio' });
+          tracks.push({ id: origCode, name: (regInfo ? regInfo.name : 'Regional') + ' (Original)', flag: (regInfo ? regInfo.flag : '🇮🇳'), badge: 'Master Track' });
+          tracks.push({ id: 'en', name: 'English Dubbed', flag: '🇬🇧', badge: 'HD Audio' });
+        } else if (origCode === 'ko' || origCode === 'ja') {
+          var eastAsian = LANGUAGE_MAP[origCode];
+          tracks.push({ id: 'hi', name: 'Hindi Dubbed', flag: '🇮🇳', badge: 'K-Drama Hindi' });
+          tracks.push({ id: origCode, name: (eastAsian ? eastAsian.name : origCode.toUpperCase()) + ' (Original)', flag: (eastAsian ? eastAsian.flag : '🇰🇷'), badge: 'Master Track' });
+          tracks.push({ id: 'en', name: 'English Dubbed', flag: '🇬🇧', badge: 'HD Audio' });
+        } else {
+          tracks.push({ id: 'hi', name: 'Hindi Dubbed', flag: '🇮🇳', badge: 'Dual Audio' });
+          tracks.push({ id: 'en', name: 'English (Original)', flag: '🇬🇧', badge: 'HD Audio' });
+        }
+
+        tracks.push({ id: 'multi', name: 'Multi-Audio / Subtitles', flag: '🌐', badge: 'All Languages' });
+
+        vm.audioTracks = tracks;
+        vm.selectedAudioTrack = tracks[0];
+        vm.audioNotice = 'Active Audio: ' + tracks[0].name + ' • Switch between Hindi Dubbed or Original anytime.';
+      }
+
+      vm.selectAudioTrack = function (track) {
+        vm.selectedAudioTrack = track;
+        if (track.id === 'hi') {
+          var hindiServer = vm.servers.find(function (s) { return s.id === 3; }) || vm.servers[0];
+          vm.currentServer = hindiServer;
+          vm.audioNotice = '🇮🇳 Hindi Dubbed / Dual-Audio Active on ' + vm.currentServer.name + '! (If stream starts in English, tap the ⚙️ Settings / Audio menu inside the player)';
+        } else if (track.id === 'en') {
+          vm.currentServer = vm.servers[0];
+          vm.audioNotice = '🇬🇧 English Master Track (1080p HD) active on ' + vm.currentServer.name + '.';
+        } else if (track.id === 'multi') {
+          vm.audioNotice = '🌐 Multi-Language & Subtitles Active on ' + vm.currentServer.name + '. You can select tracks in the player ⚙️ settings.';
+        } else {
+          vm.audioNotice = track.name + ' selected on ' + vm.currentServer.name + '.';
+        }
+
+        if (vm.show && vm.show.id) {
+          var url = vm.currentServer.getUrl(vm.show.id, vm.currentSeasonNumber, vm.currentEpisodeNumber);
+          vm.currentStreamUrl = $sce.trustAsResourceUrl(url);
+        }
+      };
+
+      // ---------------- STREAM ENGINE (CINVERSE PRO NATIVE ARTPLAYER + CLOUD INTERCEPTOR) ----------------
+      vm.useNativePlayer = false;
+      vm.isExtractingStream = false;
+      vm.extractionStatus = '';
+      vm.artInstance = null;
+
+      vm.bootNativePlayerWithUrl = function (streamUrl, title) {
+        if (!vm.showPlayer) return;
+        var container = document.getElementById('cinverse-artplayer-tv');
+        if (!container) return;
+
+        if (vm.artInstance) {
+          PlayerService.destroyPlayer(vm.artInstance);
+          vm.artInstance = null;
+        }
+
+        var epTitle = title || ((vm.show ? vm.show.name : 'TV Series') + ' • S' + vm.currentSeasonNumber + ':E' + vm.currentEpisodeNumber);
+        vm.artInstance = PlayerService.initPlayer({
+          container: container,
+          url: streamUrl,
+          title: epTitle,
+          poster: vm.show ? vm.getBackdropUrl(vm.show.backdrop_path) : '',
+          onTimeUpdate: function (currentTime, duration) {
+            if (vm.show && vm.show.id && duration > 0) {
+              var pct = Math.floor((currentTime / duration) * 100);
+              StorageService.recordWatch(
+                {
+                  id: vm.show.id,
+                  name: vm.show.name,
+                  title: vm.show.name + ' (S' + vm.currentSeasonNumber + ':E' + vm.currentEpisodeNumber + ')',
+                  poster_path: vm.show.poster_path,
+                  backdrop_path: vm.show.backdrop_path,
+                  vote_average: vm.show.vote_average,
+                  isTv: true,
+                  season: vm.currentSeasonNumber,
+                  episode: vm.currentEpisodeNumber
+                },
+                'CinVerse Native Player',
+                'Multi-Audio Master',
+                pct,
+                vm.currentServer ? vm.currentServer.id : 1,
+                'multi'
+              );
+            }
+          }
+        });
       };
 
       vm.nextServer = function () {
@@ -196,19 +434,41 @@
         vm.selectServer(vm.servers[nextIdx]);
       };
 
+      vm.toggleServersDropdown = function () {
+        vm.isServersOpen = !vm.isServersOpen;
+      };
+
+      vm.selectServerAndClose = function (server) {
+        vm.selectServer(server);
+        vm.isServersOpen = false;
+      };
+
       vm.selectServer = function (server) {
         vm.currentServer = server;
         vm.collegeBypassActive = (server.id === 5);
-        if (vm.show && vm.show.id) {
-          var url = server.getUrl(vm.show.id, vm.currentSeasonNumber, vm.currentEpisodeNumber);
-          vm.currentStreamUrl = $sce.trustAsResourceUrl(url);
+        if (vm.showPlayer) {
+          vm.playEpisode(vm.currentSeasonNumber, vm.currentEpisodeNumber);
         }
+      };
+
+      vm.resumePlayback = function () {
+        if (!vm.resumeEntry) return;
+        var s = vm.resumeEntry.season || 1;
+        var e = vm.resumeEntry.episode || 1;
+        if (vm.resumeEntry.serverId) {
+          var srv = vm.servers.find(function (srv) { return srv.id === vm.resumeEntry.serverId; });
+          if (srv) vm.currentServer = srv;
+        }
+        vm.selectSeason(s);
+        vm.playEpisode(s, e);
       };
 
       // ---------------- PLAY EPISODE ----------------
       vm.playEpisode = function (seasonNum, epNum) {
         vm.currentSeasonNumber = parseInt(seasonNum, 10) || 1;
         vm.currentEpisodeNumber = parseInt(epNum, 10) || 1;
+        vm.isPlaying = true;
+        vm.showControlsOverlay = false;
         acquireWakeLock();
 
         // Find episode in current list if available
@@ -222,23 +482,63 @@
         }
 
         vm.showPlayer = true;
-        var url = vm.currentServer.getUrl(vm.show.id, vm.currentSeasonNumber, vm.currentEpisodeNumber);
-        vm.currentStreamUrl = $sce.trustAsResourceUrl(url);
+        acquireWakeLock();
 
-        // Record into Watch History
+        if (vm.artInstance) {
+          PlayerService.destroyPlayer(vm.artInstance);
+          vm.artInstance = null;
+        }
+
+        vm.isExtractingStream = true;
+        vm.extractionStatus = 'Extracting Season ' + vm.currentSeasonNumber + ' Episode ' + vm.currentEpisodeNumber + ' Master Stream...';
+
+        var embedUrl = vm.currentServer.getUrl(vm.show.id, vm.currentSeasonNumber, vm.currentEpisodeNumber);
+        var epTitle = (vm.show ? vm.show.name : 'TV Series') + ' • S' + vm.currentSeasonNumber + ':E' + vm.currentEpisodeNumber;
+
+        try {
+          StreamBridgeService.resolveStream({
+            id: vm.show.id,
+            title: epTitle,
+            type: 'tv',
+            season: vm.currentSeasonNumber,
+            episode: vm.currentEpisodeNumber,
+            embedUrl: embedUrl
+          }).then(function (res) {
+            vm.isExtractingStream = false;
+            vm.useNativePlayer = true;
+            $timeout(function () {
+              vm.bootNativePlayerWithUrl(res.url, res.title);
+            }, 80);
+          }).catch(function (err) {
+            vm.isExtractingStream = false;
+            vm.useNativePlayer = false;
+            var url = vm.currentServer.getUrl(vm.show.id, vm.currentSeasonNumber, vm.currentEpisodeNumber);
+            vm.currentStreamUrl = $sce.trustAsResourceUrl(url);
+          });
+        } catch (ex) {
+          vm.isExtractingStream = false;
+          vm.useNativePlayer = false;
+          var fallbackUrl = vm.currentServer.getUrl(vm.show.id, vm.currentSeasonNumber, vm.currentEpisodeNumber);
+          vm.currentStreamUrl = $sce.trustAsResourceUrl(fallbackUrl);
+        }
+
+        // Record into Watch History with season & episode for OTT Resume
         if (vm.show && vm.show.id) {
           StorageService.recordWatch(
             {
               id: vm.show.id,
+              name: vm.show.name,
               title: vm.show.name + ' (S' + vm.currentSeasonNumber + ':E' + vm.currentEpisodeNumber + ')',
               poster_path: vm.show.poster_path,
               backdrop_path: vm.show.backdrop_path,
               vote_average: vm.show.vote_average,
-              isTv: true
+              isTv: true,
+              season: vm.currentSeasonNumber,
+              episode: vm.currentEpisodeNumber
             },
-            vm.currentServer.name,
+            'CinVerse Native Engine',
             'In-Player Multi-Audio',
-            25,
+            Math.min(95, Math.max(20, vm.currentEpisodeNumber * 10)),
             vm.currentServer.id,
             'multi'
           );
@@ -262,6 +562,12 @@
         vm.showPlayer = false;
         vm.theaterMode = false;
         vm.currentStreamUrl = null;
+        vm.isExtractingStream = false;
+        StreamBridgeService.cancelExtraction();
+        if (vm.artInstance) {
+          PlayerService.destroyPlayer(vm.artInstance);
+          vm.artInstance = null;
+        }
         releaseWakeLock();
       };
 
@@ -498,7 +804,7 @@
       vm.openCloudMirror = function (mirrorNum) {
         var epNum = vm.selectedEpisodeToDownload ? vm.selectedEpisodeToDownload.episode_number : vm.currentEpisodeNumber;
         var url = mirrorNum === 2
-          ? 'https://vidfast.vc/tv/' + vm.show.id + '/' + vm.currentSeasonNumber + '/' + epNum
+          ? 'https://superembed.stream/?video_id=' + vm.show.id + '&tmdb=1&season=' + vm.currentSeasonNumber + '&episode=' + epNum
           : 'https://vidbolt.xyz/tv/' + vm.show.id + '/' + vm.currentSeasonNumber + '/' + epNum;
         window.open(url, '_blank');
       };
@@ -562,6 +868,7 @@
           vm.show = data;
           vm.isFavorite = StorageService.isFavorite(tvId);
           vm.isWatchlisted = StorageService.isInWatchlist(tvId);
+          setupLanguages(data);
 
           // Find first available valid season number (often season 1)
           var firstSeason = 1;
@@ -571,11 +878,28 @@
               firstSeason = regularSeason.season_number;
             }
           }
-          vm.selectSeason(firstSeason);
+
+          // Check if previously in watch history
+          var savedWatch = StorageService.getWatchEntry ? StorageService.getWatchEntry(tvId) : null;
+          vm.resumeEntry = savedWatch;
+
+          var sQuery = $location.search();
+          var targetSeason = parseInt(sQuery.season, 10) || (savedWatch && savedWatch.season) || firstSeason;
+          var targetEpisode = parseInt(sQuery.episode, 10) || (savedWatch && savedWatch.episode) || 1;
+          var reqServerId = parseInt(sQuery.server, 10) || (savedWatch && savedWatch.serverId);
+
+          if (reqServerId) {
+            var foundSrv = vm.servers.find(function (s) { return s.id === reqServerId; });
+            if (foundSrv) {
+              vm.currentServer = foundSrv;
+            }
+          }
+
+          vm.selectSeason(targetSeason);
 
           // Check if URL specifies auto-play
-          if ($location.search().play === 'true') {
-            vm.playEpisode(firstSeason, 1);
+          if (sQuery.play === 'true') {
+            vm.playEpisode(targetSeason, targetEpisode);
           }
         })
         .catch(function (err) {
@@ -623,13 +947,30 @@
           vm.similarShows = [];
         });
 
-      // Keyboard shortcuts (Escape = close player)
+      // Keyboard shortcuts (Space = Play/Pause, F = Fullscreen, T = Theater, N = Next Server, Esc = Close)
       function onKeyDown(e) {
         if (!vm.showPlayer) return;
         var tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
         if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
 
-        if (e.key === 'Escape') {
+        if (e.key === 't' || e.key === 'T') {
+          $scope.$apply(function () {
+            vm.toggleTheaterMode();
+          });
+        } else if (e.key === 'f' || e.key === 'F') {
+          $scope.$apply(function () {
+            vm.toggleFullscreen();
+          });
+        } else if (e.key === ' ' || e.code === 'Space') {
+          e.preventDefault();
+          $scope.$apply(function () {
+            vm.togglePlayPause();
+          });
+        } else if (e.key === 'n' || e.key === 'N') {
+          $scope.$apply(function () {
+            vm.nextServer();
+          });
+        } else if (e.key === 'Escape') {
           $scope.$apply(function () {
             vm.closePlayer();
           });
@@ -638,7 +979,15 @@
 
       window.addEventListener('keydown', onKeyDown);
       $scope.$on('$destroy', function () {
+        releaseWakeLock();
+        if (vm.artInstance) {
+          PlayerService.destroyPlayer(vm.artInstance);
+          vm.artInstance = null;
+        }
         window.removeEventListener('keydown', onKeyDown);
+        document.removeEventListener('fullscreenchange', updateFsState);
+        document.removeEventListener('webkitfullscreenchange', updateFsState);
+        document.removeEventListener('mozfullscreenchange', updateFsState);
       });
     }
   ]);

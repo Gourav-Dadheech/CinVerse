@@ -25,11 +25,21 @@
 
       vm.resumeMovie = function (item) {
         if (!item || !item.id) return;
-        $location.path('/movie/' + item.id).search({
-          play: 'true',
-          server: item.serverId || 1,
-          track: item.trackId || 'en'
-        });
+        if (item.isTv || item.media_type === 'tv') {
+          $location.path('/tv/' + item.id).search({
+            play: 'true',
+            season: item.season || 1,
+            episode: item.episode || 1,
+            server: item.serverId || 1,
+            track: item.trackId || 'en'
+          });
+        } else {
+          $location.path('/movie/' + item.id).search({
+            play: 'true',
+            server: item.serverId || 1,
+            track: item.trackId || 'en'
+          });
+        }
       };
 
       vm.removeFromHistory = function (e, movieId) {
