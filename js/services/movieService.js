@@ -77,6 +77,93 @@
       }
 
       /* ----------------------------------------------------------
+         SMART QUERY FALLBACK HELPER
+         Handles user typos, gender swaps ("actor" vs "actress"),
+         stop-words ("is", "a", "an"), and keywords for accurate matching.
+         ---------------------------------------------------------- */
+      var STOP_WORDS = {
+        'is': true, 'are': true, 'was': true, 'were': true, 'the': true,
+        'a': true, 'an': true, 'in': true, 'on': true, 'at': true,
+        'to': true, 'for': true, 'of': true, 'and': true, 'with': true,
+        'from': true, 'it': true, 'that': true, 'this': true, 'my': true,
+        'your': true, 'his': true, 'her': true, 'their': true
+      };
+
+      function generateSearchFallbacks(rawQuery) {
+        var q = (rawQuery || '').trim().toLowerCase();
+        if (!q) return [];
+        var candidates = [];
+
+        // 1. Swap gender/alias words safely without immediately reverting
+        var syn = q.replace(/\b(actor|actress)\b/gi, function (m) {
+          return m.toLowerCase() === 'actor' ? 'actress' : 'actor';
+        }).replace(/\b(animes?|movies?|series|shows?|season\s*\d+)\b/gi, '').trim();
+
+        // 2. If synonym or media type removal changed the query:
+        if (syn && syn !== q) {
+          var synTokens = syn.split(/[\s,.'"\-_:!?/()]+/).filter(Boolean);
+          var synNonStop = synTokens.filter(function (t) { return !STOP_WORDS[t]; });
+          if (synNonStop.length > 0) {
+            candidates.push(synNonStop.join(' '));
+          }
+          candidates.push(syn);
+        }
+
+        // 3. Remove stop words from original query
+        var tokens = q.split(/[\s,.'"\-_:!?/()]+/).filter(Boolean);
+        var nonStop = tokens.filter(function (t) { return !STOP_WORDS[t]; });
+        if (nonStop.length > 0 && nonStop.length < tokens.length) {
+          candidates.push(nonStop.join(' '));
+        }
+
+        // 4. Prominent keyword pairs for multi-word queries (e.g. "classmate sexy", "overflow")
+        if (syn && syn !== q) {
+          var synTokens2 = syn.split(/[\s,.'"\-_:!?/()]+/).filter(Boolean);
+          var synNonStop2 = synTokens2.filter(function (t) { return !STOP_WORDS[t]; });
+          if (synNonStop2.length >= 3) {
+            candidates.push(synNonStop2.slice(0, 2).join(' '));
+            candidates.push([synNonStop2[0], synNonStop2[synNonStop2.length - 1]].join(' '));
+            candidates.push(synNonStop2.slice(1).join(' '));
+          }
+        }
+
+        if (nonStop.length >= 3) {
+          candidates.push(nonStop.slice(0, 2).join(' '));
+          candidates.push([nonStop[0], nonStop[nonStop.length - 1]].join(' '));
+          candidates.push(nonStop.slice(1).join(' '));
+        }
+
+        // Unique deduplicated candidates excluding the exact original query
+        var seen = {};
+        seen[q] = true;
+        return candidates.filter(function (item) {
+          item = (item || '').trim();
+          if (!item || seen[item]) return false;
+          seen[item] = true;
+          return true;
+        });
+      }
+
+      function tryMultiFallbacks(fallbacks, index) {
+        if (!fallbacks || index >= fallbacks.length) {
+          return $q.resolve(null);
+        }
+        var candidate = fallbacks[index];
+        return request('/search/multi', {
+          query: candidate,
+          page: 1,
+          include_adult: true
+        }).then(function (res) {
+          if (res && res.results && res.results.length > 0) {
+            return res;
+          }
+          return tryMultiFallbacks(fallbacks, index + 1);
+        }).catch(function () {
+          return tryMultiFallbacks(fallbacks, index + 1);
+        });
+      }
+
+      /* ----------------------------------------------------------
          PUBLIC METHODS
          ---------------------------------------------------------- */
 
@@ -125,9 +212,14 @@
         return request('/movie/' + movieId + '/recommendations');
       };
 
-      // Search movies by text query
+      // Search movies by text query (with adult and anime content included)
       service.searchMovies = function (query, page) {
-        return request('/search/movie', { query: query, page: page || 1, include_adult: false });
+        return request('/search/movie', { query: query, page: page || 1, include_adult: true });
+      };
+
+      // Search TV shows / Anime series by text query
+      service.searchTv = function (query, page) {
+        return request('/search/tv', { query: query, page: page || 1, include_adult: true });
       };
 
       // Full list of genres (used for filters + genre badges)
@@ -148,7 +240,7 @@
         filters = filters || {};
         var params = {
           sort_by: "popularity.desc",
-          include_adult: false,
+          include_adult: true,
           page: 1
         };
 
@@ -268,11 +360,12 @@
         return request('/trending/tv/week');
       };
 
-      // Anime TV Series (Demon Slayer, Jujutsu Kaisen, etc.)
+      // Anime TV Series (Demon Slayer, Jujutsu Kaisen, Overflow, etc.)
       service.getAnimeShows = function (page) {
         return request('/discover/tv', {
           with_genres: '16',
           with_original_language: 'ja',
+          include_adult: true,
           sort_by: 'popularity.desc',
           page: page || 1
         });
@@ -332,12 +425,94 @@
         });
       };
 
-      // Multi-search: searches across BOTH movies AND TV shows
+      // Multi-search: searches across BOTH movies AND TV shows (with anime & adult support + smart fallbacks)
       service.searchMulti = function (query, page) {
+        page = page || 1;
+        var trimmed = (query || '').trim();
+        if (!trimmed) {
+          return $q.resolve({ results: [], total_results: 0 });
+        }
+
         return request('/search/multi', {
-          query: query,
-          page: page || 1,
-          include_adult: false
+          query: trimmed,
+          page: page,
+          include_adult: true
+        }).then(function (data) {
+          if (data && data.results && data.results.length > 0) {
+            return data;
+          }
+          // If page 1 returns 0 results, trigger intelligent fallback sequence
+          if (page === 1) {
+            var fallbacks = generateSearchFallbacks(trimmed);
+            return tryMultiFallbacks(fallbacks, 0).then(function (fbData) {
+              if (fbData && fbData.results && fbData.results.length > 0) {
+                return fbData;
+              }
+              // If still empty, check dedicated /search/tv endpoint as backup
+              return request('/search/tv', {
+                query: trimmed,
+                page: 1,
+                include_adult: true
+              }).then(function (tvData) {
+                if (tvData && tvData.results && tvData.results.length > 0) {
+                  tvData.results.forEach(function (r) {
+                    if (!r.media_type) r.media_type = 'tv';
+                  });
+                  return tvData;
+                }
+                return data;
+              }).catch(function () {
+                return data;
+              });
+            });
+          }
+          return data;
+        });
+      };
+
+      // Curated & Dynamic Ecchi & 18+ Anime (Overflow, My Classmate's a Sexy Actress, Redo of Healer, etc.)
+      service.getEcchiAnime = function (page) {
+        page = page || 1;
+        var featuredIds = [95897, 325473, 70998, 99071, 45950, 96444, 64706, 68005, 83103, 45998, 34742, 63187, 114477];
+        if (page === 1) {
+          var detailsPromises = featuredIds.map(function (id) {
+            return service.getTvDetails(id).then(function (show) {
+              if (show && show.id) {
+                show.isTv = true;
+                show.media_type = 'tv';
+                return show;
+              }
+              return null;
+            }).catch(function () { return null; });
+          });
+          return $q.all(detailsPromises).then(function (list) {
+            var valid = list.filter(Boolean);
+            return request('/discover/tv', {
+              with_genres: '16',
+              with_original_language: 'ja',
+              include_adult: true,
+              sort_by: 'popularity.desc',
+              page: page
+            }).then(function (res) {
+              var disc = res.results || [];
+              disc.forEach(function (d) { d.isTv = true; d.media_type = 'tv'; });
+              var adultOnly = disc.filter(function (d) { return d.adult; });
+              return { results: valid.concat(adultOnly) };
+            }).catch(function () {
+              return { results: valid };
+            });
+          });
+        }
+        return request('/discover/tv', {
+          with_genres: '16',
+          with_original_language: 'ja',
+          include_adult: true,
+          sort_by: 'popularity.desc',
+          page: page
+        }).then(function (res) {
+          var list = res.results || [];
+          list.forEach(function (d) { d.isTv = true; d.media_type = 'tv'; });
+          return { results: list.filter(function (d) { return d.adult; }) };
         });
       };
 
@@ -399,6 +574,7 @@
             return request('/discover/movie', {
               with_genres: '16',
               with_original_language: 'ja',
+              include_adult: true,
               sort_by: sortBy,
               page: page
             });
@@ -451,6 +627,7 @@
             return request('/discover/tv', {
               with_genres: '16',
               with_original_language: 'ja',
+              include_adult: true,
               sort_by: sortBy,
               page: page
             });
@@ -503,6 +680,7 @@
             return request('/discover/tv', {
               with_genres: '16',
               with_original_language: 'ja',
+              include_adult: true,
               sort_by: 'popularity.desc',
               page: page
             });
@@ -554,6 +732,7 @@
             return request('/discover/movie', {
               with_genres: '16',
               with_original_language: 'ja',
+              include_adult: true,
               sort_by: 'popularity.desc',
               page: page
             });
@@ -594,6 +773,7 @@
             return request('/discover/movie', {
               with_genres: '16',
               with_original_language: 'ja',
+              include_adult: true,
               sort_by: 'primary_release_date.asc',
               page: page
             });

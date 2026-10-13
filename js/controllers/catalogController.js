@@ -35,6 +35,7 @@
       vm.allItems = [];
       vm.movieItems = [];
       vm.tvItems = [];
+      vm.ecchiItems = [];
       vm.animationItems = [];
       vm.timelineItems = [];
       vm.filteredItems = [];
@@ -196,7 +197,8 @@
         vm.filterTabs = [
           { id: 'all', name: 'All Anime' },
           { id: 'tv', name: 'Anime Series', icon: 'fa-tv' },
-          { id: 'movie', name: 'Anime Movies', icon: 'fa-film' }
+          { id: 'movie', name: 'Anime Movies', icon: 'fa-film' },
+          { id: 'ecchi', name: 'Ecchi & 18+ Anime', icon: 'fa-fire-flame-curved' }
         ];
       } else if (currentPath.indexOf('/kdrama') === 0) {
         vm.mode = 'kdrama';
@@ -267,6 +269,8 @@
             vm.filteredItems = vm.tvItems;
           } else if (vm.activeTab === 'movie') {
             vm.filteredItems = vm.movieItems;
+          } else if (vm.activeTab === 'ecchi') {
+            vm.filteredItems = vm.ecchiItems || [];
           } else {
             vm.filteredItems = vm.allItems;
           }
@@ -480,6 +484,20 @@
 
           promises.push(animeTvPromise, animeMoviePromise);
 
+          if (page === 1 && MovieService.getEcchiAnime) {
+            var ecchiPromise = MovieService.getEcchiAnime(1)
+              .then(function (res) {
+                var list = res.results || [];
+                list.forEach(function (t) { t.isTv = true; });
+                vm.ecchiItems = dedupe(list);
+                vm.tvItems = dedupe(list.concat(vm.tvItems));
+              })
+              .catch(function () {
+                vm.ecchiItems = [];
+              });
+            promises.push(ecchiPromise);
+          }
+
         } else if (vm.mode === 'kdrama') {
           var kdramaPromise = MovieService.getKdramaShows(page)
             .then(function (res) {
@@ -517,7 +535,7 @@
             vm.timelineItems = dedupe(buildTimelineOrder(allDated));
 
           } else if (vm.mode === 'anime') {
-            vm.allItems = vm.tvItems.concat(vm.movieItems);
+            vm.allItems = dedupe(vm.tvItems.concat(vm.movieItems));
           }
           applyFilter();
         }).finally(function () {
