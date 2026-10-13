@@ -359,12 +359,40 @@
         } catch (e) {}
       };
 
+      vm.linkCopiedToast = false;
+
       vm.downloadAppUpdate = function () {
         var apkUrl = 'https://github.com/Gourav-Dadheech/CinVerse/releases/download/v1.1.0/CinVerse-v1.1.0.apk';
+
+        // 1. If native app has the new update installer bridge, call it
         if (window.CinVerseNative && typeof window.CinVerseNative.downloadAndInstallUpdate === 'function') {
           window.CinVerseNative.downloadAndInstallUpdate(apkUrl);
-        } else {
+          return;
+        }
+
+        // 2. Open rich App Download Modal
+        vm.openAppDownloadModal();
+
+        // 3. Automatically copy direct link to clipboard for convenience
+        vm.copyAppUpdateLink();
+
+        // 4. Try browser navigation
+        try {
+          window.open(apkUrl, '_blank');
+        } catch (e) {}
+        try {
           window.location.href = apkUrl;
+        } catch (e) {}
+      };
+
+      vm.copyAppUpdateLink = function () {
+        var apkUrl = 'https://github.com/Gourav-Dadheech/CinVerse/releases/download/v1.1.0/CinVerse-v1.1.0.apk';
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(apkUrl).then(function () {
+            vm.linkCopiedToast = true;
+            $timeout(function () { vm.linkCopiedToast = false; }, 4500);
+            $rootScope.$applyAsync();
+          }).catch(function () {});
         }
       };
 

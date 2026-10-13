@@ -69,7 +69,7 @@
 
   <!-- App Styles (Version-tagged for instant OTA cache refresh) -->
   <link rel="stylesheet" href="css/style.css?v=1.2.0" />
-  <link rel="stylesheet" href="css/navbar.css?v=1.2.2" />
+  <link rel="stylesheet" href="css/navbar.css?v=1.2.3" />
   <link rel="stylesheet" href="css/home.css?v=1.2.0" />
   <link rel="stylesheet" href="css/movie.css?v=1.2.1" />
   <link rel="stylesheet" href="css/search.css?v=1.2.0" />
@@ -89,7 +89,7 @@
       var _origOpen = window.open;
       window.open = function (url, name, specs) {
         if (!url) return null;
-        var allowed = ['google.com', 'themoviedb.org', 'youtube.com', 'tmdb.org'];
+        var allowed = ['google.com', 'themoviedb.org', 'youtube.com', 'tmdb.org', 'github.com', 'githubusercontent.com'];
         var isAllowed = allowed.some(function (d) { return url.indexOf(d) !== -1; });
         if (isAllowed) {
           return _origOpen.call(window, url, name, specs);
@@ -487,7 +487,7 @@
           </div>
           <div class="app-modal-titles">
             <h3 class="app-modal-title">CinVerse for Android</h3>
-            <span class="app-modal-version"><i class="fa-solid fa-circle-check"></i> v1.0.0 Official Release • No Ads</span>
+            <span class="app-modal-version"><i class="fa-solid fa-circle-check"></i> v1.1.0 Update (Native Cinema Player &amp; Dual Audio) • No Ads</span>
           </div>
         </div>
         <button type="button" class="app-modal-close" ng-click="navCtrl.closeAppDownloadModal()" aria-label="Close">
@@ -544,6 +544,18 @@
             </div>
             <span class="btn-apk-badge">V1.1 FAST</span>
           </a>
+
+          <!-- 1-Click Copy Link for in-app users where webview blocks direct downloads -->
+          <div class="app-copy-link-box">
+            <button type="button" class="btn-copy-apk-url" ng-click="navCtrl.copyAppUpdateLink()" title="Copy direct APK link to clipboard">
+              <i class="fa-solid" ng-class="navCtrl.linkCopiedToast ? 'fa-check' : 'fa-copy'"></i>
+              <span>{{ navCtrl.linkCopiedToast ? 'Link Copied to Clipboard!' : 'Copy Direct Download Link (For Chrome)' }}</span>
+            </button>
+            <p class="copy-hint" ng-if="navCtrl.linkCopiedToast">
+              <i class="fa-solid fa-circle-check"></i> Link copied! Paste in Chrome on your phone to download the update.
+            </p>
+          </div>
+
           <div class="app-download-mirror-row">
             <span class="mirror-label"><i class="fa-solid fa-cloud"></i> Official GitHub Source:</span>
             <a href="https://github.com/Gourav-Dadheech/CinVerse/releases" target="_blank" rel="noopener noreferrer" class="mirror-link">
@@ -810,7 +822,7 @@
   <script src="js/lib/artplayer.js?v=1.2.0"></script>
 
   <!-- App Core (Version-tagged for instant OTA updates) -->
-  <script src="app.js?v=1.2.2"></script>
+  <script src="app.js?v=1.2.3"></script>
   <script src="routes.js?v=1.2.0"></script>
   <script src="js/templates.js?v=1.2.1"></script>
 
