@@ -174,30 +174,16 @@
 
         <!-- Video Screen Container: CinVerse Personal Cinema Player (In-Frame Controls & Audio Tools) -->
         <div class="theater-screen-wrap cinverse-personal-player" id="tv-theater-screen-container">
-          <!-- 1. Top In-Player HUD Bar (Inside Frame) -->          <!-- 1. Stream Extraction & Connecting Radar Overlay -->
-          <div class="stream-extracting-overlay" ng-if="tvCtrl.isExtractingStream">
-            <div class="extractor-radar-spinner">
-              <i class="fa-solid fa-satellite-dish radar-icon"></i>
-              <div class="radar-pulse"></div>
-            </div>
-            <div class="extractor-info">
-              <h4 class="extractor-status-title">{{ tvCtrl.extractionStatus || 'Extracting Direct Stream...' }}</h4>
-              <p class="extractor-status-desc">
-                <i class="fa-solid fa-shield-halved"></i> Intercepting episode stream &amp; multi-audio tracks for CinVerse Native Player
-              </p>
-            </div>
-          </div>
-
-          <!-- 2. CinVerse Pro Native Player (Artplayer: Multi-Audio In-Settings, Rewind/Fast Forward 10s) -->
+          <!-- 1. CinVerse Pro Native Player (Artplayer: Multi-Audio In-Settings, Rewind/Fast Forward 10s) -->
           <div id="cinverse-artplayer-tv"
                class="cinverse-artplayer-container"
-               ng-show="tvCtrl.useNativePlayer && !tvCtrl.isExtractingStream">
+               ng-show="tvCtrl.useNativePlayer">
           </div>
 
-          <!-- 3. Direct Streaming Canvas (Fallback if host restricts browser CORS) -->
+          <!-- 2. Direct Streaming Canvas (Fallback if host restricts browser CORS) -->
           <iframe
             id="cinema-tv-iframe"
-            ng-if="!tvCtrl.useNativePlayer && !tvCtrl.isExtractingStream"
+            ng-show="!tvCtrl.useNativePlayer"
             ng-src="{{ tvCtrl.currentStreamUrl }}"
             title="{{ tvCtrl.show.name }} Episode Stream"
             frameborder="0"

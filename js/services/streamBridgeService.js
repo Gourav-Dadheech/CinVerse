@@ -114,7 +114,7 @@
         // ==========================================
         if (self.isNativeApp() && window.CinVerseNative && typeof window.CinVerseNative.extractStream === 'function') {
           try {
-            // Safety timeout
+            // Safety timeout (fast 3.5s non-blocking background timeout)
             activeExtractionTimer = $timeout(function () {
               if (currentDeferred) {
                 currentDeferred.reject({
@@ -125,7 +125,7 @@
                 });
                 currentDeferred = null;
               }
-            }, 19000);
+            }, 3500);
 
             // Trigger native Android background interception
             window.CinVerseNative.extractStream(embedUrl, mediaTitle);

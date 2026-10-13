@@ -489,11 +489,13 @@
           vm.artInstance = null;
         }
 
-        vm.isExtractingStream = true;
-        vm.extractionStatus = 'Extracting Season ' + vm.currentSeasonNumber + ' Episode ' + vm.currentEpisodeNumber + ' Master Stream...';
-
         var embedUrl = vm.currentServer.getUrl(vm.show.id, vm.currentSeasonNumber, vm.currentEpisodeNumber);
         var epTitle = (vm.show ? vm.show.name : 'TV Series') + ' • S' + vm.currentSeasonNumber + ':E' + vm.currentEpisodeNumber;
+
+        // INSTANT 0s PLAYBACK: Set stream URL immediately so iframe buffers & starts with 0 wait
+        vm.currentStreamUrl = $sce.trustAsResourceUrl(embedUrl);
+        vm.useNativePlayer = false;
+        vm.isExtractingStream = false;
 
         try {
           StreamBridgeService.resolveStream({
@@ -504,22 +506,18 @@
             episode: vm.currentEpisodeNumber,
             embedUrl: embedUrl
           }).then(function (res) {
-            vm.isExtractingStream = false;
-            vm.useNativePlayer = true;
-            $timeout(function () {
-              vm.bootNativePlayerWithUrl(res.url, res.title);
-            }, 80);
-          }).catch(function (err) {
-            vm.isExtractingStream = false;
+            if (res && res.url) {
+              vm.useNativePlayer = true;
+              $timeout(function () {
+                vm.bootNativePlayerWithUrl(res.url, res.title);
+              }, 80);
+            }
+          }).catch(function () {
+            // Already streaming smoothly via iframe, keep playing
             vm.useNativePlayer = false;
-            var url = vm.currentServer.getUrl(vm.show.id, vm.currentSeasonNumber, vm.currentEpisodeNumber);
-            vm.currentStreamUrl = $sce.trustAsResourceUrl(url);
           });
         } catch (ex) {
-          vm.isExtractingStream = false;
           vm.useNativePlayer = false;
-          var fallbackUrl = vm.currentServer.getUrl(vm.show.id, vm.currentSeasonNumber, vm.currentEpisodeNumber);
-          vm.currentStreamUrl = $sce.trustAsResourceUrl(fallbackUrl);
         }
 
         // Record into Watch History with season & episode for OTT Resume

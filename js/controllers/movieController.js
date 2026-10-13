@@ -878,11 +878,15 @@
           vm.artInstance = null;
         }
 
-        vm.isExtractingStream = true;
-        vm.extractionStatus = 'Extracting Direct Master Stream & Multi-Audio Tracks...';
-
         var embedUrl = vm.currentServer ? vm.currentServer.getUrl(vm.movie ? vm.movie.id : movieId) : '';
         var mediaTitle = vm.movie ? vm.movie.title : 'CinVerse Cinema';
+
+        // INSTANT 0s PLAYBACK: Set stream URL immediately so iframe buffers & starts with 0 wait
+        if (embedUrl) {
+          vm.currentStreamUrl = $sce.trustAsResourceUrl(embedUrl);
+        }
+        vm.useNativePlayer = false;
+        vm.isExtractingStream = false;
 
         try {
           StreamBridgeService.resolveStream({
@@ -891,24 +895,18 @@
             type: 'movie',
             embedUrl: embedUrl
           }).then(function (res) {
-            vm.isExtractingStream = false;
-            vm.useNativePlayer = true;
-            $timeout(function () {
-              vm.bootNativePlayerWithUrl(res.url, res.title, res.tracks);
-            }, 80);
-          }).catch(function (err) {
-            vm.isExtractingStream = false;
-            vm.useNativePlayer = false;
-            if (vm.movie && vm.movie.id && vm.currentServer) {
-              vm.currentStreamUrl = $sce.trustAsResourceUrl(vm.currentServer.getUrl(vm.movie.id));
+            if (res && res.url) {
+              vm.useNativePlayer = true;
+              $timeout(function () {
+                vm.bootNativePlayerWithUrl(res.url, res.title, res.tracks);
+              }, 80);
             }
+          }).catch(function () {
+            // Already streaming smoothly via iframe, keep playing
+            vm.useNativePlayer = false;
           });
         } catch (ex) {
-          vm.isExtractingStream = false;
           vm.useNativePlayer = false;
-          if (vm.movie && vm.movie.id && vm.currentServer) {
-            vm.currentStreamUrl = $sce.trustAsResourceUrl(vm.currentServer.getUrl(vm.movie.id));
-          }
         }
 
         // Record in Watch History for OTT Resume & Continue Watching

@@ -183,30 +183,16 @@
 
         <!-- Screen / Video Container: CinVerse Native Cinema Player (Artplayer Engine) -->
         <div class="theater-screen-wrap cinverse-personal-player" id="theater-screen-container">
-          <!-- 1. Stream Extraction & Connecting Radar Overlay -->
-          <div class="stream-extracting-overlay" ng-if="movieCtrl.isExtractingStream">
-            <div class="extractor-radar-spinner">
-              <i class="fa-solid fa-satellite-dish radar-icon"></i>
-              <div class="radar-pulse"></div>
-            </div>
-            <div class="extractor-info">
-              <h4 class="extractor-status-title">{{ movieCtrl.extractionStatus || 'Extracting Direct Stream...' }}</h4>
-              <p class="extractor-status-desc">
-                <i class="fa-solid fa-shield-halved"></i> Intercepting master stream &amp; multi-audio tracks for CinVerse Native Player
-              </p>
-            </div>
-          </div>
-
-          <!-- 2. CinVerse Pro Native Player (Artplayer: Multi-Audio In-Settings, Rewind/Fast Forward 10s) -->
+          <!-- 1. CinVerse Pro Native Player (Artplayer: Multi-Audio In-Settings, Rewind/Fast Forward 10s) -->
           <div id="cinverse-artplayer-movie"
                class="cinverse-artplayer-container"
-               ng-show="movieCtrl.useNativePlayer && !movieCtrl.isExtractingStream">
+               ng-show="movieCtrl.useNativePlayer">
           </div>
 
-          <!-- 3. Direct Streaming Canvas (Fallback if host restricts browser CORS) -->
+          <!-- 2. Direct Streaming Canvas (Fallback if host restricts browser CORS) -->
           <iframe
             id="cinema-movie-iframe"
-            ng-if="!movieCtrl.useNativePlayer && !movieCtrl.isExtractingStream"
+            ng-show="!movieCtrl.useNativePlayer"
             ng-src="{{ movieCtrl.currentStreamUrl }}"
             title="{{ movieCtrl.movie.title }} Stream"
             frameborder="0"
