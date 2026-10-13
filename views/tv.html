@@ -99,7 +99,35 @@
           <div class="theater-title-info">
             <span class="live-pill"><i class="fa-solid fa-circle"></i> S{{ tvCtrl.currentSeasonNumber }} • E{{ tvCtrl.currentEpisodeNumber }}</span>
             <h2 class="theater-movie-title">{{ tvCtrl.show.name }}: {{ tvCtrl.currentEpisode.name || ('Episode ' + tvCtrl.currentEpisodeNumber) }}</h2>
-            <span class="theater-server-tag"><i class="fa-solid" ng-class="tvCtrl.currentServer.icon || 'fa-bolt'"></i> {{ tvCtrl.currentServer.name }}</span>
+
+            <!-- Interactive Server Dropdown -->
+            <div class="theater-server-dropdown-wrapper">
+              <button type="button" class="theater-server-dropdown-btn" ng-click="tvCtrl.toggleServersDropdown()" title="Switch Streaming Server">
+                <i class="fa-solid" ng-class="tvCtrl.currentServer.icon || 'fa-bolt'"></i>
+                <span class="current-server-name">{{ tvCtrl.currentServer.name }}</span>
+                <span class="current-server-badge">{{ tvCtrl.currentServer.badge }}</span>
+                <i class="fa-solid fa-chevron-down dropdown-arrow" ng-class="{'rotated': tvCtrl.isServersOpen}"></i>
+              </button>
+              <div class="theater-server-menu" ng-show="tvCtrl.isServersOpen">
+                <div class="server-menu-header">
+                  <i class="fa-solid fa-server"></i> Choose Streaming Mirror:
+                </div>
+                <button type="button"
+                        class="server-menu-item"
+                        ng-repeat="srv in tvCtrl.servers"
+                        ng-class="{'active': tvCtrl.currentServer.id === srv.id}"
+                        ng-click="tvCtrl.selectServerAndClose(srv)">
+                  <div class="item-left">
+                    <i class="fa-solid" ng-class="srv.icon || 'fa-bolt'"></i>
+                    <div class="item-text">
+                      <span class="item-name">{{ srv.name }}</span>
+                      <span class="item-badge">{{ srv.badge }}</span>
+                    </div>
+                  </div>
+                  <i class="fa-solid fa-check check-icon" ng-if="tvCtrl.currentServer.id === srv.id"></i>
+                </button>
+              </div>
+            </div>
           </div>
 
           <div class="theater-actions">
@@ -184,6 +212,23 @@
             <button type="button" class="btn-mobile-unlock-pill" ng-click="tvCtrl.toggleScreenLock()" title="Tap to Unlock Screen">
               <i class="fa-solid fa-lock-open"></i>
               <span>Screen Locked • Tap to Unlock</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick 1-Tap Server Switching Bar -->
+        <div class="theater-quick-server-pills">
+          <span class="pills-title"><i class="fa-solid fa-server"></i> Switch Server:</span>
+          <div class="pills-scroll-track">
+            <button type="button"
+                    class="server-pill-tab"
+                    ng-repeat="srv in tvCtrl.servers"
+                    ng-class="{'active': tvCtrl.currentServer.id === srv.id}"
+                    ng-click="tvCtrl.selectServer(srv)"
+                    title="Switch to {{ srv.name }}">
+              <i class="fa-solid" ng-class="srv.icon || 'fa-bolt'"></i>
+              <span>{{ srv.name }}</span>
+              <span class="pill-chip">{{ srv.badge }}</span>
             </button>
           </div>
         </div>
