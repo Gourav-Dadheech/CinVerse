@@ -93,6 +93,17 @@ public class MainActivity extends AppCompatActivity {
 
         webView.setWebViewClient(new CinVerseWebViewClient());
         webView.setWebChromeClient(new CinVerseChromeClient());
+
+        // Enable APK Download & Update Listener
+        webView.setDownloadListener((downloadUrl, userAgent, contentDisposition, mimetype, contentLength) -> {
+            try {
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(downloadUrl));
+                startActivity(i);
+            } catch (Exception e) {
+                Toast.makeText(MainActivity.this, "Opening download...", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     /**
@@ -104,6 +115,31 @@ public class MainActivity extends AppCompatActivity {
         @JavascriptInterface
         public boolean isNativeApp() {
             return true;
+        }
+
+        @JavascriptInterface
+        public int getAppVersionCode() {
+            return 2;
+        }
+
+        @JavascriptInterface
+        public String getAppVersionName() {
+            return "1.1.0";
+        }
+
+        @JavascriptInterface
+        public void downloadAndInstallUpdate(final String apkUrl) {
+            runOnUiThread(() -> {
+                try {
+                    String target = (apkUrl != null && !apkUrl.isEmpty()) 
+                        ? apkUrl 
+                        : "https://github.com/Gourav-Dadheech/CinVerse/releases/download/v1.1.0/CinVerse-v1.1.0.apk";
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(target));
+                    startActivity(intent);
+                } catch (Exception e) {
+                    Toast.makeText(MainActivity.this, "Downloading update...", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
 
         @JavascriptInterface
@@ -207,6 +243,17 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(intent);
                 } catch (Exception e) {
                     Toast.makeText(MainActivity.this, "No external app installed to handle this link.", Toast.LENGTH_SHORT).show();
+                }
+                return true;
+            }
+
+            // Allow APK downloads, GitHub releases, and direct update downloads
+            if (url.endsWith(".apk") || (url.contains("github.com") && url.contains("/releases"))) {
+                try {
+                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                    startActivity(intent);
+                } catch (Exception e) {
+                    Toast.makeText(MainActivity.this, "Cannot download APK: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
                 return true;
             }

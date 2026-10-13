@@ -69,7 +69,7 @@
 
   <!-- App Styles (Version-tagged for instant OTA cache refresh) -->
   <link rel="stylesheet" href="css/style.css?v=1.2.0" />
-  <link rel="stylesheet" href="css/navbar.css?v=1.2.0" />
+  <link rel="stylesheet" href="css/navbar.css?v=1.2.2" />
   <link rel="stylesheet" href="css/home.css?v=1.2.0" />
   <link rel="stylesheet" href="css/movie.css?v=1.2.1" />
   <link rel="stylesheet" href="css/search.css?v=1.2.0" />
@@ -107,6 +107,27 @@
   <!-- NAVIGATION & AUTH WRAPPER -->
   <!-- ============================= -->
   <div id="navbar-app-wrapper" ng-controller="NavbarController as navCtrl">
+    <!-- In-App Direct Auto-Update Banner for Existing Android App Users -->
+    <div class="in-app-update-banner" ng-if="navCtrl.needsAppUpdate">
+      <div class="update-banner-container">
+        <div class="update-banner-left">
+          <div class="update-icon-pulse"><i class="fa-solid fa-cloud-arrow-down"></i></div>
+          <div class="update-text">
+            <strong>CinVerse v1.1.0 Update Available!</strong>
+            <span>Direct 1080p stream extractor, multi-audio tools &amp; 5 cloud mirrors.</span>
+          </div>
+        </div>
+        <div class="update-banner-actions">
+          <button type="button" class="btn-update-now" ng-click="navCtrl.downloadAppUpdate()">
+            <i class="fa-solid fa-bolt"></i> Update Now
+          </button>
+          <button type="button" class="btn-dismiss-update" ng-click="navCtrl.dismissUpdateBanner()" title="Remind me later">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <header class="navbar" ng-class="{'navbar-scrolled': navCtrl.isScrolled, 'menu-open': navCtrl.menuOpen}">
       <div class="navbar-container">
 
@@ -789,7 +810,7 @@
   <script src="js/lib/artplayer.js?v=1.2.0"></script>
 
   <!-- App Core (Version-tagged for instant OTA updates) -->
-  <script src="app.js?v=1.2.0"></script>
+  <script src="app.js?v=1.2.2"></script>
   <script src="routes.js?v=1.2.0"></script>
   <script src="js/templates.js?v=1.2.1"></script>
 

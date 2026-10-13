@@ -318,12 +318,55 @@
         $location.path('/search').search({ q: query });
       };
 
-      // Android App Download Modal State
+      // Android App Download & Direct Auto-Update State
       vm.showAppModal = false;
       vm.isNativeApp = !!(window.CinVerseNative || (navigator.userAgent && navigator.userAgent.indexOf('CinVerseApp') !== -1));
       if (vm.isNativeApp) {
         document.body.classList.add('is-native-app');
       }
+
+      // In-App Auto-Update Detector for Existing App Users
+      vm.needsAppUpdate = false;
+      vm.checkAppUpdate = function () {
+        if (!vm.isNativeApp) return;
+
+        // Respect temporary session dismissal
+        try {
+          if (sessionStorage.getItem('cinverse_update_dismissed') === 'true') {
+            return;
+          }
+        } catch (e) {}
+
+        // Check native bridge capabilities
+        var hasStreamExtractor = !!(window.CinVerseNative && typeof window.CinVerseNative.extractStream === 'function');
+        var installedVersion = (window.CinVerseNative && typeof window.CinVerseNative.getAppVersionCode === 'function')
+          ? window.CinVerseNative.getAppVersionCode()
+          : (hasStreamExtractor ? 2 : 1);
+
+        // If running version 1 or missing the native stream interceptor, prompt update!
+        if (installedVersion < 2 || !hasStreamExtractor) {
+          vm.needsAppUpdate = true;
+          $rootScope.$applyAsync();
+        }
+      };
+
+      $timeout(vm.checkAppUpdate, 700);
+
+      vm.dismissUpdateBanner = function () {
+        vm.needsAppUpdate = false;
+        try {
+          sessionStorage.setItem('cinverse_update_dismissed', 'true');
+        } catch (e) {}
+      };
+
+      vm.downloadAppUpdate = function () {
+        var apkUrl = 'https://github.com/Gourav-Dadheech/CinVerse/releases/download/v1.1.0/CinVerse-v1.1.0.apk';
+        if (window.CinVerseNative && typeof window.CinVerseNative.downloadAndInstallUpdate === 'function') {
+          window.CinVerseNative.downloadAndInstallUpdate(apkUrl);
+        } else {
+          window.location.href = apkUrl;
+        }
+      };
 
       vm.openAppDownloadModal = function () {
         vm.showAppModal = true;
