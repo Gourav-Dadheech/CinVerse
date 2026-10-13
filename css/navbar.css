@@ -1125,6 +1125,17 @@
   color: #ef4444;
 }
 
+/* Anti-FOUC Modal Safety Guards (Prevents modal popups from flashing before AngularJS loads) */
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+  display: none !important;
+}
+
+.auth-modal-backdrop:not(.ng-scope),
+.app-download-backdrop:not(.ng-scope),
+.app-download-modal:not(.ng-scope) {
+  display: none !important;
+}
+
 /* ---------------- NETMIRROR STYLE AUTH MODAL ---------------- */
 .auth-modal-backdrop {
   position: fixed;

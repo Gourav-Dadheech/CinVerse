@@ -54,6 +54,19 @@
   }
   </script>
 
+  <!-- Critical Anti-FOUC (Prevents uncompiled AngularJS templates & modal popups flashing on initial paint) -->
+  <style>
+    [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+      display: none !important;
+    }
+    .auth-modal-backdrop:not(.ng-scope),
+    .app-download-backdrop:not(.ng-scope),
+    .app-download-modal:not(.ng-scope),
+    .in-app-update-banner:not(.ng-scope) {
+      display: none !important;
+    }
+  </style>
+
   <meta name="theme-color" content="#07090E" />
   <meta name="color-scheme" content="dark" />
 
@@ -68,8 +81,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <!-- App Styles (Version-tagged for instant OTA cache refresh) -->
-  <link rel="stylesheet" href="css/style.css?v=1.2.0" />
-  <link rel="stylesheet" href="css/navbar.css?v=1.2.3" />
+  <link rel="stylesheet" href="css/style.css?v=1.2.4" />
+  <link rel="stylesheet" href="css/navbar.css?v=1.2.4" />
   <link rel="stylesheet" href="css/home.css?v=1.2.0" />
   <link rel="stylesheet" href="css/movie.css?v=1.2.1" />
   <link rel="stylesheet" href="css/search.css?v=1.2.0" />
@@ -101,14 +114,14 @@
   </script>
 </head>
 
-<body>
+<body ng-cloak class="ng-cloak">
 
   <!-- ============================= -->
   <!-- NAVIGATION & AUTH WRAPPER -->
   <!-- ============================= -->
   <div id="navbar-app-wrapper" ng-controller="NavbarController as navCtrl">
     <!-- In-App Direct Auto-Update Banner for Existing Android App Users -->
-    <div class="in-app-update-banner" ng-if="navCtrl.needsAppUpdate">
+    <div class="in-app-update-banner ng-cloak" ng-cloak ng-if="navCtrl.needsAppUpdate">
       <div class="update-banner-container">
         <div class="update-banner-left">
           <div class="update-icon-pulse"><i class="fa-solid fa-cloud-arrow-down"></i></div>
@@ -375,7 +388,7 @@
     <!-- ============================= -->
     <!-- AUTH MODAL (DETACHED FROM NAVBAR TO PREVENT CLIPPING GLITCH) -->
     <!-- ============================= -->
-    <div class="auth-modal-backdrop" ng-if="navCtrl.showAuthModal" ng-click="navCtrl.closeAuthModal($event)">
+    <div class="auth-modal-backdrop ng-cloak" ng-cloak ng-if="navCtrl.showAuthModal" ng-click="navCtrl.closeAuthModal($event)">
       <div class="auth-modal-card" ng-click="$event.stopPropagation()">
         <div class="auth-modal-header">
           <div class="auth-brand">
@@ -478,8 +491,8 @@
     <!-- ============================= -->
     <!-- CINVERSE ANDROID APP DOWNLOAD MODAL -->
     <!-- ============================= -->
-    <div class="app-download-backdrop" ng-if="navCtrl.showAppModal" ng-click="navCtrl.closeAppDownloadModal()"></div>
-    <div class="app-download-modal" ng-if="navCtrl.showAppModal" ng-click="$event.stopPropagation()">
+    <div class="app-download-backdrop ng-cloak" ng-cloak ng-if="navCtrl.showAppModal" ng-click="navCtrl.closeAppDownloadModal()"></div>
+    <div class="app-download-modal ng-cloak" ng-cloak ng-if="navCtrl.showAppModal" ng-click="$event.stopPropagation()">
       <div class="app-modal-header">
         <div class="app-modal-brand">
           <div class="app-modal-icon-badge">
@@ -822,7 +835,7 @@
   <script src="js/lib/artplayer.js?v=1.2.0"></script>
 
   <!-- App Core (Version-tagged for instant OTA updates) -->
-  <script src="app.js?v=1.2.3"></script>
+  <script src="app.js?v=1.2.4"></script>
   <script src="routes.js?v=1.2.0"></script>
   <script src="js/templates.js?v=1.2.1"></script>
 

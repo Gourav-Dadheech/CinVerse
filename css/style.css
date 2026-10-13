@@ -4,6 +4,11 @@
    buttons, loaders, skeletons and shared animations.
    ============================================================ */
 
+/* Anti-FOUC rule */
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+  display: none !important;
+}
+
 /* ---------------- CSS VARIABLES (THEME: FLIQ CINEMA PURPLE) ---------------- */
 :root {
   --color-bg: #07090E;
