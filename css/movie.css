@@ -2361,3 +2361,140 @@
   overflow: hidden;
 }
 
+/* ============================================================
+   MOBILE-ONLY TOUCH & ROTATION LOCK (PREVENTS MISTOUCH)
+   Active strictly on mobile screens (<= 768px) and touch devices.
+   Completely hidden on PC / desktop displays.
+   ============================================================ */
+
+/* Desktop / PC default: Completely hidden */
+.mobile-only-tool,
+.mobile-player-floating-lock-btn,
+.mobile-screen-locked-barrier,
+.btn-mobile-lock-tool {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .mobile-only-tool {
+    display: inline-flex !important;
+  }
+
+  .theater-action-btn.mobile-only-tool {
+    display: flex !important;
+  }
+
+  .theater-action-btn.lock-screen-btn.active {
+    background: rgba(239, 68, 68, 0.25) !important;
+    border-color: rgba(239, 68, 68, 0.6) !important;
+    color: #fca5a5 !important;
+  }
+
+  .btn-mobile-lock-tool.mobile-only-tool {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: #e2e8f0;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.74rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-mobile-lock-tool.locked {
+    background: rgba(239, 68, 68, 0.22) !important;
+    border-color: rgba(239, 68, 68, 0.5) !important;
+    color: #fca5a5 !important;
+  }
+
+  /* Floating lock button on the video player in corner */
+  .mobile-player-floating-lock-btn.mobile-only-tool {
+    display: flex !important;
+    align-items: center;
+    gap: 6px;
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 15;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    color: #f1f5f9;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.74rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+    pointer-events: auto;
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+
+  .mobile-player-floating-lock-btn:active {
+    transform: scale(0.94);
+    background: rgba(239, 68, 68, 0.85);
+  }
+
+  .mobile-player-floating-lock-btn i {
+    color: #f87171;
+    font-size: 0.76rem;
+  }
+
+  /* Screen locked touch barrier over iframe to avoid mistouch */
+  .mobile-screen-locked-barrier.mobile-only-tool {
+    display: flex !important;
+    position: absolute;
+    inset: 0;
+    z-index: 25;
+    background: rgba(15, 23, 42, 0.35);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+    touch-action: none;
+  }
+
+  .btn-mobile-unlock-pill {
+    background: rgba(15, 23, 42, 0.94);
+    border: 1.5px solid rgba(239, 68, 68, 0.7);
+    color: #fca5a5;
+    padding: 11px 24px;
+    border-radius: 30px;
+    font-size: 0.86rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    box-shadow: 0 0 25px rgba(239, 68, 68, 0.4), 0 8px 24px rgba(0, 0, 0, 0.8);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    animation: pulse-lock 2s infinite ease-in-out;
+  }
+
+  .btn-mobile-unlock-pill:active {
+    transform: scale(0.96);
+    background: rgba(239, 68, 68, 0.25);
+  }
+
+  .btn-mobile-unlock-pill i {
+    color: #f87171;
+    font-size: 1.05rem;
+  }
+
+  @keyframes pulse-lock {
+    0%, 100% {
+      box-shadow: 0 0 15px rgba(239, 68, 68, 0.3), 0 8px 24px rgba(0, 0, 0, 0.8);
+    }
+    50% {
+      box-shadow: 0 0 28px rgba(239, 68, 68, 0.55), 0 8px 24px rgba(0, 0, 0, 0.8);
+    }
+  }
+}
+
+

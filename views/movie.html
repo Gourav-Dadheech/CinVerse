@@ -113,6 +113,15 @@
               <span>Audio & Tools</span>
             </button>
 
+            <!-- Mobile-Only Screen & Rotation Lock (Prevents Accidental Pause & Mistouch) -->
+            <button class="theater-action-btn mobile-only-tool lock-screen-btn"
+                    ng-class="{ 'active': movieCtrl.isScreenLocked }"
+                    ng-click="movieCtrl.toggleScreenLock()"
+                    title="Lock screen touches & rotation to prevent mistouch">
+              <i class="fa-solid" ng-class="movieCtrl.isScreenLocked ? 'fa-lock' : 'fa-lock-open'"></i>
+              <span>{{ movieCtrl.isScreenLocked ? 'Locked' : 'Lock' }}</span>
+            </button>
+
             <!-- Close Player -->
             <button class="theater-close-btn" ng-click="movieCtrl.closePlayer()" title="Close Cinema Player (Hotkey: Esc)">
               <i class="fa-solid fa-xmark"></i>
@@ -158,6 +167,14 @@
             <i class="fa-solid fa-headphones"></i>
             <span><strong>In-Player Multi-Audio & Subtitles:</strong> Audio tracks (Hindi, English, Regional) and subtitles are built directly into this player. Tap the <strong>⚙️ Settings / Audio</strong> icon on the bottom player bar to switch language without changing servers!</span>
           </div>
+          <!-- Mobile Touch & Rotation Lock Tool Button (Near Player Settings/Captions) -->
+          <button class="btn-mobile-lock-tool mobile-only-tool"
+                  ng-class="{ 'locked': movieCtrl.isScreenLocked }"
+                  ng-click="movieCtrl.toggleScreenLock()"
+                  title="Lock touches and orientation to avoid mistouch">
+            <i class="fa-solid" ng-class="movieCtrl.isScreenLocked ? 'fa-lock' : 'fa-lock-open'"></i>
+            <span>{{ movieCtrl.isScreenLocked ? 'Screen Locked' : 'Touch & Rotation Lock' }}</span>
+          </button>
           <div class="server-switch-notice" ng-if="movieCtrl.audioNotice">
             <i class="fa-solid fa-circle-check"></i>
             <span>{{ movieCtrl.audioNotice }}</span>
@@ -202,6 +219,24 @@
             mozallowfullscreen
             allowfullscreen>
           </iframe>
+
+          <!-- Mobile-Only Floating Screen & Touch Lock Sign Button (Near Player Tools) -->
+          <button class="mobile-player-floating-lock-btn mobile-only-tool"
+                  type="button"
+                  ng-if="!movieCtrl.isScreenLocked"
+                  ng-click="movieCtrl.toggleScreenLock()"
+                  title="Lock touches and orientation to prevent accidental pause">
+            <i class="fa-solid fa-lock"></i>
+            <span>Lock</span>
+          </button>
+
+          <!-- Mobile Screen Locked Barrier (Active Only When Locked - Prevents Mistouch) -->
+          <div class="mobile-screen-locked-barrier mobile-only-tool" ng-if="movieCtrl.isScreenLocked">
+            <button type="button" class="btn-mobile-unlock-pill" ng-click="movieCtrl.toggleScreenLock()" title="Tap to Unlock Screen">
+              <i class="fa-solid fa-lock-open"></i>
+              <span>Screen Locked • Tap to Unlock</span>
+            </button>
+          </div>
         </div>
 
         <!-- Theater Footer: Quick Keyboard Hints & Status -->

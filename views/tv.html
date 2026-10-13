@@ -118,6 +118,15 @@
               <span>Ad Shield</span>
             </button>
 
+            <!-- Mobile-Only Screen & Rotation Lock (Prevents Accidental Pause & Mistouch) -->
+            <button class="theater-action-btn mobile-only-tool lock-screen-btn"
+                    ng-class="{ 'active': tvCtrl.isScreenLocked }"
+                    ng-click="tvCtrl.toggleScreenLock()"
+                    title="Lock screen touches & rotation to prevent mistouch">
+              <i class="fa-solid" ng-class="tvCtrl.isScreenLocked ? 'fa-lock' : 'fa-lock-open'"></i>
+              <span>{{ tvCtrl.isScreenLocked ? 'Locked' : 'Lock' }}</span>
+            </button>
+
             <!-- Close Player -->
             <button class="theater-close-btn" ng-click="tvCtrl.closePlayer()" title="Close Player">
               <i class="fa-solid fa-xmark"></i>
@@ -149,6 +158,14 @@
             <i class="fa-solid fa-headphones"></i>
             <span><strong>In-Player Multi-Audio & Subtitles:</strong> Audio tracks (Hindi, English, Japanese/Original) and subtitles are built directly into this player. Tap the <strong>⚙️ Settings</strong> icon inside the player controls to change audio track!</span>
           </div>
+          <!-- Mobile Touch & Rotation Lock Tool Button (Near Player Settings/Captions) -->
+          <button class="btn-mobile-lock-tool mobile-only-tool"
+                  ng-class="{ 'locked': tvCtrl.isScreenLocked }"
+                  ng-click="tvCtrl.toggleScreenLock()"
+                  title="Lock touches and orientation to avoid mistouch">
+            <i class="fa-solid" ng-class="tvCtrl.isScreenLocked ? 'fa-lock' : 'fa-lock-open'"></i>
+            <span>{{ tvCtrl.isScreenLocked ? 'Screen Locked' : 'Touch & Rotation Lock' }}</span>
+          </button>
         </div>
 
         <!-- Video Screen Container (Direct Unblocked Native Playback) -->
@@ -162,6 +179,24 @@
             mozallowfullscreen
             allowfullscreen>
           </iframe>
+
+          <!-- Mobile-Only Floating Screen & Touch Lock Sign Button (Near Player Tools) -->
+          <button class="mobile-player-floating-lock-btn mobile-only-tool"
+                  type="button"
+                  ng-if="!tvCtrl.isScreenLocked"
+                  ng-click="tvCtrl.toggleScreenLock()"
+                  title="Lock touches and orientation to prevent accidental pause">
+            <i class="fa-solid fa-lock"></i>
+            <span>Lock</span>
+          </button>
+
+          <!-- Mobile Screen Locked Barrier (Active Only When Locked - Prevents Mistouch) -->
+          <div class="mobile-screen-locked-barrier mobile-only-tool" ng-if="tvCtrl.isScreenLocked">
+            <button type="button" class="btn-mobile-unlock-pill" ng-click="tvCtrl.toggleScreenLock()" title="Tap to Unlock Screen">
+              <i class="fa-solid fa-lock-open"></i>
+              <span>Screen Locked • Tap to Unlock</span>
+            </button>
+          </div>
         </div>
 
         <!-- Theater Footer -->

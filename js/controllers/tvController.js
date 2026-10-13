@@ -142,6 +142,43 @@
         }
       }
 
+      vm.isScreenLocked = false;
+
+      vm.toggleScreenLock = function () {
+        vm.isScreenLocked = !vm.isScreenLocked;
+
+        if (vm.isScreenLocked) {
+          // Lock orientation on mobile devices to prevent accidental rotation flipping
+          try {
+            if (screen.orientation && screen.orientation.lock) {
+              var currentOrientation = screen.orientation.type || 'landscape';
+              screen.orientation.lock(currentOrientation).catch(function () {});
+            }
+          } catch (e) {}
+
+          if (window.CinVerseNative && window.CinVerseNative.lockOrientation) {
+            try { window.CinVerseNative.lockOrientation(true); } catch (e) {}
+          }
+          if (window.CinVerseNative && window.CinVerseNative.vibrate) {
+            try { window.CinVerseNative.vibrate(30); } catch (e) {}
+          }
+        } else {
+          // Unlock orientation
+          try {
+            if (screen.orientation && screen.orientation.unlock) {
+              screen.orientation.unlock();
+            }
+          } catch (e) {}
+
+          if (window.CinVerseNative && window.CinVerseNative.lockOrientation) {
+            try { window.CinVerseNative.lockOrientation(false); } catch (e) {}
+          }
+          if (window.CinVerseNative && window.CinVerseNative.vibrate) {
+            try { window.CinVerseNative.vibrate(20); } catch (e) {}
+          }
+        }
+      };
+
       vm.toggleFullscreen = function () {
         var wrap = document.getElementById('tv-player-section') || document.querySelector('.theater-screen-wrap');
         if (!wrap) return;
@@ -219,6 +256,9 @@
       };
 
       vm.closePlayer = function () {
+        if (vm.isScreenLocked) {
+          vm.toggleScreenLock();
+        }
         vm.showPlayer = false;
         vm.theaterMode = false;
         vm.currentStreamUrl = null;
