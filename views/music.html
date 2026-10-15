@@ -1,0 +1,752 @@
+<!-- ============================================================
+     VIEW: music.html
+     CinVerse Sound Studio & Next-Gen Audio Experience
+     Bespoke Cyber-Luxury Design:
+       - 3D Neon Vinyl Turntable & Animated 16-Bar Frequency Spectrum
+       - Top Search Station & Horizontal Vibe Filters
+       - 3-Column Studio: Sound Vault • Master Soundstage • Synced Lyrics
+       - Responsive Fixed Bottom Web Player Dock with 1-Click MP3 Download
+     ============================================================ -->
+<div class="sound-studio-container">
+
+  <!-- ================= TOAST NOTIFICATION ================= -->
+  <div class="studio-toast-pill" ng-if="musicCtrl.toastMessage" ng-cloak>
+    <i class="fa-solid fa-circle-check"></i>
+    <span>{{ musicCtrl.toastMessage }}</span>
+  </div>
+
+  <!-- ================= TOP SEARCH & VIBE STATION ================= -->
+  <header class="studio-top-station">
+    <div class="station-brand-row">
+      <div class="studio-brand-badge">
+        <div class="brand-disc-icon" ng-class="{'spinning': musicCtrl.musicService.isPlaying}">
+          <i class="fa-solid fa-compact-disc"></i>
+        </div>
+        <div class="brand-text">
+          <span class="brand-sub">CINVERSE AUDIO LAB</span>
+          <h2 class="brand-title">Sound Studio</h2>
+        </div>
+      </div>
+
+      <!-- Search Bar with Live Auto-Suggestions -->
+      <div class="studio-search-bar">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text"
+               class="studio-search-input"
+               placeholder="Search tracks, artists, Marvel, Bollywood, Anime..."
+               ng-model="musicCtrl.searchQuery"
+               ng-change="musicCtrl.onSearchInput()"
+               ng-focus="musicCtrl.onSearchInput()"
+               ng-blur="musicCtrl.closeSuggestions()"
+               aria-label="Search Tracks and Soundtracks" />
+        <span class="search-spinner" ng-if="musicCtrl.isSearching">
+          <i class="fa-solid fa-circle-notch fa-spin"></i>
+        </span>
+        <button type="button" class="btn-clear-search" ng-if="musicCtrl.searchQuery" ng-click="musicCtrl.searchQuery = ''; musicCtrl.onSearchInput()" title="Clear Search">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <!-- Live Auto-Suggestions Dropdown -->
+        <div class="studio-suggestions-dropdown" ng-if="musicCtrl.showSuggestions && musicCtrl.searchSuggestions.length">
+          <div class="suggestion-header">
+            <span><i class="fa-solid fa-sparkles text-cyan"></i> Live Suggestions</span>
+            <span class="suggestion-count">{{ musicCtrl.searchSuggestions.length }} tracks</span>
+          </div>
+          <div class="suggestion-row"
+               ng-repeat="sug in musicCtrl.searchSuggestions track by sug.id"
+               ng-mousedown="musicCtrl.selectSuggestion(sug); $event.stopPropagation()">
+            <img ng-src="{{ sug.cover }}" alt="{{ sug.title }}" class="sug-thumb" />
+            <div class="sug-meta">
+              <h4 class="sug-title">{{ sug.title }}</h4>
+              <span class="sug-artist">{{ sug.artist }} • {{ sug.album }}</span>
+            </div>
+            <button type="button" class="sug-play-btn" title="Play Now" ng-click="musicCtrl.selectSuggestion(sug); $event.stopPropagation()">
+              <i class="fa-solid fa-play"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Action: Create Playlist -->
+      <button type="button" class="btn-studio-action btn-glow-purple" ng-click="musicCtrl.openCreatePlaylistModal()">
+        <i class="fa-solid fa-plus"></i>
+        <span>New Playlist</span>
+      </button>
+    </div>
+
+    <!-- Vibe Filter Chips -->
+    <div class="studio-vibe-ribbon">
+      <button type="button"
+              class="vibe-chip-btn"
+              ng-repeat="vibe in musicCtrl.vibeCategories track by vibe.id"
+              ng-class="{'active': musicCtrl.activeVibeFilter === vibe.id}"
+              ng-click="musicCtrl.setVibeFilter(vibe.id)">
+        <i class="fa-solid {{ vibe.icon }}"></i>
+        <span>{{ vibe.label }}</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ================= HERO 3D NEON VINYL SOUNDSTAGE ================= -->
+  <section class="studio-hero-deck" ng-if="musicCtrl.musicService.currentTrack">
+    <div class="hero-turntable-wrapper">
+
+      <!-- 3D Vinyl Turntable Display -->
+      <div class="vinyl-turntable-deck" ng-click="musicCtrl.musicService.togglePlay()">
+        <div class="vinyl-platter-base"></div>
+        <div class="vinyl-record" ng-class="{'spinning': musicCtrl.musicService.isPlaying}">
+          <div class="vinyl-groove groove-1"></div>
+          <div class="vinyl-groove groove-2"></div>
+          <div class="vinyl-center-label" ng-style="{'background-image': 'url(' + musicCtrl.musicService.currentTrack.cover + ')'}">
+            <div class="vinyl-spindle-hole"></div>
+          </div>
+        </div>
+        <div class="turntable-tonearm" ng-class="{'engaged': musicCtrl.musicService.isPlaying}">
+          <div class="tonearm-base"></div>
+          <div class="tonearm-rod"></div>
+          <div class="tonearm-headshell"></div>
+        </div>
+        <div class="turntable-strobe-glow" ng-class="{'active': musicCtrl.musicService.isPlaying}"></div>
+      </div>
+
+      <!-- Now Playing Hero Metadata & Spectrum -->
+      <div class="hero-track-details">
+        <div class="track-tag-row">
+          <span class="studio-badge-pill badge-live-pulse">
+            <span class="pulse-dot" ng-class="{'playing': musicCtrl.musicService.isPlaying}"></span>
+            <span ng-if="musicCtrl.musicService.isPlaying">NOW SPINNING</span>
+            <span ng-if="!musicCtrl.musicService.isPlaying">READY TO PLAY</span>
+          </span>
+          <span class="studio-badge-pill badge-lossless">
+            <i class="fa-solid fa-wave-square"></i> 320 KBPS LOSSLESS
+          </span>
+          <span class="studio-badge-pill badge-dolby">
+            <i class="fa-solid fa-certificate"></i> DOLBY SURROUND
+          </span>
+          <span class="studio-badge-pill badge-category" ng-if="musicCtrl.musicService.currentTrack.badge">
+            {{ musicCtrl.musicService.currentTrack.badge }}
+          </span>
+        </div>
+
+        <h1 class="hero-track-title">{{ musicCtrl.musicService.currentTrack.title }}</h1>
+        <p class="hero-track-artist">
+          <i class="fa-solid fa-music text-cyan"></i>
+          <strong>{{ musicCtrl.musicService.currentTrack.artist }}</strong>
+          <span class="artist-album-sep">•</span>
+          <span class="text-subtle">{{ musicCtrl.musicService.currentTrack.album }}</span>
+        </p>
+
+        <!-- 16-Bar Animated Live Frequency Spectrum -->
+        <div class="studio-equalizer-bars" ng-class="{'active': musicCtrl.musicService.isPlaying}">
+          <span class="eq-bar bar-1"></span>
+          <span class="eq-bar bar-2"></span>
+          <span class="eq-bar bar-3"></span>
+          <span class="eq-bar bar-4"></span>
+          <span class="eq-bar bar-5"></span>
+          <span class="eq-bar bar-6"></span>
+          <span class="eq-bar bar-7"></span>
+          <span class="eq-bar bar-8"></span>
+          <span class="eq-bar bar-9"></span>
+          <span class="eq-bar bar-10"></span>
+          <span class="eq-bar bar-11"></span>
+          <span class="eq-bar bar-12"></span>
+          <span class="eq-bar bar-13"></span>
+          <span class="eq-bar bar-14"></span>
+          <span class="eq-bar bar-15"></span>
+          <span class="eq-bar bar-16"></span>
+        </div>
+
+        <!-- Master Hero Actions -->
+        <div class="hero-action-buttons">
+          <button type="button"
+                  class="btn-hero-master-play"
+                  ng-click="musicCtrl.musicService.togglePlay()"
+                  title="{{ musicCtrl.musicService.isPlaying ? 'Pause' : 'Play' }}">
+            <i class="fa-solid" ng-class="musicCtrl.musicService.isPlaying ? 'fa-pause' : 'fa-play'"></i>
+            <span>{{ musicCtrl.musicService.isPlaying ? 'PAUSE TRACK' : 'START PLAYBACK' }}</span>
+          </button>
+
+          <button type="button"
+                  class="btn-hero-tool"
+                  ng-class="{'active-liked': musicCtrl.isLiked(musicCtrl.musicService.currentTrack.id)}"
+                  ng-click="musicCtrl.toggleLike(musicCtrl.musicService.currentTrack, $event)"
+                  title="Save to Liked Songs">
+            <i class="fa-solid fa-heart"></i>
+          </button>
+
+          <button type="button"
+                  class="btn-hero-tool"
+                  ng-click="musicCtrl.downloadTrack(musicCtrl.musicService.currentTrack, $event)"
+                  title="Download MP3 to Device (Free)">
+            <i class="fa-solid fa-arrow-down-to-bracket"></i>
+            <span class="tool-label">Free MP3</span>
+          </button>
+
+          <button type="button"
+                  class="btn-hero-tool"
+                  ng-click="musicCtrl.openAddToPlaylistModal(musicCtrl.musicService.currentTrack, $event)"
+                  title="Add to Custom Playlist">
+            <i class="fa-solid fa-folder-plus"></i>
+          </button>
+
+          <button type="button"
+                  class="btn-hero-tool"
+                  ng-click="musicCtrl.openLyricsModal()"
+                  title="View Synced Lyrics">
+            <i class="fa-solid fa-quote-left"></i>
+            <span class="tool-label">Lyrics</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 3-COLUMN STUDIO LAYOUT ================= -->
+  <div class="studio-deck-layout" ng-class="{'collapsed-monitor': !musicCtrl.showNowPlayingSidebar}">
+
+    <!-- ---------------- COLUMN 1: LEFT VAULT (PLAYLISTS & LIBRARY) ---------------- -->
+    <aside class="studio-vault-panel">
+      <div class="vault-header">
+        <div class="vault-title">
+          <i class="fa-solid fa-compact-disc text-violet"></i>
+          <span>Sound Vault</span>
+        </div>
+        <button type="button" class="btn-vault-add" ng-click="musicCtrl.openCreatePlaylistModal()" title="Create New Playlist">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      </div>
+
+      <!-- Quick Library Filter Tabs -->
+      <div class="vault-chips-row">
+        <button type="button" class="vault-chip" ng-class="{'active': musicCtrl.sidebarChipFilter === 'all'}" ng-click="musicCtrl.setSidebarChipFilter('all')">
+          All
+        </button>
+        <button type="button" class="vault-chip" ng-class="{'active': musicCtrl.sidebarChipFilter === 'playlists'}" ng-click="musicCtrl.setSidebarChipFilter('playlists')">
+          Playlists
+        </button>
+        <button type="button" class="vault-chip" ng-class="{'active': musicCtrl.sidebarChipFilter === 'soundtracks'}" ng-click="musicCtrl.setSidebarChipFilter('soundtracks')">
+          Soundtracks
+        </button>
+      </div>
+
+      <!-- Vault Scroll Area -->
+      <div class="vault-scroll-area">
+
+        <!-- 1. Pinned Liked Songs -->
+        <div class="vault-item-card pinned-liked"
+             ng-class="{'active': musicCtrl.activeSidebarTab === 'liked'}"
+             ng-click="musicCtrl.selectSidebarTab('liked')">
+          <div class="vault-thumb-box liked-gradient">
+            <i class="fa-solid fa-heart"></i>
+          </div>
+          <div class="vault-item-meta">
+            <h4 class="item-name">Liked Anthems</h4>
+            <span class="item-count"><i class="fa-solid fa-thumbtack text-accent"></i> {{ musicCtrl.musicService.getLikedTracks().length }} Saved Songs</span>
+          </div>
+        </div>
+
+        <!-- 2. Master All Catalog Link -->
+        <div class="vault-item-card"
+             ng-class="{'active': musicCtrl.activeSidebarTab === 'all'}"
+             ng-click="musicCtrl.selectSidebarTab('all')">
+          <div class="vault-thumb-box all-music-gradient">
+            <i class="fa-solid fa-bolt-lightning"></i>
+          </div>
+          <div class="vault-item-meta">
+            <h4 class="item-name">All Studio Tracks</h4>
+            <span class="item-count">{{ musicCtrl.musicService.catalog.length }} Audio Masters</span>
+          </div>
+        </div>
+
+        <!-- 3. User Custom Playlists (From LocalStorage) -->
+        <div class="vault-divider-title" ng-if="musicCtrl.musicService.playlists.length">
+          <span>YOUR PLAYLISTS</span>
+        </div>
+
+        <div class="vault-item-card custom-playlist-card"
+             ng-repeat="pl in musicCtrl.musicService.playlists track by pl.id"
+             ng-class="{'active': musicCtrl.activeSidebarTab === 'custom' && musicCtrl.selectedCustomPlaylist.id === pl.id}"
+             ng-click="musicCtrl.selectCustomPlaylist(pl)">
+          <div class="vault-thumb-box custom-thumb" ng-style="{'background-color': pl.color || '#7c3aed'}">
+            <i class="fa-solid fa-music"></i>
+          </div>
+          <div class="vault-item-meta">
+            <h4 class="item-name">{{ pl.name }}</h4>
+            <span class="item-count">{{ (pl.tracks || []).length }} songs</span>
+          </div>
+          <button type="button" class="btn-vault-delete" ng-click="musicCtrl.deletePlaylist(pl, $event)" title="Delete Playlist">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ---------------- COLUMN 2: CENTER SOUNDSTAGE (DISCOVERY & TRACKS) ---------------- -->
+    <main class="studio-soundstage-panel">
+
+      <!-- Soundstage Header Info Banner -->
+      <div class="soundstage-header-card">
+        <div class="header-banner-backdrop" ng-style="{'background-image': 'url(' + musicCtrl.getCurrentHeaderInfo().cover + ')'}"></div>
+        <div class="header-card-content">
+          <div class="header-card-thumb">
+            <img ng-src="{{ musicCtrl.getCurrentHeaderInfo().cover }}" alt="{{ musicCtrl.getCurrentHeaderInfo().title }}" />
+          </div>
+          <div class="header-card-text">
+            <span class="header-badge-tag">{{ musicCtrl.getCurrentHeaderInfo().badge }}</span>
+            <h2 class="header-title">{{ musicCtrl.getCurrentHeaderInfo().title }}</h2>
+            <p class="header-desc">{{ musicCtrl.getCurrentHeaderInfo().desc }}</p>
+            <div class="header-stats-row">
+              <span class="stat-item"><i class="fa-solid fa-music text-cyan"></i> {{ musicCtrl.getDisplayedTracks().length }} Tracks</span>
+              <span class="stat-item"><i class="fa-solid fa-wave-square text-violet"></i> 320kbps Master</span>
+              <span class="stat-item"><i class="fa-solid fa-bolt text-gold"></i> Instant Stream</span>
+              <button type="button" class="btn-play-all-card" ng-click="musicCtrl.playCurrentList()">
+                <i class="fa-solid fa-play"></i> Play All
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick 6-Pack Discovery Grid -->
+      <section class="soundstage-section" ng-if="musicCtrl.activeSidebarTab === 'all' && !musicCtrl.searchQuery">
+        <div class="section-title-row">
+          <h3 class="section-heading"><i class="fa-solid fa-sparkles text-cyan"></i> Quick Launch Soundstage</h3>
+        </div>
+        <div class="quick-sound-grid">
+          <div class="quick-sound-card"
+               ng-repeat="tile in musicCtrl.quickTiles track by tile.id"
+               ng-click="musicCtrl.onTileClick(tile)">
+            <div class="quick-thumb-wrap" ng-if="!tile.isLikedSquare">
+              <img ng-src="{{ tile.cover }}" alt="{{ tile.title }}" class="quick-img" />
+            </div>
+            <div class="quick-thumb-wrap liked-icon-box" ng-if="tile.isLikedSquare">
+              <i class="fa-solid fa-heart"></i>
+            </div>
+            <div class="quick-card-info">
+              <h4 class="quick-title">{{ tile.title }}</h4>
+              <span class="quick-sub">{{ tile.subtitle }}</span>
+            </div>
+            <button type="button" class="quick-hover-play" title="Play">
+              <i class="fa-solid fa-play"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3D Vinyl Sleeve Albums Carousel -->
+      <section class="soundstage-section" ng-if="musicCtrl.activeSidebarTab === 'all' && !musicCtrl.searchQuery">
+        <div class="section-title-row">
+          <h3 class="section-heading"><i class="fa-solid fa-record-vinyl text-violet"></i> Blockbuster Cinema Soundtracks</h3>
+          <span class="section-subtext">Hans Zimmer • Marvel Studios • Bollywood Blockbusters</span>
+        </div>
+        <div class="albums-sleeve-carousel">
+          <div class="album-sleeve-card"
+               ng-repeat="alb in musicCtrl.featuredAlbums track by alb.id"
+               ng-click="musicCtrl.onAlbumClick(alb)">
+            <div class="sleeve-artwork-box">
+              <img ng-src="{{ alb.cover }}" alt="{{ alb.title }}" class="sleeve-img" />
+              <div class="vinyl-peek-disc"></div>
+              <button type="button" class="sleeve-play-btn" title="Play Album">
+                <i class="fa-solid fa-play"></i>
+              </button>
+            </div>
+            <div class="sleeve-meta">
+              <h4 class="album-name">{{ alb.title }}</h4>
+              <p class="album-artist">{{ alb.artist }}</p>
+              <span class="album-badge">{{ alb.year }}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Master Tracks Table -->
+      <section class="soundstage-section">
+        <div class="section-title-row">
+          <h3 class="section-heading">
+            <i class="fa-solid fa-list-ul text-accent"></i> Master Audio Tracks
+          </h3>
+          <span class="section-subtext" ng-if="musicCtrl.searchQuery">
+            Showing results for "{{ musicCtrl.searchQuery }}"
+          </span>
+        </div>
+
+        <div class="master-tracks-table">
+          <div class="table-header-row">
+            <span class="col-num">#</span>
+            <span class="col-title">Title &amp; Artist</span>
+            <span class="col-album hide-mobile">Album / Source</span>
+            <span class="col-duration hide-mobile"><i class="fa-regular fa-clock"></i></span>
+            <span class="col-actions">Actions</span>
+          </div>
+
+          <!-- Empty State -->
+          <div class="table-empty-box" ng-if="!musicCtrl.getDisplayedTracks().length">
+            <i class="fa-solid fa-music-slash"></i>
+            <h4>No tracks found</h4>
+            <p>Try searching for another keyword or change your vibe category filter.</p>
+          </div>
+
+          <!-- Track Row -->
+          <div class="table-track-row"
+               ng-repeat="track in musicCtrl.getDisplayedTracks() track by track.id"
+               ng-class="{'active-row': musicCtrl.isCurrentTrack(track), 'playing-row': musicCtrl.isCurrentPlaying(track)}"
+               ng-click="musicCtrl.playTrack(track)">
+
+            <!-- Index / Play Button -->
+            <div class="col-num" ng-click="musicCtrl.toggleTrackPlay(track, $event)">
+              <span class="index-digit" ng-if="!musicCtrl.isCurrentPlaying(track)">{{ $index + 1 }}</span>
+              <div class="mini-eq-icon" ng-if="musicCtrl.isCurrentPlaying(track)">
+                <span class="meq-bar"></span>
+                <span class="meq-bar"></span>
+                <span class="meq-bar"></span>
+              </div>
+              <button type="button" class="row-play-btn" title="Play">
+                <i class="fa-solid" ng-class="musicCtrl.isCurrentPlaying(track) ? 'fa-pause' : 'fa-play'"></i>
+              </button>
+            </div>
+
+            <!-- Title & Artist -->
+            <div class="col-title">
+              <div class="row-thumb">
+                <img ng-src="{{ track.cover }}" alt="{{ track.title }}" />
+              </div>
+              <div class="row-text">
+                <h4 class="track-name" ng-class="{'text-accent': musicCtrl.isCurrentTrack(track)}">{{ track.title }}</h4>
+                <p class="track-artist">{{ track.artist }}</p>
+              </div>
+            </div>
+
+            <!-- Album / Source -->
+            <div class="col-album hide-mobile">
+              <span class="album-tag">{{ track.album }}</span>
+            </div>
+
+            <!-- Duration -->
+            <div class="col-duration hide-mobile">
+              <span>{{ track.duration }}</span>
+            </div>
+
+            <!-- Action Tools -->
+            <div class="col-actions" ng-click="$event.stopPropagation()">
+
+              <!-- Like Button -->
+              <button type="button"
+                      class="btn-row-action"
+                      ng-class="{'liked': musicCtrl.isLiked(track.id)}"
+                      ng-click="musicCtrl.toggleLike(track, $event)"
+                      title="Save to Liked Songs">
+                <i class="fa-solid fa-heart"></i>
+              </button>
+
+              <!-- 1-Click Free MP3 Download -->
+              <button type="button"
+                      class="btn-row-action btn-download"
+                      ng-click="musicCtrl.downloadTrack(track, $event)"
+                      title="Download MP3 (Free)">
+                <i class="fa-solid fa-download"></i>
+              </button>
+
+              <!-- Add to custom playlist -->
+              <button type="button"
+                      class="btn-row-action"
+                      ng-click="musicCtrl.openAddToPlaylistModal(track, $event)"
+                      title="Add to Playlist">
+                <i class="fa-solid fa-folder-plus"></i>
+              </button>
+
+              <!-- Remove from custom playlist if currently inside one -->
+              <button type="button"
+                      class="btn-row-action btn-delete"
+                      ng-if="musicCtrl.activeSidebarTab === 'custom'"
+                      ng-click="musicCtrl.removeTrackFromCurrentPlaylist(track, $event)"
+                      title="Remove from Playlist">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ---------------- COLUMN 3: RIGHT PANEL (STUDIO MONITOR & LYRICS) ---------------- -->
+    <aside class="studio-monitor-panel" ng-if="musicCtrl.showNowPlayingSidebar && musicCtrl.musicService.currentTrack">
+      <div class="monitor-header">
+        <div class="monitor-title">
+          <i class="fa-solid fa-tower-broadcast text-cyan"></i>
+          <span>Studio Monitor</span>
+        </div>
+        <button type="button" class="btn-close-monitor" ng-click="musicCtrl.toggleNowPlayingSidebar()" title="Hide Monitor">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Large Cover Card -->
+      <div class="monitor-cover-card">
+        <div class="monitor-cover-glow" ng-style="{'background-image': 'url(' + musicCtrl.musicService.currentTrack.cover + ')'}"></div>
+        <img ng-src="{{ musicCtrl.musicService.currentTrack.cover }}" alt="{{ musicCtrl.musicService.currentTrack.title }}" class="monitor-art-img" />
+      </div>
+
+      <!-- Track Details -->
+      <div class="monitor-meta-box">
+        <h3 class="monitor-song-title">{{ musicCtrl.musicService.currentTrack.title }}</h3>
+        <p class="monitor-artist-name">{{ musicCtrl.musicService.currentTrack.artist }}</p>
+        <span class="monitor-album-name">{{ musicCtrl.musicService.currentTrack.album }}</span>
+      </div>
+
+      <!-- Synced Karaoke Lyrics Preview Box -->
+      <div class="monitor-lyrics-box" ng-click="musicCtrl.openLyricsModal()">
+        <div class="lyrics-box-header">
+          <span class="lyrics-label"><i class="fa-solid fa-quote-left text-violet"></i> Synced Lyrics</span>
+          <span class="lyrics-expand-hint">Tap to expand <i class="fa-solid fa-up-right-and-down-left-from-center"></i></span>
+        </div>
+        <div class="lyrics-box-content">
+          <p class="lyrics-preview-lines">{{ musicCtrl.musicService.currentTrack.lyrics }}</p>
+        </div>
+      </div>
+
+      <!-- Artist Bio Spotlight -->
+      <div class="monitor-artist-card" ng-if="musicCtrl.musicService.currentTrack.artistBio">
+        <h4 class="artist-card-heading"><i class="fa-solid fa-circle-info text-cyan"></i> About The Artist</h4>
+        <p class="artist-card-text">{{ musicCtrl.musicService.currentTrack.artistBio }}</p>
+      </div>
+    </aside>
+  </div>
+
+  <!-- ================= FIXED BOTTOM MASTER WEB PLAYER DOCK ================= -->
+  <footer class="cinverse-web-player-dock" ng-if="musicCtrl.musicService.currentTrack" ng-cloak>
+    <div class="dock-inner-container">
+
+      <!-- Left: Track Info & Rotating Vinyl Mini-Disc -->
+      <div class="dock-left-track">
+        <div class="dock-thumb-wrap" ng-click="musicCtrl.musicService.togglePlay()">
+          <img ng-src="{{ musicCtrl.musicService.currentTrack.cover }}" alt="{{ musicCtrl.musicService.currentTrack.title }}" class="dock-thumb-img" />
+          <div class="dock-mini-vinyl" ng-class="{'spinning': musicCtrl.musicService.isPlaying}"></div>
+        </div>
+        <div class="dock-track-text">
+          <h4 class="dock-title">{{ musicCtrl.musicService.currentTrack.title }}</h4>
+          <p class="dock-artist">{{ musicCtrl.musicService.currentTrack.artist }}</p>
+        </div>
+        <button type="button"
+                class="btn-dock-icon"
+                ng-class="{'liked': musicCtrl.isLiked(musicCtrl.musicService.currentTrack.id)}"
+                ng-click="musicCtrl.toggleLike(musicCtrl.musicService.currentTrack, $event)"
+                title="Like Song">
+          <i class="fa-solid fa-heart"></i>
+        </button>
+      </div>
+
+      <!-- Center: Playback Controls & Timeline Scrubber -->
+      <div class="dock-center-controls">
+        <div class="dock-buttons-row">
+
+          <!-- Shuffle Toggle -->
+          <button type="button"
+                  class="btn-dock-tool"
+                  ng-class="{'active': musicCtrl.musicService.shuffleMode}"
+                  ng-click="musicCtrl.musicService.toggleShuffle()"
+                  title="Shuffle">
+            <i class="fa-solid fa-shuffle"></i>
+          </button>
+
+          <!-- Prev Track -->
+          <button type="button"
+                  class="btn-dock-tool"
+                  ng-click="musicCtrl.musicService.prevTrack()"
+                  title="Previous Track">
+            <i class="fa-solid fa-backward-step"></i>
+          </button>
+
+          <!-- Master Giant Play/Pause Circle -->
+          <button type="button"
+                  class="btn-dock-master-play"
+                  ng-click="musicCtrl.musicService.togglePlay()"
+                  title="{{ musicCtrl.musicService.isPlaying ? 'Pause' : 'Play' }}">
+            <i class="fa-solid" ng-class="musicCtrl.musicService.isPlaying ? 'fa-pause' : 'fa-play'"></i>
+          </button>
+
+          <!-- Next Track -->
+          <button type="button"
+                  class="btn-dock-tool"
+                  ng-click="musicCtrl.musicService.nextTrack()"
+                  title="Next Track">
+            <i class="fa-solid fa-forward-step"></i>
+          </button>
+
+          <!-- Repeat Toggle -->
+          <button type="button"
+                  class="btn-dock-tool"
+                  ng-class="{'active': musicCtrl.musicService.repeatMode}"
+                  ng-click="musicCtrl.musicService.toggleRepeat()"
+                  title="Repeat Track">
+            <i class="fa-solid fa-repeat"></i>
+          </button>
+        </div>
+
+        <!-- Timeline Scrubber -->
+        <div class="dock-timeline-row">
+          <span class="time-label current-time">{{ musicCtrl.musicService.currentTimeFormatted || '0:00' }}</span>
+          <div class="scrubber-track-bar"
+               ng-click="musicCtrl.musicService.seekTo(($event.offsetX / $event.currentTarget.clientWidth) * 100)">
+            <div class="scrubber-fill" ng-style="{'width': musicCtrl.musicService.progressPct + '%'}"></div>
+            <div class="scrubber-thumb" ng-style="{'left': musicCtrl.musicService.progressPct + '%'}"></div>
+          </div>
+          <span class="time-label total-duration">{{ musicCtrl.musicService.durationFormatted || musicCtrl.musicService.currentTrack.duration }}</span>
+        </div>
+      </div>
+
+      <!-- Right: Audio Lossless Badge, Synced Lyrics, Volume, Free MP3 Download -->
+      <div class="dock-right-tools">
+        <span class="dock-lossless-badge hide-mobile">
+          <i class="fa-solid fa-circle-check text-accent"></i> 320K FLAC
+        </span>
+
+        <!-- Synced Lyrics Toggle -->
+        <button type="button"
+                class="btn-dock-tool"
+                ng-class="{'active': musicCtrl.showLyricsModal}"
+                ng-click="musicCtrl.openLyricsModal()"
+                title="Synced Lyrics">
+          <i class="fa-solid fa-quote-left"></i>
+        </button>
+
+        <!-- 1-Click Free MP3 Download -->
+        <button type="button"
+                class="btn-dock-tool btn-free-mp3"
+                ng-click="musicCtrl.downloadTrack(musicCtrl.musicService.currentTrack, $event)"
+                title="Download MP3 to Device (Free)">
+          <i class="fa-solid fa-arrow-down-to-bracket"></i>
+          <span class="hide-mobile">MP3</span>
+        </button>
+
+        <!-- Volume Controller -->
+        <div class="dock-volume-ctrl hide-mobile">
+          <button type="button" class="btn-dock-icon" ng-click="musicCtrl.musicService.toggleMute()" title="Mute/Unmute">
+            <i class="fa-solid"
+               ng-class="musicCtrl.musicService.isMuted || musicCtrl.musicService.volume === 0 ? 'fa-volume-xmark' : (musicCtrl.musicService.volume > 50 ? 'fa-volume-high' : 'fa-volume-low')">
+            </i>
+          </button>
+          <input type="range"
+                 min="0"
+                 max="100"
+                 class="volume-slider"
+                 ng-model="musicCtrl.musicService.volume"
+                 ng-change="musicCtrl.musicService.setVolume(musicCtrl.musicService.volume)"
+                 aria-label="Volume Slider" />
+        </div>
+
+        <!-- Toggle Right Monitor -->
+        <button type="button"
+                class="btn-dock-tool hide-mobile"
+                ng-class="{'active': musicCtrl.showNowPlayingSidebar}"
+                ng-click="musicCtrl.toggleNowPlayingSidebar()"
+                title="Toggle Studio Monitor">
+          <i class="fa-solid fa-sidebar"></i>
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ================= MODAL 1: CREATE CUSTOM PLAYLIST ================= -->
+  <div class="studio-modal-backdrop" ng-if="musicCtrl.showCreatePlaylistModal" ng-click="musicCtrl.closeCreatePlaylistModal()">
+    <div class="studio-modal-card" ng-click="$event.stopPropagation()">
+      <div class="modal-card-header">
+        <h3 class="modal-card-title"><i class="fa-solid fa-folder-plus text-violet"></i> Create Custom Playlist</h3>
+        <button type="button" class="btn-modal-close" ng-click="musicCtrl.closeCreatePlaylistModal()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form class="modal-card-body" ng-submit="musicCtrl.submitCreatePlaylist()">
+        <div class="form-group">
+          <label class="form-label">Playlist Name</label>
+          <input type="text"
+                 class="studio-input"
+                 placeholder="e.g. Marvel Gym Hype, Late Night Lo-Fi..."
+                 ng-model="musicCtrl.newPlaylistName"
+                 required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description (Optional)</label>
+          <textarea class="studio-textarea"
+                    placeholder="Give your playlist a custom vibe description..."
+                    ng-model="musicCtrl.newPlaylistDesc">
+          </textarea>
+        </div>
+        <div class="modal-actions-row">
+          <button type="button" class="btn-studio-secondary" ng-click="musicCtrl.closeCreatePlaylistModal()">Cancel</button>
+          <button type="submit" class="btn-studio-action btn-glow-purple">Create Playlist</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL 2: ADD TRACK TO PLAYLIST ================= -->
+  <div class="studio-modal-backdrop" ng-if="musicCtrl.showAddToPlaylistModal" ng-click="musicCtrl.closeAddToPlaylistModal()">
+    <div class="studio-modal-card" ng-click="$event.stopPropagation()">
+      <div class="modal-card-header">
+        <h3 class="modal-card-title"><i class="fa-solid fa-plus-circle text-cyan"></i> Add to Playlist</h3>
+        <button type="button" class="btn-modal-close" ng-click="musicCtrl.closeAddToPlaylistModal()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-card-body">
+        <p class="modal-sub-info">Choose which playlist to add <strong>"{{ musicCtrl.trackToAddToPlaylist.title }}"</strong>:</p>
+
+        <div class="modal-playlists-list" ng-if="musicCtrl.musicService.playlists.length">
+          <div class="modal-pl-row"
+               ng-repeat="pl in musicCtrl.musicService.playlists track by pl.id"
+               ng-click="musicCtrl.addTrackToSpecificPlaylist(pl)">
+            <div class="modal-pl-thumb" ng-style="{'background-color': pl.color || '#8b5cf6'}">
+              <i class="fa-solid fa-music"></i>
+            </div>
+            <div class="modal-pl-meta">
+              <h4 class="pl-name">{{ pl.name }}</h4>
+              <span class="pl-count">{{ (pl.tracks || []).length }} tracks</span>
+            </div>
+            <i class="fa-solid fa-circle-plus add-icon"></i>
+          </div>
+        </div>
+
+        <div class="modal-empty-vault" ng-if="!musicCtrl.musicService.playlists.length">
+          <p>You haven't created any custom playlists yet.</p>
+          <button type="button" class="btn-studio-action btn-glow-purple" ng-click="musicCtrl.closeAddToPlaylistModal(); musicCtrl.openCreatePlaylistModal()">
+            <i class="fa-solid fa-plus"></i> Create Playlist Now
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL 3: FULLSCREEN SYNCED LYRICS ================= -->
+  <div class="studio-lyrics-overlay" ng-if="musicCtrl.showLyricsModal" ng-click="musicCtrl.closeLyricsModal()">
+    <div class="lyrics-overlay-container" ng-click="$event.stopPropagation()">
+      <div class="lyrics-overlay-header">
+        <div class="overlay-track-info">
+          <span class="lyrics-studio-pill">CINVERSE KARAOKE SYNC</span>
+          <h2 class="overlay-track-title">{{ musicCtrl.musicService.currentTrack.title }}</h2>
+          <span class="overlay-artist-subtitle">{{ musicCtrl.musicService.currentTrack.artist }} • {{ musicCtrl.musicService.currentTrack.album }}</span>
+        </div>
+        <button type="button" class="btn-close-lyrics" ng-click="musicCtrl.closeLyricsModal()" title="Close Lyrics">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="lyrics-karaoke-viewport">
+        <div class="karaoke-stream-text">
+          <p class="karaoke-line active-line">{{ musicCtrl.musicService.currentTrack.lyrics }}</p>
+        </div>
+      </div>
+
+      <div class="lyrics-overlay-footer">
+        <div class="lyrics-audio-status">
+          <i class="fa-solid fa-music text-accent"></i>
+          <span>Synced with Master Lossless Audio Stream</span>
+        </div>
+        <button type="button" class="btn-studio-action" ng-click="musicCtrl.musicService.togglePlay()">
+          <i class="fa-solid" ng-class="musicCtrl.musicService.isPlaying ? 'fa-pause' : 'fa-play'"></i>
+          <span>{{ musicCtrl.musicService.isPlaying ? 'Pause' : 'Play' }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

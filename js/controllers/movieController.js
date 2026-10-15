@@ -373,8 +373,8 @@
       vm.selectAudioTrack = function (track) {
         vm.selectedAudioTrack = track;
         if (track.id === 'hi') {
-          // Switch to Server 3 (2Embed Bollywood / Hindi) or Server 1 (VidBolt Dual Audio)
-          var hindiServer = vm.servers.find(function (s) { return s.id === 3; }) || vm.servers[0];
+          // Switch to Server 1 (VidBolt Dual Audio)
+          var hindiServer = vm.servers[0];
           vm.currentServer = hindiServer;
           vm.audioNotice = '🇮🇳 Hindi Dubbed / Dual-Audio Active on ' + vm.currentServer.name + '! (If stream starts in English, tap the ⚙️ Settings / Audio menu inside the player to switch to Hindi)';
         } else if (track.id === 'en') {
@@ -609,7 +609,7 @@
         });
       };
 
-      // ---------------- 5 HIGH-SPEED STREAMING SERVERS (MULTI-AUDIO & BOLLYWOOD READY) ----------------
+      // ---------------- 3 HIGH-SPEED POWERHOUSE STREAMING SERVERS (MULTI-AUDIO, ANIME & CAMPUS) ----------------
       vm.showPlayer = false;
 
       vm.servers = [
@@ -622,29 +622,15 @@
         },
         {
           id: 2,
-          name: 'Server 2 • SuperEmbed',
-          badge: '4K Multi-Cloud 🚀',
+          name: 'Server 2 • VidFast 4K (Native Video Engine)',
+          badge: 'Direct 4K ⚡',
           icon: 'fa-film',
-          getUrl: function (id) { return 'https://superembed.stream/?video_id=' + id + '&tmdb=1'; }
+          getUrl: function (id) { return 'https://vidfast.vc/movie/' + id; }
         },
         {
           id: 3,
-          name: 'Server 3 • 2Embed',
-          badge: 'Bollywood / Hindi 🇮🇳',
-          icon: 'fa-clapperboard',
-          getUrl: function (id) { return 'https://www.2embed.cc/embed/' + id; }
-        },
-        {
-          id: 4,
-          name: 'Server 4 • SmashyStream',
-          badge: 'Fast Mirror 💨',
-          icon: 'fa-cloud',
-          getUrl: function (id) { return 'https://embed.smashystream.com/playere.php?tmdb=' + id; }
-        },
-        {
-          id: 5,
-          name: 'Server 5 • Vidflix',
-          badge: 'Campus WiFi Proof 🎓',
+          name: 'Server 3 • Campus WiFi Bypass',
+          badge: 'Unblocked 🎓',
           icon: 'fa-graduation-cap',
           getUrl: function (id) { return 'https://vidsrc.pm/embed/movie/' + id; }
         }

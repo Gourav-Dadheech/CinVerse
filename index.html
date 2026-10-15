@@ -54,6 +54,27 @@
   }
   </script>
 
+  <!-- CinVerse Ad-Shield: Neutralizes rogue popups, redirect attacks, and spam ads -->
+  <script>
+    (function () {
+      var _origOpen = window.open;
+      window.open = function (url, target, features) {
+        if (!url) return null;
+        var u = String(url).toLowerCase();
+        // Allow legitimate blob downloads, local links, 1DM links
+        if (u.indexOf('blob:') === 0 || u.indexOf('data:') === 0 || u.indexOf('localhost') !== -1 || u.indexOf('127.0.0.1') !== -1 || u.indexOf('1dm') !== -1) {
+          return _origOpen.apply(window, arguments);
+        }
+        // Block known ad, redirect, and betting domains
+        if (u.indexOf('bet') !== -1 || u.indexOf('casino') !== -1 || u.indexOf('ad') !== -1 || u.indexOf('click') !== -1 || u.indexOf('pop') !== -1 || u.indexOf('banner') !== -1 || u.indexOf('track') !== -1) {
+          console.warn('[CinVerse Ad-Shield] Neutralized rogue popup ad:', url);
+          return null;
+        }
+        return _origOpen.apply(window, arguments);
+      };
+    })();
+  </script>
+
   <!-- Critical Anti-FOUC (Prevents uncompiled AngularJS templates & modal popups flashing on initial paint) -->
   <style>
     [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
@@ -81,14 +102,16 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <!-- App Styles (Version-tagged for instant OTA cache refresh) -->
-  <link rel="stylesheet" href="css/style.css?v=1.2.4" />
-  <link rel="stylesheet" href="css/navbar.css?v=1.2.4" />
-  <link rel="stylesheet" href="css/home.css?v=1.2.0" />
-  <link rel="stylesheet" href="css/movie.css?v=1.2.1" />
-  <link rel="stylesheet" href="css/search.css?v=1.2.0" />
-  <link rel="stylesheet" href="css/catalog.css?v=1.2.0" />
-  <link rel="stylesheet" href="css/responsive.css?v=1.2.0" />
-  <link rel="stylesheet" href="css/movie-match.css?v=1.2.0">
+  <link rel="stylesheet" href="css/style.css?v=1.3.0" />
+  <link rel="stylesheet" href="css/navbar.css?v=1.3.0" />
+  <link rel="stylesheet" href="css/home.css?v=1.3.0" />
+  <link rel="stylesheet" href="css/movie.css?v=1.3.0" />
+  <link rel="stylesheet" href="css/search.css?v=1.3.0" />
+  <link rel="stylesheet" href="css/catalog.css?v=1.3.0" />
+  <link rel="stylesheet" href="css/responsive.css?v=1.3.0" />
+  <link rel="stylesheet" href="css/movie-match.css?v=1.3.0">
+  <link rel="stylesheet" href="css/music.css?v=1.3.0">
+  <link rel="stylesheet" href="css/sports.css?v=1.3.0">
 
   <!-- High-Definition CinVerse Favicon & App Icons (No red icon) -->
   <link rel="icon" type="image/png" sizes="64x64" href="assets/icons/favicon.png?v=2" />
@@ -126,8 +149,8 @@
         <div class="update-banner-left">
           <div class="update-icon-pulse"><i class="fa-solid fa-cloud-arrow-down"></i></div>
           <div class="update-text">
-            <strong>CinVerse v1.1.0 Update Available!</strong>
-            <span>Direct 1080p stream extractor, multi-audio tools &amp; 5 cloud mirrors.</span>
+            <strong>CinVerse v1.3.0 Live Sports &amp; CREX Hub!</strong>
+            <span>CREX Cricket Match Center, 2026 ICC calendar engine, Live Web Scraper, and music dock.</span>
           </div>
         </div>
         <div class="update-banner-actions">
@@ -152,39 +175,74 @@
         <!-- Nav Links (FLIQ TV Floating Pill Nav & Mobile Drawer) -->
         <nav class="navbar-links" ng-class="{'nav-open': navCtrl.menuOpen}">
           <a href="#!/home" class="nav-link" ng-click="navCtrl.navTo('/home')" ng-class="{'active': navCtrl.isActive('/home')}">
-            <i class="fa-solid fa-house"></i> Home
-          </a>
-          <a href="#!/search" class="nav-link nav-link-search" ng-click="navCtrl.navTo('/search')" ng-class="{'active': navCtrl.isActive('/search')}">
-            <i class="fa-solid fa-magnifying-glass"></i> Search
+            <i class="fa-solid fa-house"></i> <span>Home</span>
           </a>
           <a href="#!/shows" class="nav-link" ng-click="navCtrl.navTo('/shows')" ng-class="{'active': navCtrl.isActive('/shows')}">
-            <i class="fa-solid fa-tv"></i> TV Shows
+            <i class="fa-solid fa-tv"></i> <span>TV Shows</span>
           </a>
           <a href="#!/anime" class="nav-link" ng-click="navCtrl.navTo('/anime')" ng-class="{'active': navCtrl.isActive('/anime')}">
-            <i class="fa-solid fa-wand-magic-sparkles"></i> Anime
+            <i class="fa-solid fa-wand-magic-sparkles"></i> <span>Anime</span>
           </a>
-          <a href="#!/kdrama" class="nav-link" ng-click="navCtrl.navTo('/kdrama')" ng-class="{'active': navCtrl.isActive('/kdrama')}">
-            <i class="fa-solid fa-heart-pulse"></i> K-Drama
+          <a href="#!/music" class="nav-link nav-link-music" ng-click="navCtrl.navTo('/music')" ng-class="{'active': navCtrl.isActive('/music')}" title="Cinverse Music (Spotify Style)">
+            <i class="fa-solid fa-music"></i> <span>Music</span>
           </a>
-          <a href="#!/home#trending" class="nav-link" ng-click="navCtrl.navTo('/home#trending')">
-            <i class="fa-solid fa-fire"></i> Trending
+          <a href="#!/sports" class="nav-link nav-link-sports" ng-click="navCtrl.navTo('/sports')" ng-class="{'active': navCtrl.isActive('/sports')}" title="Live Sports & Matches">
+            <i class="fa-solid fa-satellite-dish"></i> <span>Live Sports</span>
           </a>
-          <a href="#!/ott/netflix" class="nav-link" ng-click="navCtrl.navTo('/ott/netflix')" ng-class="{'active': navCtrl.isActive('/ott')}">
-            <i class="fa-solid fa-layer-group"></i> OTT Hub
+
+          <!-- Desktop 'More' Dropdown Capsule -->
+          <div class="nav-dropdown-wrapper" ng-class="{'open': navCtrl.moreDropdownOpen}">
+            <button type="button" class="nav-link nav-dropdown-btn" ng-click="navCtrl.toggleMoreDropdown($event)" aria-expanded="{{navCtrl.moreDropdownOpen}}" title="More Categories">
+              <span>More</span> <i class="fa-solid fa-chevron-down dropdown-caret" ng-class="{'rotate-up': navCtrl.moreDropdownOpen}"></i>
+            </button>
+            <div class="nav-dropdown-flyout" ng-if="navCtrl.moreDropdownOpen">
+              <a href="#!/kdrama" class="dropdown-flyout-item" ng-click="navCtrl.navTo('/kdrama')" ng-class="{'active': navCtrl.isActive('/kdrama')}">
+                <i class="fa-solid fa-heart-pulse"></i> <span>K-Drama</span>
+              </a>
+              <a href="#!/home#trending" class="dropdown-flyout-item" ng-click="navCtrl.navTo('/home#trending')">
+                <i class="fa-solid fa-fire"></i> <span>Trending</span>
+              </a>
+              <a href="#!/ott/netflix" class="dropdown-flyout-item" ng-click="navCtrl.navTo('/ott/netflix')" ng-class="{'active': navCtrl.isActive('/ott')}">
+                <i class="fa-solid fa-layer-group"></i> <span>OTT Hub</span>
+              </a>
+              <a href="#!/franchise/marvel" class="dropdown-flyout-item" ng-click="navCtrl.navTo('/franchise/marvel')" ng-class="{'active': navCtrl.isActive('/franchise')}">
+                <i class="fa-solid fa-shield-halved"></i> <span>Universes</span>
+              </a>
+              <a href="#!/movie-match" class="dropdown-flyout-item" ng-click="navCtrl.navTo('/movie-match')" ng-class="{'active': navCtrl.isActive('/movie-match')}">
+                <i class="fa-solid fa-shuffle"></i> <span>Match</span>
+              </a>
+              <a href="#!/favorites" class="dropdown-flyout-item" ng-click="navCtrl.navTo('/favorites')" ng-class="{'active': navCtrl.isActive('/favorites')}">
+                <i class="fa-solid fa-heart"></i> <span>Favorites</span>
+              </a>
+              <a href="#!/watchlist" class="dropdown-flyout-item" ng-click="navCtrl.navTo('/watchlist')" ng-class="{'active': navCtrl.isActive('/watchlist')}">
+                <i class="fa-solid fa-bookmark"></i> <span>Watchlist</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Mobile-only secondary links (expanded directly in mobile drawer) -->
+          <a href="#!/kdrama" class="nav-link mobile-only-link" ng-click="navCtrl.navTo('/kdrama')" ng-class="{'active': navCtrl.isActive('/kdrama')}">
+            <i class="fa-solid fa-heart-pulse"></i> <span>K-Drama</span>
           </a>
-          <a href="#!/franchise/marvel" class="nav-link" ng-click="navCtrl.navTo('/franchise/marvel')" ng-class="{'active': navCtrl.isActive('/franchise')}">
-            <i class="fa-solid fa-shield-halved"></i> Universes
+          <a href="#!/home#trending" class="nav-link mobile-only-link" ng-click="navCtrl.navTo('/home#trending')">
+            <i class="fa-solid fa-fire"></i> <span>Trending</span>
           </a>
-          <a href="#!/movie-match" class="nav-link" ng-click="navCtrl.navTo('/movie-match')" ng-class="{'active': navCtrl.isActive('/movie-match')}">
-            <i class="fa-solid fa-shuffle"></i> Match
+          <a href="#!/ott/netflix" class="nav-link mobile-only-link" ng-click="navCtrl.navTo('/ott/netflix')" ng-class="{'active': navCtrl.isActive('/ott')}">
+            <i class="fa-solid fa-layer-group"></i> <span>OTT Hub</span>
           </a>
-          <a href="#!/favorites" class="nav-link" ng-click="navCtrl.navTo('/favorites')" ng-class="{'active': navCtrl.isActive('/favorites')}"
+          <a href="#!/franchise/marvel" class="nav-link mobile-only-link" ng-click="navCtrl.navTo('/franchise/marvel')" ng-class="{'active': navCtrl.isActive('/franchise')}">
+            <i class="fa-solid fa-shield-halved"></i> <span>Universes</span>
+          </a>
+          <a href="#!/movie-match" class="nav-link mobile-only-link" ng-click="navCtrl.navTo('/movie-match')" ng-class="{'active': navCtrl.isActive('/movie-match')}">
+            <i class="fa-solid fa-shuffle"></i> <span>Match</span>
+          </a>
+          <a href="#!/favorites" class="nav-link mobile-only-link" ng-click="navCtrl.navTo('/favorites')" ng-class="{'active': navCtrl.isActive('/favorites')}"
             title="Favorites">
-            <i class="fa-solid fa-heart"></i> Favorites
+            <i class="fa-solid fa-heart"></i> <span>Favorites</span>
           </a>
-          <a href="#!/watchlist" class="nav-link" ng-click="navCtrl.navTo('/watchlist')" ng-class="{'active': navCtrl.isActive('/watchlist')}"
+          <a href="#!/watchlist" class="nav-link mobile-only-link" ng-click="navCtrl.navTo('/watchlist')" ng-class="{'active': navCtrl.isActive('/watchlist')}"
             title="Watchlist">
-            <i class="fa-solid fa-bookmark"></i> Watchlist
+            <i class="fa-solid fa-bookmark"></i> <span>Watchlist</span>
           </a>
           <!-- Mobile Drawer Item for App (Only shown inside drawer on mobile) -->
           <a href="javascript:void(0)" class="nav-link nav-link-app-drawer" ng-click="navCtrl.openAppDownloadModal(); navCtrl.closeMenu()" title="Download CinVerse Android App (APK)">
@@ -195,7 +253,7 @@
 
         <!-- Right Group: Search Pill + Profile (FLIQ style) -->
         <div class="navbar-right-group">
-          <!-- Single App Pill Button between Menu Navbar and Search -->
+          <!-- Single App Pill Button between Menu Navbar and Search (Hidden on Desktop) -->
           <button type="button" class="navbar-app-pill-btn" ng-click="navCtrl.openAppDownloadModal()" title="Download CinVerse Android App (APK)">
             <i class="fa-brands fa-android"></i>
             <span class="app-pill-text">Get App</span>
@@ -275,12 +333,19 @@
               <i class="fa-solid fa-chevron-down user-pill-caret"></i>
             </div>
 
-            <!-- Signed Out: Sign In Button -->
-            <button type="button" class="btn-signin" ng-if="!navCtrl.currentUser" ng-click="navCtrl.openAuthModal('login')"
-              title="Sign In to CinVerse" aria-label="Sign In">
-              <i class="fa-solid fa-user"></i>
-              <span class="signin-text">Sign In</span>
-            </button>
+            <!-- Signed Out: Sign In & Sign Up Button Group -->
+            <div class="navbar-auth-buttons" ng-if="!navCtrl.currentUser">
+              <button type="button" class="btn-signin" ng-click="navCtrl.openAuthModal('login')"
+                title="Sign In to CinVerse" aria-label="Sign In">
+                <i class="fa-solid fa-user"></i>
+                <span class="signin-text">Sign In</span>
+              </button>
+              <button type="button" class="btn-signup-pill" ng-click="navCtrl.openAuthModal('register')"
+                title="Create a free CinVerse account" aria-label="Sign Up">
+                <i class="fa-solid fa-sparkles"></i>
+                <span class="signup-text">Sign Up</span>
+              </button>
+            </div>
 
             <!-- Profile Dropdown Menu -->
             <div class="user-dropdown-menu" ng-if="navCtrl.userDropdownOpen && navCtrl.currentUser">
@@ -476,8 +541,11 @@
       <a href="#!/shows" class="dock-item" ng-class="{'active': navCtrl.isActive('/shows')}" title="TV Shows & Movies">
         <i class="fa-solid fa-clapperboard"></i>
       </a>
-      <a href="#!/watchlist" class="dock-item" ng-class="{'active': navCtrl.isActive('/watchlist')}" title="Watchlist">
-        <i class="fa-solid fa-bookmark"></i>
+      <a href="#!/music" class="dock-item" ng-class="{'active': navCtrl.isActive('/music')}" title="Cinverse Music (Spotify Style)">
+        <i class="fa-solid fa-music"></i>
+      </a>
+      <a href="#!/sports" class="dock-item" ng-class="{'active': navCtrl.isActive('/sports')}" title="Live Sports & Matches">
+        <i class="fa-solid fa-satellite-dish"></i>
       </a>
       <a href="#!/search" class="dock-item" ng-class="{'active': navCtrl.isActive('/search')}" title="Search">
         <i class="fa-solid fa-magnifying-glass"></i>
@@ -677,7 +745,7 @@
           <!-- Live Network Status Pill -->
           <div class="footer-status-pill">
             <span class="status-dot"></span>
-            <span class="status-text">5 Cloud Mirrors Online &bull; Ad-Shield Active</span>
+            <span class="status-text">3 Powerhouse Cloud Mirrors Online &bull; Ad-Shield Active</span>
           </div>
 
           <!-- Official Android App Download Card -->
@@ -820,6 +888,67 @@
   </footer>
 
   <!-- ============================= -->
+  <!-- PERSISTENT GLOBAL MUSIC DOCK -->
+  <!-- ============================= -->
+  <div class="cinverse-music-dock" ng-controller="MusicDockController as dockCtrl" ng-if="dockCtrl.music.currentTrack" ng-cloak>
+    <!-- Left: Track Meta -->
+    <div class="dock-track-info">
+      <div class="dock-thumb-wrap">
+        <img ng-src="{{ dockCtrl.music.currentTrack.cover }}" alt="{{ dockCtrl.music.currentTrack.title }}" class="dock-thumb" />
+      </div>
+      <div class="dock-meta">
+        <h4 class="dock-title">{{ dockCtrl.music.currentTrack.title }}</h4>
+        <span class="dock-artist">{{ dockCtrl.music.currentTrack.artist }}</span>
+      </div>
+    </div>
+
+    <!-- Center: Playback Controls & Scrubber -->
+    <div class="dock-controls-center">
+      <div class="dock-buttons-row">
+        <button type="button" class="btn-dock-control" ng-class="{'active': dockCtrl.music.shuffleMode}" ng-click="dockCtrl.music.toggleShuffle()" title="Shuffle">
+          <i class="fa-solid fa-shuffle"></i>
+        </button>
+        <button type="button" class="btn-dock-control" ng-click="dockCtrl.music.prevTrack()" title="Previous Track">
+          <i class="fa-solid fa-backward-step"></i>
+        </button>
+        <button type="button" class="btn-dock-control btn-dock-play" ng-click="dockCtrl.music.togglePlay()" title="{{ dockCtrl.music.isPlaying ? 'Pause' : 'Play' }}">
+          <i class="fa-solid" ng-class="dockCtrl.music.isPlaying ? 'fa-pause' : 'fa-play'"></i>
+        </button>
+        <button type="button" class="btn-dock-control" ng-click="dockCtrl.music.nextTrack()" title="Next Track">
+          <i class="fa-solid fa-forward-step"></i>
+        </button>
+        <button type="button" class="btn-dock-control" ng-class="{'active': dockCtrl.music.repeatMode}" ng-click="dockCtrl.music.toggleRepeat()" title="Repeat">
+          <i class="fa-solid fa-repeat"></i>
+        </button>
+      </div>
+
+      <div class="dock-scrubber-row">
+        <span class="dock-time">{{ dockCtrl.music.formatTime(dockCtrl.music.currentTime) }}</span>
+        <div class="dock-progress-track" ng-click="dockCtrl.onScrubClick($event)">
+          <div class="dock-progress-fill" ng-style="{ width: dockCtrl.music.progressPct + '%' }"></div>
+        </div>
+        <span class="dock-time">{{ dockCtrl.music.formatTime(dockCtrl.music.duration) }}</span>
+      </div>
+    </div>
+
+    <!-- Right: Volume & Expand -->
+    <div class="dock-tools-right">
+      <div class="dock-vol-wrap">
+        <button type="button" class="btn-dock-vol" ng-click="dockCtrl.music.toggleMute()" title="Mute/Unmute">
+          <i class="fa-solid" ng-class="dockCtrl.music.isMuted || dockCtrl.music.volume === 0 ? 'fa-volume-xmark' : (dockCtrl.music.volume < 50 ? 'fa-volume-low' : 'fa-volume-high')"></i>
+        </button>
+        <input type="range" min="0" max="100" class="dock-vol-slider" ng-model="dockCtrl.music.volume" ng-change="dockCtrl.music.setVolume(dockCtrl.music.volume)" />
+      </div>
+      <a href="#!/music" class="btn-dock-expand" title="Open Full Music Dashboard">
+        <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
+      </a>
+      <button type="button" class="btn-dock-close" ng-click="dockCtrl.music.closePlayer()" title="Close Player">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================= -->
   <!-- SCRIPTS -->
   <!-- ============================= -->
 
@@ -833,30 +962,38 @@
   <!-- Core Video Streaming Engines (Native HTML5 + HLS.js + Artplayer) -->
   <script src="js/lib/hls.min.js?v=1.2.0"></script>
   <script src="js/lib/artplayer.js?v=1.2.0"></script>
+  <!-- YouTube IFrame Audio Engine (Full-Length Music Tracks & Global Hits) -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <div id="cinverse-yt-audio-player" style="position:fixed; bottom:-9999px; left:-9999px; width:200px; height:200px; opacity:0; pointer-events:none; z-index:-1;"></div>
 
   <!-- App Core (Version-tagged for instant OTA updates) -->
-  <script src="app.js?v=1.2.6"></script>
-  <script src="routes.js?v=1.2.6"></script>
-  <script src="js/templates.js?v=1.2.6"></script>
+  <script src="app.js?v=1.3.0"></script>
+  <script src="routes.js?v=1.3.0"></script>
+  <script src="js/templates.js?v=1.3.0"></script>
 
   <!-- Services -->
-  <script src="js/services/movieService.js?v=1.2.6"></script>
-  <script src="js/services/storageService.js?v=1.2.6"></script>
-  <script src="js/services/playerService.js?v=1.2.6"></script>
-  <script src="js/services/streamBridgeService.js?v=1.2.6"></script>
+  <script src="js/services/movieService.js?v=1.3.0"></script>
+  <script src="js/services/storageService.js?v=1.3.0"></script>
+  <script src="js/services/playerService.js?v=1.3.0"></script>
+  <script src="js/services/streamBridgeService.js?v=1.3.0"></script>
+  <script src="js/services/musicService.js?v=1.3.0"></script>
+  <script src="js/services/sportsService.js?v=1.3.0"></script>
 
   <!-- Directives -->
-  <script src="js/directives/movieCard.js?v=1.2.6"></script>
+  <script src="js/directives/movieCard.js?v=1.3.0"></script>
 
   <!-- Controllers -->
-  <script src="js/controllers/homeController.js?v=1.2.6"></script>
-  <script src="js/controllers/movieController.js?v=1.2.6"></script>
-  <script src="js/controllers/tvController.js?v=1.2.6"></script>
-  <script src="js/controllers/catalogController.js?v=1.2.6"></script>
-  <script src="js/controllers/searchController.js?v=1.2.6"></script>
-  <script src="js/controllers/favoriteController.js?v=1.2.6"></script>
-  <script src="js/controllers/watchlistController.js?v=1.2.6"></script>
-  <script src="js/controllers/movieMatchController.js?v=1.2.6"></script>
+  <script src="js/controllers/homeController.js?v=1.3.0"></script>
+  <script src="js/controllers/movieController.js?v=1.3.0"></script>
+  <script src="js/controllers/tvController.js?v=1.3.0"></script>
+  <script src="js/controllers/catalogController.js?v=1.3.0"></script>
+  <script src="js/controllers/searchController.js?v=1.3.0"></script>
+  <script src="js/controllers/favoriteController.js?v=1.3.0"></script>
+  <script src="js/controllers/watchlistController.js?v=1.3.0"></script>
+  <script src="js/controllers/movieMatchController.js?v=1.3.0"></script>
+  <script src="js/controllers/musicController.js?v=1.3.0"></script>
+  <script src="js/controllers/sportsController.js?v=1.3.0"></script>
+  <script src="js/controllers/musicDockController.js?v=1.3.0"></script>
 
 </body>
 

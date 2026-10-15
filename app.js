@@ -90,6 +90,18 @@
       vm.showSuggestions = false;
       vm.isLoadingSuggestions = false;
       vm.mobileSearchOpen = false;
+      vm.moreDropdownOpen = false;
+
+      vm.toggleMoreDropdown = function ($event) {
+        if ($event) {
+          $event.stopPropagation();
+        }
+        vm.moreDropdownOpen = !vm.moreDropdownOpen;
+      };
+
+      vm.closeMoreDropdown = function () {
+        vm.moreDropdownOpen = false;
+      };
 
       var searchTimer = null;
 
@@ -301,6 +313,7 @@
             $location.url(clean);
           }
         }
+        vm.moreDropdownOpen = false;
         $timeout(function () {
           vm.menuOpen = false;
         }, 100);
@@ -315,6 +328,7 @@
         vm.menuOpen = false;
         vm.mobileSearchOpen = false;
         vm.showSuggestions = false;
+        vm.moreDropdownOpen = false;
         $location.path('/search').search({ q: query });
       };
 
@@ -410,6 +424,25 @@
         vm.showSuggestions = false;
         vm.userDropdownOpen = false;
         vm.showAppModal = false;
+        vm.moreDropdownOpen = false;
+      });
+
+      // Close dropdowns on outside document click
+      angular.element($window).on('click', function (e) {
+        if (vm.moreDropdownOpen) {
+          var inside = e.target.closest && e.target.closest('.nav-dropdown-wrapper');
+          if (!inside) {
+            vm.moreDropdownOpen = false;
+            $rootScope.$applyAsync();
+          }
+        }
+        if (vm.userDropdownOpen) {
+          var insideUser = e.target.closest && (e.target.closest('.navbar-user-area') || e.target.closest('.user-dropdown-menu'));
+          if (!insideUser) {
+            vm.userDropdownOpen = false;
+            $rootScope.$applyAsync();
+          }
+        }
       });
 
       vm.isActive = function (path) {
@@ -459,6 +492,7 @@
       };
     }
   ]);
+
 
   /* ------------------------------------------------------------
      6. FOOTER ACCORDION SYNC (DESKTOP OPEN / MOBILE COMPACT)

@@ -9,6 +9,8 @@ const templates = {
   'views/watchlist.html': fs.readFileSync('views/watchlist.html', 'utf8'),
   'views/catalog.html': fs.readFileSync('views/catalog.html', 'utf8'),
   'views/tv.html': fs.readFileSync('views/tv.html', 'utf8'),
+  'views/music.html': fs.readFileSync('views/music.html', 'utf8'),
+  'views/sports.html': fs.readFileSync('views/sports.html', 'utf8'),
   'views/partials/movie-card.html': fs.readFileSync('views/partials/movie-card.html', 'utf8')
 };
 

@@ -1,5 +1,5 @@
 /* ============================================================
-   CinVerse - routes.js
+   Cinverse - routes.js
    Client-side routing configuration using ngRoute.
    Maps every URL path to a view template + controller.
    ============================================================ */
@@ -92,14 +92,30 @@
           controllerAs: 'watchCtrl'
         })
 
+        // ---------------- CINVERSE MUSIC (SPOTIFY STYLE) ----------------
+        .when('/music', {
+          templateUrl: 'views/music.html',
+          controller: 'MusicController',
+          controllerAs: 'musicCtrl'
+        })
+
+        // ---------------- CINVERSE LIVE SPORTS (FANCODE STYLE) ----------------
+        .when('/sports', {
+          templateUrl: 'views/sports.html',
+          controller: 'SportsController',
+          controllerAs: 'sportsCtrl'
+        })
+
+        // ---------------- MOVIE MATCH ----------------
+        .when('/movie-match', {
+          templateUrl: 'views/movie-match.html',
+          controller: 'MovieMatchController',
+          controllerAs: 'vm'
+        })
+
         // ---------------- 404 NOT FOUND ----------------
         .when('/404', {
           templateUrl: 'views/notfound.html'
-        })
-        .when("/movie-match", {
-          templateUrl: "views/movie-match.html",
-          controller: "MovieMatchController",
-          controllerAs: "vm"
         })
 
         // ---------------- DEFAULT / FALLBACK ----------------

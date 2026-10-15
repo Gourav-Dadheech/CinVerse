@@ -1,0 +1,932 @@
+<!-- ============================================================
+     VIEW: sports.html
+     CinVerse Cricket Exchange • CREX, Cricbuzz & ESPNcricinfo Style Hub
+     Features:
+       - Match Status Filters: ALL, LIVE (🔴), UPCOMING (🟢), COMPLETED (⚪)
+       - Format Filters: All Formats, International, T20 Leagues (IPL), Domestic
+       - Dynamic Live Cards Carousel with Live Equations & Win Predictors
+       - Full CREX Match Center:
+           1. Live & Overview (Win Predictor, At-The-Crease mini-scorecard, Over tracker, Pitch & Weather)
+           2. Detailed Scorecard (Innings switcher, Batting, Bowling, Extras, Fall of Wickets)
+           3. Ball-by-Ball Commentary (Filters for all balls, wickets, boundaries)
+           4. Squads & Playing XI (Captains, Wicketkeepers, Roles & Bench)
+           5. Tournament Standings (ICC World Test Championship & IPL 2026 Tables)
+       - Cricket News & Editorial Station with Full Story Modal
+     ============================================================ -->
+<div class="crex-sports-page">
+
+  <!-- ================= TOP CREX HEADER & STATUS BAR ================= -->
+  <header class="crex-top-header">
+    <div class="crex-brand-row">
+      <div class="crex-brand-badge">
+        <div class="crex-pulse-ball">
+          <i class="fa-solid fa-baseball-bat-ball"></i>
+        </div>
+        <div class="crex-brand-titles">
+          <span class="crex-sub-label">CINVERSE CRICKET EXCHANGE</span>
+          <h1 class="crex-main-title">Live Cricket Match Center</h1>
+        </div>
+      </div>
+
+      <div class="crex-header-badges-group">
+        <div class="crex-calendar-pill">
+          <i class="fa-regular fa-calendar-check text-cyan"></i>
+          <span>{{ sportsCtrl.todayFormatted }}</span>
+        </div>
+        <div class="crex-scraper-pill" ng-if="sportsCtrl.backendScraperActive">
+          <span class="scraper-dot"></span>
+          <span>LIVE WEB SCRAPER ACTIVE</span>
+        </div>
+        <div class="crex-live-badge-glow">
+          <span class="pulse-indicator-dot"></span>
+          <span>AUTO-CALENDAR SYNC</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status Tabs: ALL, LIVE, UPCOMING, COMPLETED -->
+    <div class="crex-status-ribbon">
+      <div class="status-pills-wrap">
+        <button type="button"
+                class="status-pill-btn"
+                ng-class="{'active': sportsCtrl.statusFilter === 'all'}"
+                ng-click="sportsCtrl.setStatusFilter('all')">
+          <span>All Matches</span>
+          <span class="pill-count">{{ sportsCtrl.getMatchCount('all') }}</span>
+        </button>
+
+        <button type="button"
+                class="status-pill-btn pill-live"
+                ng-class="{'active': sportsCtrl.statusFilter === 'LIVE'}"
+                ng-click="sportsCtrl.setStatusFilter('LIVE')">
+          <span class="live-dot-mini"></span>
+          <span>Live</span>
+          <span class="pill-count count-live">{{ sportsCtrl.getMatchCount('LIVE') }}</span>
+        </button>
+
+        <button type="button"
+                class="status-pill-btn pill-upcoming"
+                ng-class="{'active': sportsCtrl.statusFilter === 'UPCOMING'}"
+                ng-click="sportsCtrl.setStatusFilter('UPCOMING')">
+          <i class="fa-regular fa-clock"></i>
+          <span>Upcoming</span>
+          <span class="pill-count">{{ sportsCtrl.getMatchCount('UPCOMING') }}</span>
+        </button>
+
+        <button type="button"
+                class="status-pill-btn pill-completed"
+                ng-class="{'active': sportsCtrl.statusFilter === 'COMPLETED'}"
+                ng-click="sportsCtrl.setStatusFilter('COMPLETED')">
+          <i class="fa-solid fa-circle-check"></i>
+          <span>Completed</span>
+          <span class="pill-count">{{ sportsCtrl.getMatchCount('COMPLETED') }}</span>
+        </button>
+      </div>
+
+      <!-- Format Filter Chips -->
+      <div class="format-chips-wrap">
+        <button type="button"
+                class="format-chip-btn"
+                ng-class="{'active': sportsCtrl.formatFilter === 'all' && sportsCtrl.categoryFilter === 'all'}"
+                ng-click="sportsCtrl.setFormatFilter('all'); sportsCtrl.setCategoryFilter('all')">
+          All Formats
+        </button>
+        <button type="button"
+                class="format-chip-btn"
+                ng-class="{'active': sportsCtrl.categoryFilter === 'international'}"
+                ng-click="sportsCtrl.setCategoryFilter('international')">
+          International
+        </button>
+        <button type="button"
+                class="format-chip-btn"
+                ng-class="{'active': sportsCtrl.categoryFilter === 'league'}"
+                ng-click="sportsCtrl.setCategoryFilter('league')">
+          T20 Leagues (IPL)
+        </button>
+        <button type="button"
+                class="format-chip-btn"
+                ng-class="{'active': sportsCtrl.categoryFilter === 'domestic'}"
+                ng-click="sportsCtrl.setCategoryFilter('domestic')">
+          Domestic (Ranji)
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= CREX HORIZONTAL MATCH CARDS STRIP ================= -->
+  <section class="crex-matches-strip-section">
+    <div class="strip-header-row">
+      <div class="strip-title-group">
+        <h3 class="strip-title">
+          <i class="fa-solid fa-trophy text-amber"></i>
+          <span>Featured Matches & Live Tournaments</span>
+        </h3>
+        <span class="strip-hint">Tap any match card to open the CREX Match Center</span>
+      </div>
+      <div class="strip-carousel-nav">
+        <button type="button" class="btn-strip-scroll" onclick="document.querySelector('.crex-cards-carousel').scrollBy({left: -330, behavior: 'smooth'})" title="Previous Matches">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <button type="button" class="btn-strip-scroll" onclick="document.querySelector('.crex-cards-carousel').scrollBy({left: 330, behavior: 'smooth'})" title="Next Matches">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="crex-cards-carousel">
+      <div class="crex-match-card"
+           ng-repeat="match in sportsCtrl.getFilteredMatches() track by match.id"
+           ng-class="{'active-card': sportsCtrl.activeMatch.id === match.id, 'card-live': match.status === 'LIVE'}"
+           ng-click="sportsCtrl.selectMatch(match)">
+
+        <!-- Card Header: Tournament & Status -->
+        <div class="card-meta-header">
+          <span class="card-format-tag">{{ match.format }}</span>
+          <span class="card-tournament-name" title="{{ match.tournament }}">{{ match.tournament }}</span>
+          <span class="card-status-pill"
+                ng-class="{'pill-red': match.status === 'LIVE', 'pill-green': match.status === 'UPCOMING', 'pill-gray': match.status === 'COMPLETED'}">
+            <span class="live-dot-ping" ng-if="match.status === 'LIVE'"></span>
+            {{ match.statusTag }}
+          </span>
+        </div>
+
+        <!-- Card Scoreboard Row -->
+        <div class="card-clash-body">
+          <!-- Team A -->
+          <div class="card-team-row">
+            <div class="team-identity">
+              <span class="team-flag-icon">{{ match.teamA.flag }}</span>
+              <span class="team-name-code">{{ match.teamA.name }}</span>
+            </div>
+            <div class="team-score-val">
+              <span class="runs-highlight">{{ match.teamA.score }}</span>
+              <span class="overs-sub" ng-if="match.teamA.overs">({{ match.teamA.overs }})</span>
+            </div>
+          </div>
+
+          <!-- Team B -->
+          <div class="card-team-row">
+            <div class="team-identity">
+              <span class="team-flag-icon">{{ match.teamB.flag }}</span>
+              <span class="team-name-code">{{ match.teamB.name }}</span>
+            </div>
+            <div class="team-score-val">
+              <span class="runs-highlight">{{ match.teamB.score }}</span>
+              <span class="overs-sub" ng-if="match.teamB.overs">({{ match.teamB.overs }})</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card Footer: Equation & Win Predictor -->
+        <div class="card-footer-equation">
+          <p class="equation-text" title="{{ match.equation }}">{{ match.equation }}</p>
+          <div class="card-bottom-actions-row">
+            <div class="card-win-pill" ng-if="match.winPredictor">
+              <span class="pred-label">Win:</span>
+              <span class="pred-item">{{ match.winPredictor.teamACode }} {{ match.winPredictor.teamAPct }}%</span>
+              <span class="pred-sep">•</span>
+              <span class="pred-item">{{ match.winPredictor.teamBCode }} {{ match.winPredictor.teamBPct }}%</span>
+            </div>
+            <button type="button"
+                    class="btn-card-watch-live"
+                    ng-click="sportsCtrl.watchMatchLive(match); $event.stopPropagation()">
+              <i class="fa-solid fa-circle-play"></i>
+              <span>Watch Live</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CREX MASTER MATCH CENTER HUB ================= -->
+  <main class="crex-match-center-container" id="crex-match-center-hub" ng-if="sportsCtrl.activeMatch">
+
+    <!-- 1. Hero Scoreboard & Live Win Predictor Banner -->
+    <div class="crex-hero-scoreboard-banner">
+      <div class="scoreboard-ambient-glow"></div>
+
+      <!-- Top Tournament & Venue Info -->
+      <div class="scoreboard-top-row">
+        <div class="tournament-info-pill">
+          <i class="fa-solid fa-trophy text-amber"></i>
+          <span>{{ sportsCtrl.activeMatch.tournament }}</span>
+        </div>
+        <div class="venue-info-pill">
+          <i class="fa-solid fa-location-dot text-rose"></i>
+          <span>{{ sportsCtrl.activeMatch.venue }}</span>
+        </div>
+        <div class="date-info-pill" ng-if="sportsCtrl.activeMatch.dateLabel">
+          <i class="fa-regular fa-clock text-cyan"></i>
+          <span>{{ sportsCtrl.activeMatch.dateLabel }}</span>
+        </div>
+        <div class="status-live-chip"
+             ng-class="{'chip-live': sportsCtrl.activeMatch.status === 'LIVE', 'chip-upcoming': sportsCtrl.activeMatch.status === 'UPCOMING', 'chip-done': sportsCtrl.activeMatch.status === 'COMPLETED'}">
+          <span class="live-dot-ping" ng-if="sportsCtrl.activeMatch.status === 'LIVE'"></span>
+          <span>{{ sportsCtrl.activeMatch.statusTag }}</span>
+        </div>
+      </div>
+
+      <!-- Main Clash Display -->
+      <div class="scoreboard-main-clash">
+        <!-- Team A -->
+        <div class="clash-side team-a">
+          <div class="team-emblem-wrap">{{ sportsCtrl.activeMatch.teamA.flag }}</div>
+          <div class="team-details">
+            <h2 class="team-title-h2">{{ sportsCtrl.activeMatch.teamA.name }}</h2>
+            <div class="team-runs-display">
+              <span class="runs-large">{{ sportsCtrl.activeMatch.teamA.score }}</span>
+              <span class="overs-badge" ng-if="sportsCtrl.activeMatch.teamA.overs">({{ sportsCtrl.activeMatch.teamA.overs }})</span>
+            </div>
+            <span class="crr-tag" ng-if="sportsCtrl.activeMatch.teamA.crr">CRR: {{ sportsCtrl.activeMatch.teamA.crr }}</span>
+          </div>
+        </div>
+
+        <!-- Center VS / Equation -->
+        <div class="clash-center-nexus">
+          <span class="nexus-vs-badge">VS</span>
+          <div class="nexus-equation-box">
+            <span class="equation-lead">{{ sportsCtrl.activeMatch.equation }}</span>
+            <span class="toss-lead" ng-if="sportsCtrl.activeMatch.toss"><i class="fa-solid fa-coins text-amber"></i> {{ sportsCtrl.activeMatch.toss }}</span>
+          </div>
+        </div>
+
+        <!-- Team B -->
+        <div class="clash-side team-b">
+          <div class="team-details text-right">
+            <h2 class="team-title-h2">{{ sportsCtrl.activeMatch.teamB.name }}</h2>
+            <div class="team-runs-display">
+              <span class="runs-large">{{ sportsCtrl.activeMatch.teamB.score }}</span>
+              <span class="overs-badge" ng-if="sportsCtrl.activeMatch.teamB.overs">({{ sportsCtrl.activeMatch.teamB.overs }})</span>
+            </div>
+            <span class="crr-tag" ng-if="sportsCtrl.activeMatch.teamB.crr">CRR: {{ sportsCtrl.activeMatch.teamB.crr }}</span>
+          </div>
+          <div class="team-emblem-wrap">{{ sportsCtrl.activeMatch.teamB.flag }}</div>
+        </div>
+      </div>
+
+      <!-- CREX Live Win Predictor Meter -->
+      <div class="crex-win-predictor-meter" ng-if="sportsCtrl.activeMatch.winPredictor">
+        <div class="predictor-header">
+          <span class="pred-title"><i class="fa-solid fa-chart-line text-cyan"></i> CREX LIVE WIN PREDICTOR</span>
+          <span class="pred-trend-text">{{ sportsCtrl.activeMatch.winPredictor.trend }}</span>
+        </div>
+        <div class="predictor-bar-track">
+          <div class="pred-bar-fill team-a-bar" ng-style="{'width': sportsCtrl.activeMatch.winPredictor.teamAPct + '%'}">
+            <span class="pred-pct-text">{{ sportsCtrl.activeMatch.winPredictor.teamACode }} {{ sportsCtrl.activeMatch.winPredictor.teamAPct }}%</span>
+          </div>
+          <div class="pred-bar-fill team-b-bar" ng-style="{'width': sportsCtrl.activeMatch.winPredictor.teamBPct + '%'}">
+            <span class="pred-pct-text">{{ sportsCtrl.activeMatch.winPredictor.teamBCode }} {{ sportsCtrl.activeMatch.winPredictor.teamBPct }}%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Broadcast Quick Action Bar -->
+      <div class="scoreboard-actions-bar">
+        <button type="button"
+                class="btn-hero-watch-live"
+                ng-class="{'btn-watching-active': sportsCtrl.showLivePlayer}"
+                ng-click="sportsCtrl.toggleLivePlayer()">
+          <i class="fa-solid" ng-class="sportsCtrl.showLivePlayer ? 'fa-pause' : 'fa-circle-play'"></i>
+          <span>{{ sportsCtrl.showLivePlayer ? 'Hide Live Stream' : '📺 Watch Respective Match Live (1080p HD)' }}</span>
+        </button>
+        <span class="live-stream-badge-info" ng-if="sportsCtrl.activeMatch.streamTitle">
+          <span class="pulse-indicator-dot"></span>
+          <span>{{ sportsCtrl.activeMatch.streamTitle }}</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- ================= LIVE MATCH BROADCAST THEATER DECK ================= -->
+    <div class="crex-live-theater-deck" ng-if="sportsCtrl.showLivePlayer" id="crex-live-theater">
+      <!-- Player Top Bar with Title, Server Status, and Close -->
+      <div class="theater-top-bar">
+        <div class="theater-title-block">
+          <span class="theater-live-tag">
+            <span class="pulse-indicator-dot"></span> LIVE BROADCAST
+          </span>
+          <h3 class="theater-stream-title">{{ sportsCtrl.activeMatch.streamTitle }}</h3>
+        </div>
+        <div class="theater-controls-block">
+          <span class="theater-quality-pill">
+            <i class="fa-solid fa-bolt"></i>
+            {{ sportsCtrl.activeMatch.servers[sportsCtrl.currentServerIndex].quality || '1080p HD' }}
+          </span>
+          <button type="button" class="theater-close-btn" ng-click="sportsCtrl.toggleLivePlayer()" title="Close Live Player">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Player Viewport -->
+      <div class="theater-viewport">
+        <!-- HLS Stream Video Player -->
+        <video id="crex-live-match-video"
+               class="theater-video-element"
+               ng-show="sportsCtrl.isHlsStream"
+               controls
+               autoplay
+               playsinline>
+          Your browser does not support the video tag.
+        </video>
+
+        <!-- Iframe Embed Stream (Official Broadcast / Match Feed) -->
+        <iframe id="crex-live-match-iframe"
+                class="theater-iframe-element"
+                ng-if="!sportsCtrl.isHlsStream && sportsCtrl.trustedStreamUrl"
+                ng-src="{{ sportsCtrl.trustedStreamUrl }}"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen>
+        </iframe>
+      </div>
+
+      <!-- Multi-Server Selector Row -->
+      <div class="theater-servers-deck">
+        <div class="servers-label">
+          <i class="fa-solid fa-server text-cyan"></i>
+          <span>Respective Match Live Servers:</span>
+        </div>
+        <div class="servers-buttons-list">
+          <button type="button"
+                  class="theater-server-chip"
+                  ng-repeat="srv in sportsCtrl.activeMatch.servers track by $index"
+                  ng-class="{'active-server': sportsCtrl.currentServerIndex === $index}"
+                  ng-click="sportsCtrl.switchServer($index)">
+            <i class="fa-solid fa-satellite-dish"></i>
+            <span class="server-name-txt">{{ srv.name }}</span>
+            <span class="server-badge-fmt">{{ srv.type === 'hls' ? 'HLS' : 'EMBED' }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. CREX 5-Tab Navigation Station -->
+    <nav class="crex-tabs-nav">
+      <button type="button"
+              class="crex-tab-btn"
+              ng-class="{'active': sportsCtrl.activeMatchTab === 'live'}"
+              ng-click="sportsCtrl.setMatchTab('live')">
+        <i class="fa-solid fa-chart-pie"></i>
+        <span>Live & Overview</span>
+      </button>
+
+      <button type="button"
+              class="crex-tab-btn"
+              ng-class="{'active': sportsCtrl.activeMatchTab === 'scorecard'}"
+              ng-click="sportsCtrl.setMatchTab('scorecard')">
+        <i class="fa-solid fa-list-ol"></i>
+        <span>Full Scorecard</span>
+      </button>
+
+      <button type="button"
+              class="crex-tab-btn"
+              ng-class="{'active': sportsCtrl.activeMatchTab === 'commentary'}"
+              ng-click="sportsCtrl.setMatchTab('commentary')">
+        <i class="fa-solid fa-microphone-lines"></i>
+        <span>Ball-by-Ball Commentary</span>
+      </button>
+
+      <button type="button"
+              class="crex-tab-btn"
+              ng-class="{'active': sportsCtrl.activeMatchTab === 'squads'}"
+              ng-click="sportsCtrl.setMatchTab('squads')">
+        <i class="fa-solid fa-users"></i>
+        <span>Squads & Playing XI</span>
+      </button>
+
+      <button type="button"
+              class="crex-tab-btn"
+              ng-class="{'active': sportsCtrl.activeMatchTab === 'points'}"
+              ng-click="sportsCtrl.setMatchTab('points')">
+        <i class="fa-solid fa-table"></i>
+        <span>Points Table</span>
+      </button>
+    </nav>
+
+    <!-- 3. TAB 1: LIVE & OVERVIEW -->
+    <section class="tab-pane-content" ng-if="sportsCtrl.activeMatchTab === 'live'">
+      <div class="crex-overview-grid">
+
+        <!-- Column Left: At-The-Crease Live Mini Table & Over Timeline -->
+        <div class="overview-left-card">
+          <!-- Recent Over Timeline -->
+          <div class="recent-over-timeline" ng-if="sportsCtrl.activeMatch.currentOver">
+            <div class="over-header-row">
+              <span class="over-label"><i class="fa-solid fa-circle-dot text-amber"></i> Over {{ sportsCtrl.activeMatch.currentOver.overNum }} Tracker</span>
+              <span class="over-summary">{{ sportsCtrl.activeMatch.recentOversSummary }}</span>
+            </div>
+            <div class="over-balls-row">
+              <span class="ball-bubble"
+                    ng-repeat="b in sportsCtrl.activeMatch.currentOver.balls track by $index"
+                    ng-class="{'ball-w': b === 'W', 'ball-four': b === '4', 'ball-six': b === '6', 'ball-dot': b === '0'}">
+                {{ b }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Batter & Bowler Live Table -->
+          <div class="live-crease-table-card">
+            <h4 class="crease-card-title"><i class="fa-solid fa-person-running text-cyan"></i> Live at the Crease</h4>
+            <div class="table-responsive">
+              <table class="crex-mini-table">
+                <thead>
+                  <tr>
+                    <th>Batter</th>
+                    <th class="text-center">R</th>
+                    <th class="text-center">B</th>
+                    <th class="text-center">4s</th>
+                    <th class="text-center">6s</th>
+                    <th class="text-right">SR</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="striker-row">
+                    <td>
+                      <span class="crease-name striker-name">*{{ sportsCtrl.activeMatch.striker.name }}</span>
+                    </td>
+                    <td class="text-center font-bold text-amber">{{ sportsCtrl.activeMatch.striker.runs }}</td>
+                    <td class="text-center">{{ sportsCtrl.activeMatch.striker.balls }}</td>
+                    <td class="text-center">{{ sportsCtrl.activeMatch.striker.fours }}</td>
+                    <td class="text-center">{{ sportsCtrl.activeMatch.striker.sixes }}</td>
+                    <td class="text-right">{{ sportsCtrl.activeMatch.striker.sr }}</td>
+                  </tr>
+                  <tr class="non-striker-row">
+                    <td>
+                      <span class="crease-name">{{ sportsCtrl.activeMatch.nonStriker.name }}</span>
+                    </td>
+                    <td class="text-center font-bold text-amber">{{ sportsCtrl.activeMatch.nonStriker.runs }}</td>
+                    <td class="text-center">{{ sportsCtrl.activeMatch.nonStriker.balls }}</td>
+                    <td class="text-center">{{ sportsCtrl.activeMatch.nonStriker.fours }}</td>
+                    <td class="text-center">{{ sportsCtrl.activeMatch.nonStriker.sixes }}</td>
+                    <td class="text-right">{{ sportsCtrl.activeMatch.nonStriker.sr }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Current Bowler Table -->
+            <div class="table-responsive mt-3">
+              <table class="crex-mini-table">
+                <thead>
+                  <tr>
+                    <th>Bowler</th>
+                    <th class="text-center">O</th>
+                    <th class="text-center">M</th>
+                    <th class="text-center">R</th>
+                    <th class="text-center">W</th>
+                    <th class="text-right">Econ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="crease-name">{{ sportsCtrl.activeMatch.currentBowler.name }}</span></td>
+                    <td class="text-center">{{ sportsCtrl.activeMatch.currentBowler.overs }}</td>
+                    <td class="text-center">{{ sportsCtrl.activeMatch.currentBowler.maidens }}</td>
+                    <td class="text-center">{{ sportsCtrl.activeMatch.currentBowler.runs }}</td>
+                    <td class="text-center font-bold text-rose">{{ sportsCtrl.activeMatch.currentBowler.wickets }}</td>
+                    <td class="text-right">{{ sportsCtrl.activeMatch.currentBowler.econ }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Partnership & Last Wicket Badges -->
+            <div class="crease-meta-badges">
+              <div class="meta-pill">
+                <span class="meta-k">Partnership:</span>
+                <span class="meta-v text-emerald">{{ sportsCtrl.activeMatch.partnership }}</span>
+              </div>
+              <div class="meta-pill">
+                <span class="meta-k">Last Wicket:</span>
+                <span class="meta-v text-rose">{{ sportsCtrl.activeMatch.lastWicket }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column Right: Pitch, Weather, Umpires & Match Info -->
+        <div class="overview-right-card">
+          <div class="match-info-box">
+            <h4 class="box-title"><i class="fa-solid fa-circle-info text-amber"></i> Match Information</h4>
+
+            <div class="info-row">
+              <span class="info-k">Match</span>
+              <span class="info-v">{{ sportsCtrl.activeMatch.tournament }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-k">Venue</span>
+              <span class="info-v">{{ sportsCtrl.activeMatch.venue }}</span>
+            </div>
+            <div class="info-row" ng-if="sportsCtrl.activeMatch.toss">
+              <span class="info-k">Toss</span>
+              <span class="info-v text-amber">{{ sportsCtrl.activeMatch.toss }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-k">Pitch Report</span>
+              <span class="info-v">{{ sportsCtrl.activeMatch.pitchReport }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-k">Weather</span>
+              <span class="info-v">{{ sportsCtrl.activeMatch.weather }}</span>
+            </div>
+            <div class="info-row" ng-if="sportsCtrl.activeMatch.headToHead">
+              <span class="info-k">Head-to-Head</span>
+              <span class="info-v">Played: {{ sportsCtrl.activeMatch.headToHead.played }} • {{ sportsCtrl.activeMatch.teamA.code }} ({{ sportsCtrl.activeMatch.headToHead.teamAWon }}) - {{ sportsCtrl.activeMatch.teamB.code }} ({{ sportsCtrl.activeMatch.headToHead.teamBWon }})</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 4. TAB 2: FULL SCORECARD (CRICINFO / CRICBUZZ GRADE) -->
+    <section class="tab-pane-content" ng-if="sportsCtrl.activeMatchTab === 'scorecard'">
+      <div class="crex-scorecard-wrap" ng-if="sportsCtrl.activeMatch.innings && sportsCtrl.activeMatch.innings.length">
+
+        <!-- Innings Switcher Tabs -->
+        <div class="innings-tabs-row">
+          <button type="button"
+                  class="innings-tab-btn"
+                  ng-repeat="inn in sportsCtrl.activeMatch.innings track by inn.id"
+                  ng-class="{'active': sportsCtrl.selectedInningsIndex === $index}"
+                  ng-click="sportsCtrl.selectInnings($index)">
+            <span>{{ inn.title }}</span>
+            <span class="inn-score-chip">{{ inn.score }}</span>
+          </button>
+        </div>
+
+        <!-- Selected Innings Batting Table -->
+        <div class="scorecard-table-card">
+          <div class="card-table-header">
+            <h4 class="table-h4">Batting Scorecard • {{ sportsCtrl.activeMatch.innings[sportsCtrl.selectedInningsIndex].title }}</h4>
+            <span class="table-sub-meta">CRR: {{ sportsCtrl.activeMatch.innings[sportsCtrl.selectedInningsIndex].crr }}</span>
+          </div>
+
+          <div class="table-responsive">
+            <table class="crex-full-table">
+              <thead>
+                <tr>
+                  <th class="th-batter">Batter</th>
+                  <th class="th-dismissal">Dismissal</th>
+                  <th class="th-num">R</th>
+                  <th class="th-num">B</th>
+                  <th class="th-num">4s</th>
+                  <th class="th-num">6s</th>
+                  <th class="th-num">SR</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="bat in sportsCtrl.activeMatch.innings[sportsCtrl.selectedInningsIndex].batting track by bat.name">
+                  <td class="td-batter">
+                    <span class="batter-name">{{ bat.name }}</span>
+                  </td>
+                  <td class="td-dismissal">{{ bat.dismissal }}</td>
+                  <td class="td-num font-bold text-amber">{{ bat.runs }}</td>
+                  <td class="td-num">{{ bat.balls }}</td>
+                  <td class="td-num">{{ bat.fours }}</td>
+                  <td class="td-num">{{ bat.sixes }}</td>
+                  <td class="td-num text-cyan">{{ bat.sr }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Extras & Total Row -->
+          <div class="scorecard-totals-bar">
+            <div class="totals-pill">
+              <span class="total-k">Extras:</span>
+              <span class="total-v">{{ sportsCtrl.activeMatch.innings[sportsCtrl.selectedInningsIndex].extras }}</span>
+            </div>
+            <div class="totals-pill highlight-pill">
+              <span class="total-k">Total Score:</span>
+              <span class="total-v">{{ sportsCtrl.activeMatch.innings[sportsCtrl.selectedInningsIndex].total }}</span>
+            </div>
+          </div>
+
+          <!-- Fall of Wickets Timeline -->
+          <div class="fall-of-wickets-deck" ng-if="sportsCtrl.activeMatch.innings[sportsCtrl.selectedInningsIndex].fallOfWickets.length">
+            <span class="fow-title"><i class="fa-solid fa-flag-checkered text-rose"></i> Fall of Wickets:</span>
+            <div class="fow-badges-wrap">
+              <span class="fow-chip" ng-repeat="fow in sportsCtrl.activeMatch.innings[sportsCtrl.selectedInningsIndex].fallOfWickets track by $index">
+                {{ fow }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Selected Innings Bowling Table -->
+        <div class="scorecard-table-card mt-4">
+          <div class="card-table-header">
+            <h4 class="table-h4">Bowling Analysis</h4>
+          </div>
+
+          <div class="table-responsive">
+            <table class="crex-full-table">
+              <thead>
+                <tr>
+                  <th class="th-batter">Bowler</th>
+                  <th class="th-num">O</th>
+                  <th class="th-num">M</th>
+                  <th class="th-num">R</th>
+                  <th class="th-num">W</th>
+                  <th class="th-num">Econ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="bowl in sportsCtrl.activeMatch.innings[sportsCtrl.selectedInningsIndex].bowling track by bowl.name">
+                  <td class="td-batter font-medium">{{ bowl.name }}</td>
+                  <td class="td-num">{{ bowl.overs }}</td>
+                  <td class="td-num">{{ bowl.maidens }}</td>
+                  <td class="td-num">{{ bowl.runs }}</td>
+                  <td class="td-num font-bold text-rose">{{ bowl.wickets }}</td>
+                  <td class="td-num text-cyan">{{ bowl.econ }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="empty-scorecard-placeholder" ng-if="!sportsCtrl.activeMatch.innings || !sportsCtrl.activeMatch.innings.length">
+        <i class="fa-solid fa-baseball-bat-ball fa-2x text-amber mb-2"></i>
+        <p>Scorecard will be updated live as play begins.</p>
+      </div>
+    </section>
+
+    <!-- 5. TAB 3: BALL-BY-BALL COMMENTARY (CRICBUZZ STYLE) -->
+    <section class="tab-pane-content" ng-if="sportsCtrl.activeMatchTab === 'commentary'">
+      <div class="crex-commentary-wrap">
+
+        <!-- Commentary Filter Chips -->
+        <div class="commentary-filter-bar">
+          <span class="comm-filter-title"><i class="fa-solid fa-filter text-cyan"></i> Filter Commentary:</span>
+          <div class="comm-chips-row">
+            <button type="button"
+                    class="comm-chip-btn"
+                    ng-class="{'active': sportsCtrl.commentaryFilter === 'all'}"
+                    ng-click="sportsCtrl.setCommentaryFilter('all')">
+              All Balls
+            </button>
+            <button type="button"
+                    class="comm-chip-btn"
+                    ng-class="{'active': sportsCtrl.commentaryFilter === 'wickets'}"
+                    ng-click="sportsCtrl.setCommentaryFilter('wickets')">
+              <span class="dot-red"></span> Wickets Only
+            </button>
+            <button type="button"
+                    class="comm-chip-btn"
+                    ng-class="{'active': sportsCtrl.commentaryFilter === 'boundaries'}"
+                    ng-click="sportsCtrl.setCommentaryFilter('boundaries')">
+              <span class="dot-amber"></span> Boundaries (4s & 6s)
+            </button>
+          </div>
+        </div>
+
+        <!-- Commentary Stream Timeline -->
+        <div class="commentary-stream-timeline">
+          <div class="comm-ball-entry"
+               ng-repeat="item in sportsCtrl.getFilteredCommentary() track by (item.over + '-' + $index)"
+               ng-class="{'entry-wicket': item.isWicket, 'entry-boundary': item.isBoundary}">
+
+            <div class="ball-badge-col">
+              <span class="over-num-badge">{{ item.over }}</span>
+              <span class="event-pill"
+                    ng-class="{'pill-w': item.isWicket, 'pill-six': item.isSix, 'pill-four': item.isFour, 'pill-dot': item.runs === 0}">
+                {{ item.runs }}
+              </span>
+            </div>
+
+            <div class="ball-text-col">
+              <div class="ball-actor-line">
+                <span class="actor-bowler">{{ item.bowler }}</span>
+                <span class="actor-to">to</span>
+                <span class="actor-batsman">{{ item.batsman }}</span>
+              </div>
+              <p class="ball-description">{{ item.text }}</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 6. TAB 4: SQUADS & PLAYING XI -->
+    <section class="tab-pane-content" ng-if="sportsCtrl.activeMatchTab === 'squads'">
+      <div class="crex-squads-wrap" ng-if="sportsCtrl.activeMatch.squads">
+        <div class="squads-columns-grid">
+
+          <!-- Team A Squad -->
+          <div class="squad-column-card">
+            <div class="squad-header">
+              <span class="squad-flag">{{ sportsCtrl.activeMatch.teamA.flag }}</span>
+              <h4 class="squad-title">{{ sportsCtrl.activeMatch.squads.teamA.name }}</h4>
+            </div>
+            <div class="player-roster-list">
+              <div class="player-roster-row" ng-repeat="p in sportsCtrl.activeMatch.squads.teamA.playingXI track by p.name">
+                <div class="player-name-wrap">
+                  <span class="player-fullname">{{ p.name }}</span>
+                  <span class="player-tag" ng-if="p.tag">{{ p.tag }}</span>
+                </div>
+                <span class="player-role">{{ p.role }}</span>
+              </div>
+            </div>
+            <div class="squad-bench-section" ng-if="sportsCtrl.activeMatch.squads.teamA.bench.length">
+              <span class="bench-label">Bench / Reserves:</span>
+              <span class="bench-players">{{ sportsCtrl.activeMatch.squads.teamA.bench.join(' • ') }}</span>
+            </div>
+          </div>
+
+          <!-- Team B Squad -->
+          <div class="squad-column-card">
+            <div class="squad-header">
+              <span class="squad-flag">{{ sportsCtrl.activeMatch.teamB.flag }}</span>
+              <h4 class="squad-title">{{ sportsCtrl.activeMatch.squads.teamB.name }}</h4>
+            </div>
+            <div class="player-roster-list">
+              <div class="player-roster-row" ng-repeat="p in sportsCtrl.activeMatch.squads.teamB.playingXI track by p.name">
+                <div class="player-name-wrap">
+                  <span class="player-fullname">{{ p.name }}</span>
+                  <span class="player-tag" ng-if="p.tag">{{ p.tag }}</span>
+                </div>
+                <span class="player-role">{{ p.role }}</span>
+              </div>
+            </div>
+            <div class="squad-bench-section" ng-if="sportsCtrl.activeMatch.squads.teamB.bench.length">
+              <span class="bench-label">Bench / Reserves:</span>
+              <span class="bench-players">{{ sportsCtrl.activeMatch.squads.teamB.bench.join(' • ') }}</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. TAB 5: POINTS TABLE (WTC & IPL STANDINGS) -->
+    <section class="tab-pane-content" ng-if="sportsCtrl.activeMatchTab === 'points'">
+      <div class="crex-points-tables-wrap">
+
+        <!-- WTC Table -->
+        <div class="standings-table-card">
+          <div class="standings-card-header">
+            <h4 class="standings-title"><i class="fa-solid fa-trophy text-amber"></i> ICC World Test Championship (WTC 2023-2025)</h4>
+            <span class="standings-sub">Ranked by Percentage (PCT %)</span>
+          </div>
+
+          <div class="table-responsive">
+            <table class="crex-standings-table">
+              <thead>
+                <tr>
+                  <th class="th-rank">Rank</th>
+                  <th class="th-team">Team</th>
+                  <th class="th-num">P</th>
+                  <th class="th-num">W</th>
+                  <th class="th-num">L</th>
+                  <th class="th-num">D</th>
+                  <th class="th-num">Pts</th>
+                  <th class="th-num th-pct">PCT %</th>
+                  <th class="th-form">Form</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="row in sportsCtrl.wtcPointsTable track by row.team"
+                    ng-class="{'top-two-row': row.rank <= 2}">
+                  <td class="td-rank font-bold">#{{ row.rank }}</td>
+                  <td class="td-team">
+                    <span class="table-flag">{{ row.flag }}</span>
+                    <span class="table-team-name">{{ row.team }}</span>
+                  </td>
+                  <td class="td-num">{{ row.played }}</td>
+                  <td class="td-num">{{ row.won }}</td>
+                  <td class="td-num">{{ row.lost }}</td>
+                  <td class="td-num">{{ row.drawn }}</td>
+                  <td class="td-num font-bold text-amber">{{ row.points }}</td>
+                  <td class="td-num td-pct font-bold text-emerald">{{ row.pct }}</td>
+                  <td class="td-form">
+                    <span class="form-strip">{{ row.form }}</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- IPL Table -->
+        <div class="standings-table-card mt-4">
+          <div class="standings-card-header">
+            <h4 class="standings-title"><i class="fa-solid fa-fire text-rose"></i> TATA IPL 2026 Standings</h4>
+            <span class="standings-sub">Top 4 Qualify for Playoffs</span>
+          </div>
+
+          <div class="table-responsive">
+            <table class="crex-standings-table">
+              <thead>
+                <tr>
+                  <th class="th-rank">Rank</th>
+                  <th class="th-team">Team</th>
+                  <th class="th-num">P</th>
+                  <th class="th-num">W</th>
+                  <th class="th-num">L</th>
+                  <th class="th-num">Pts</th>
+                  <th class="th-num">NRR</th>
+                  <th class="th-form">Form</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="row in sportsCtrl.iplPointsTable track by row.team"
+                    ng-class="{'top-four-row': row.rank <= 4}">
+                  <td class="td-rank font-bold">#{{ row.rank }}</td>
+                  <td class="td-team">
+                    <span class="table-flag">{{ row.flag }}</span>
+                    <span class="table-team-name">{{ row.team }}</span>
+                  </td>
+                  <td class="td-num">{{ row.played }}</td>
+                  <td class="td-num">{{ row.won }}</td>
+                  <td class="td-num">{{ row.lost }}</td>
+                  <td class="td-num font-bold text-amber">{{ row.points }}</td>
+                  <td class="td-num text-cyan">{{ row.nrr }}</td>
+                  <td class="td-form">
+                    <span class="form-strip">{{ row.form }}</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= CREX LIVE CRICKET NEWS & EDITORIAL ================= -->
+  <section class="crex-news-station-section">
+    <div class="news-station-header">
+      <div class="station-title-box">
+        <span class="station-sub-tag">CRICINFO & CRICBUZZ GRADE</span>
+        <h2 class="station-main-title"><i class="fa-solid fa-newspaper text-cyan"></i> Trending Cricket News & Tactical Analysis</h2>
+      </div>
+      <span class="news-updated-pill"><i class="fa-solid fa-bolt text-amber"></i> Live Feed</span>
+    </div>
+
+    <div class="news-cards-grid">
+      <article class="crex-news-card"
+               ng-repeat="item in sportsCtrl.cricketNews track by item.id"
+               ng-click="sportsCtrl.openArticle(item)">
+        <div class="news-cover-wrap">
+          <img ng-src="{{ item.cover }}" alt="{{ item.title }}" class="news-cover-img" />
+          <span class="news-category-badge">{{ item.tag }}</span>
+        </div>
+        <div class="news-content-box">
+          <div class="news-meta-top">
+            <span class="news-source">{{ item.source }}</span>
+            <span class="news-time">{{ item.timeAgo }}</span>
+          </div>
+          <h3 class="news-headline">{{ item.title }}</h3>
+          <p class="news-excerpt">{{ item.subtitle }}</p>
+          <div class="news-card-footer">
+            <span class="author-tag"><i class="fa-solid fa-user-pen"></i> {{ item.author }}</span>
+            <span class="read-more-link">Read Story <i class="fa-solid fa-arrow-right"></i></span>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ================= NEWS ARTICLE FULL MODAL ================= -->
+  <div class="crex-modal-backdrop" ng-if="sportsCtrl.showNewsModal" ng-click="sportsCtrl.closeNewsModal()">
+    <div class="crex-modal-dialog" ng-click="$event.stopPropagation()">
+      <div class="modal-dialog-header">
+        <span class="dialog-badge">{{ sportsCtrl.selectedArticle.tag }}</span>
+        <button type="button" class="btn-close-modal" ng-click="sportsCtrl.closeNewsModal()" title="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-dialog-body">
+        <h2 class="modal-article-title">{{ sportsCtrl.selectedArticle.title }}</h2>
+        <div class="modal-meta-line">
+          <span>By <strong>{{ sportsCtrl.selectedArticle.author }}</strong></span>
+          <span>•</span>
+          <span>{{ sportsCtrl.selectedArticle.source }}</span>
+          <span>•</span>
+          <span>{{ sportsCtrl.selectedArticle.timeAgo }}</span>
+        </div>
+
+        <img ng-src="{{ sportsCtrl.selectedArticle.cover }}" alt="{{ sportsCtrl.selectedArticle.title }}" class="modal-article-img" />
+
+        <p class="modal-lead-para">{{ sportsCtrl.selectedArticle.subtitle }}</p>
+
+        <div class="modal-highlights-card">
+          <h4 class="hl-title"><i class="fa-solid fa-star text-amber"></i> Key Takeaways</h4>
+          <ul class="hl-list">
+            <li ng-repeat="point in sportsCtrl.selectedArticle.highlights track by $index">
+              {{ point }}
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

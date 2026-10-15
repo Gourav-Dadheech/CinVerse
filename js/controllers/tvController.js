@@ -80,35 +80,17 @@
         },
         {
           id: 2,
-          name: 'Server 2 • SuperEmbed',
-          badge: '4K Multi-Cloud 🚀',
+          name: 'Server 2 • VidFast 4K (Native Video Engine)',
+          badge: 'Direct 4K ⚡',
           icon: 'fa-film',
           getUrl: function (id, s, e) {
-            return 'https://superembed.stream/?video_id=' + id + '&tmdb=1&season=' + s + '&episode=' + e;
+            return 'https://vidfast.vc/tv/' + id + '/' + s + '/' + e;
           }
         },
         {
           id: 3,
-          name: 'Server 3 • 2Embed',
-          badge: 'Bollywood / Hindi 🇮🇳',
-          icon: 'fa-clapperboard',
-          getUrl: function (id, s, e) {
-            return 'https://www.2embed.cc/embedtv/' + id + '&s=' + s + '&e=' + e;
-          }
-        },
-        {
-          id: 4,
-          name: 'Server 4 • SmashyStream',
-          badge: 'Fast Mirror 💨',
-          icon: 'fa-cloud',
-          getUrl: function (id, s, e) {
-            return 'https://embed.smashystream.com/playere.php?tmdb=' + id + '&season=' + s + '&episode=' + e;
-          }
-        },
-        {
-          id: 5,
-          name: 'Server 5 • Vidflix',
-          badge: 'Campus WiFi Proof 🎓',
+          name: 'Server 3 • Campus WiFi Bypass',
+          badge: 'Unblocked 🎓',
           icon: 'fa-graduation-cap',
           getUrl: function (id, s, e) {
             return 'https://vidsrc.pm/embed/tv?tmdb=' + id + '&season=' + s + '&episode=' + e;
@@ -362,7 +344,7 @@
       vm.selectAudioTrack = function (track) {
         vm.selectedAudioTrack = track;
         if (track.id === 'hi') {
-          var hindiServer = vm.servers.find(function (s) { return s.id === 3; }) || vm.servers[0];
+          var hindiServer = vm.servers[0];
           vm.currentServer = hindiServer;
           vm.audioNotice = '🇮🇳 Hindi Dubbed / Dual-Audio Active on ' + vm.currentServer.name + '! (If stream starts in English, tap the ⚙️ Settings / Audio menu inside the player)';
         } else if (track.id === 'en') {
