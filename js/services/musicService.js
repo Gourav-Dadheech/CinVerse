@@ -758,6 +758,105 @@
         } catch (e) {}
       }
 
+      // ---------------- W3C MEDIA SESSION API (NOTIFICATION CENTER & LOCK SCREEN) ----------------
+      function updateMediaSession(track) {
+        if (!('mediaSession' in navigator) || !track) return;
+
+        try {
+          var artworkList = [
+            { src: track.cover, sizes: '96x96', type: 'image/jpeg' },
+            { src: track.cover, sizes: '128x128', type: 'image/jpeg' },
+            { src: track.cover, sizes: '192x192', type: 'image/jpeg' },
+            { src: track.cover, sizes: '256x256', type: 'image/jpeg' },
+            { src: track.cover, sizes: '384x384', type: 'image/jpeg' },
+            { src: track.cover, sizes: '512x512', type: 'image/jpeg' }
+          ];
+
+          navigator.mediaSession.metadata = new window.MediaMetadata({
+            title: track.title,
+            artist: track.artist,
+            album: track.album || 'CinVerse Studio Sound',
+            artwork: artworkList
+          });
+
+          navigator.mediaSession.playbackState = self.isPlaying ? 'playing' : 'paused';
+          updateMediaSessionPosition();
+        } catch (e) {
+          console.warn('[Cinverse Sound] MediaSession metadata error:', e);
+        }
+      }
+
+      function updateMediaSessionPosition() {
+        if (!('mediaSession' in navigator) || typeof navigator.mediaSession.setPositionState !== 'function') return;
+        try {
+          if (self.duration > 0 && self.currentTime >= 0 && self.currentTime <= self.duration) {
+            navigator.mediaSession.setPositionState({
+              duration: Math.max(1, self.duration),
+              playbackRate: 1.0,
+              position: Math.min(Math.max(0, self.currentTime), self.duration)
+            });
+          }
+        } catch (e) {}
+      }
+
+      function setupMediaSessionHandlers() {
+        if (!('mediaSession' in navigator)) return;
+
+        var actions = [
+          ['play', function () {
+            if (!self.isPlaying) self.togglePlay();
+            if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
+            $rootScope.$applyAsync();
+          }],
+          ['pause', function () {
+            if (self.isPlaying) self.togglePlay();
+            if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
+            $rootScope.$applyAsync();
+          }],
+          ['previoustrack', function () {
+            self.prevTrack();
+            $rootScope.$applyAsync();
+          }],
+          ['nexttrack', function () {
+            self.nextTrack();
+            $rootScope.$applyAsync();
+          }],
+          ['seekto', function (details) {
+            if (details.seekTime !== undefined && self.duration > 0) {
+              self.seek((details.seekTime / self.duration) * 100);
+              $rootScope.$applyAsync();
+            }
+          }],
+          ['seekbackward', function (details) {
+            var offset = details.seekOffset || 10;
+            var target = Math.max(0, self.currentTime - offset);
+            if (self.duration > 0) {
+              self.seek((target / self.duration) * 100);
+              $rootScope.$applyAsync();
+            }
+          }],
+          ['seekforward', function (details) {
+            var offset = details.seekOffset || 10;
+            var target = Math.min(self.duration, self.currentTime + offset);
+            if (self.duration > 0) {
+              self.seek((target / self.duration) * 100);
+              $rootScope.$applyAsync();
+            }
+          }],
+          ['stop', function () {
+            self.closePlayer();
+            if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'none';
+            $rootScope.$applyAsync();
+          }]
+        ];
+
+        actions.forEach(function (pair) {
+          try {
+            navigator.mediaSession.setActionHandler(pair[0], pair[1]);
+          } catch (e) {}
+        });
+      }
+
       // ---------------- CORE PLAYBACK CONTROLS ----------------
       self.playTrack = function (track, trackList) {
         if (!track) return;
@@ -775,6 +874,9 @@
         self.currentTimeFormatted = '0:00';
         self.progressPct = 0;
 
+        // Register with Android / iOS Notification Center & Lock Screen
+        updateMediaSession(track);
+
         // Priority 1: YouTube Full Audio Engine
         if (track.ytId) {
           try {
@@ -787,6 +889,7 @@
               ytPlayer.setVolume(self.isMuted ? 0 : self.volume);
               ytPlayer.playVideo();
               self.isPlaying = true;
+              if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
               startProgressTimer();
             } catch (err) {
               console.warn('[Cinverse Sound] YT load exception:', err);
@@ -823,6 +926,7 @@
             audio.pause();
           } catch (e) {}
           self.isPlaying = false;
+          if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
           stopProgressTimer();
         } else {
           // Resume stream
@@ -830,6 +934,7 @@
             try {
               ytPlayer.playVideo();
               self.isPlaying = true;
+              if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
               startProgressTimer();
               return;
             } catch (e) {}
@@ -842,6 +947,7 @@
             audio.play().then(function () {
               $rootScope.$applyAsync(function () {
                 self.isPlaying = true;
+                if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
               });
             }).catch(function (e) {
               console.warn('[Cinverse Sound] Audio play error:', e);
@@ -941,6 +1047,11 @@
         self.isPlaying = false;
         self.currentTime = 0;
         self.progressPct = 0;
+        if ('mediaSession' in navigator) {
+          try {
+            navigator.mediaSession.playbackState = 'none';
+          } catch (e) {}
+        }
         stopProgressTimer();
       };
 
@@ -1016,6 +1127,7 @@
       };
 
       initStorage();
+      setupMediaSessionHandlers();
     }
   ]);
 })();
