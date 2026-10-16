@@ -81,12 +81,12 @@ public class MainActivity extends AppCompatActivity {
         settings.setDisplayZoomControls(false);
         settings.setMediaPlaybackRequiresUserGesture(false);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        }
+
         // Hardware Acceleration
         webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-
-        // Custom User Agent
-        String defaultUa = settings.getUserAgentString();
-        settings.setUserAgentString(defaultUa + " CinVerseApp/1.1.0");
 
         // Native Hardware Bridge for Gesture Controls (Slide Brightness, Volume & WakeLock)
         webView.addJavascriptInterface(new CinVerseNativeBridge(), "CinVerseNative");
@@ -267,7 +267,8 @@ public class MainActivity extends AppCompatActivity {
             if (url.contains("vidbolt.xyz") || url.contains("superembed.stream") || url.contains("seapi.link") ||
                 url.contains("2embed.cc") || url.contains("smashystream") || url.contains("smashy.stream") ||
                 url.contains("vidsrc") || url.contains("youtube.com") || url.contains("streamwish") || url.contains("filemoon") ||
-                url.contains("streamtape") || url.contains("dood") || url.contains("mixdrop")) {
+                url.contains("streamtape") || url.contains("dood") || url.contains("mixdrop") ||
+                url.contains("rousav.tech") || url.contains("vidfast")) {
                 return false;
             }
 
@@ -346,7 +347,7 @@ public class MainActivity extends AppCompatActivity {
             extractorSettings.setDomStorageEnabled(true);
             extractorSettings.setDatabaseEnabled(true);
             extractorSettings.setMediaPlaybackRequiresUserGesture(false);
-            extractorSettings.setUserAgentString("Mozilla/5.0 (Linux; Android 13; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36 CinVerseStreamExtractor/1.0");
+            extractorSettings.setUserAgentString("Mozilla/5.0 (Linux; Android 13; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36");
         }
 
         final boolean[] streamCaptured = {false};

@@ -72,6 +72,7 @@
       // Empty container before mount
       containerEl.innerHTML = '';
 
+      var streamUrl = cfg.url || cfg.streamUrl || '';
       var isMp4 = typeof streamUrl === 'string' && streamUrl.toLowerCase().indexOf('.mp4') !== -1;
       var streamType = isMp4 ? 'mp4' : 'm3u8';
 
