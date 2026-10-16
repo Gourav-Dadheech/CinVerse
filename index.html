@@ -65,7 +65,7 @@
         if (!url) return null;
         var u = String(url).toLowerCase();
         // Allow legitimate blob downloads, local links, 1DM links, and Monetag ad network
-        if (u.indexOf('blob:') === 0 || u.indexOf('data:') === 0 || u.indexOf('localhost') !== -1 || u.indexOf('127.0.0.1') !== -1 || u.indexOf('1dm') !== -1 || u.indexOf('quge5.com') !== -1 || u.indexOf('3nbf4.com') !== -1) {
+        if (u.indexOf('blob:') === 0 || u.indexOf('data:') === 0 || u.indexOf('localhost') !== -1 || u.indexOf('127.0.0.1') !== -1 || u.indexOf('1dm') !== -1 || u.indexOf('quge5.com') !== -1 || u.indexOf('3nbf4.com') !== -1 || u.indexOf('5gvci.com') !== -1) {
           return _origOpen.apply(window, arguments);
         }
         // Block known unauthorized redirect and rogue spam domains
