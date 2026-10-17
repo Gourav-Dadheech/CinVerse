@@ -59,6 +59,15 @@
       $rootScope.$on('$routeChangeSuccess', function () {
         $rootScope.appLoading = false;
         window.scrollTo(0, 0); // scroll to top on every page change
+
+        // Track SPA route navigation in Google Analytics 4
+        if (typeof window.gtag === 'function') {
+          window.gtag('event', 'page_view', {
+            page_title: document.title,
+            page_path: $location.path(),
+            page_location: window.location.href
+          });
+        }
       });
 
       $rootScope.$on('$routeChangeError', function () {
