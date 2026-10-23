@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     private WebView extractorWebView;
     private Runnable extractionTimeoutRunnable;
     private final android.os.Handler mainHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+    private boolean isAudioPlaying = false;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -199,6 +200,20 @@ public class MainActivity extends AppCompatActivity {
                         } else {
                             v.vibrate(durationMs);
                         }
+                    }
+                } catch (Exception ignored) {}
+            });
+        }
+
+        @JavascriptInterface
+        public void setAudioPlaybackState(final boolean isPlaying) {
+            runOnUiThread(() -> {
+                isAudioPlaying = isPlaying;
+                try {
+                    if (isPlaying) {
+                        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                    } else {
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                     }
                 } catch (Exception ignored) {}
             });
@@ -477,6 +492,23 @@ public class MainActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         webView.saveState(outState);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Keep WebView timers running in background so music continues playing seamlessly
+        if (webView != null) {
+            webView.resumeTimers();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (isAudioPlaying && webView != null) {
+            webView.resumeTimers();
+        }
     }
 
     @Override
