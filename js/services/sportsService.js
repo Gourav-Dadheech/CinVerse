@@ -715,87 +715,67 @@
           });
       };
 
-      // ---------------- BACKEND LIVE CRICKET SCRAPER BRIDGE ----------------
+      // ---------------- BACKEND REAL-TIME CRICKET API BRIDGE ----------------
       self.backendScraperActive = false;
       self.scrapedMatchesCount = 0;
 
       self.fetchBackendScrapedMatches = function () {
-        $http.get('/api/cricket-live', { timeout: 4000 })
+        $http.get('/api/cricket-live', { timeout: 8000 })
           .then(function (res) {
             if (res.data && res.data.success && res.data.matches && res.data.matches.length > 0) {
               self.backendScraperActive = true;
               self.scrapedMatchesCount = res.data.matches.length;
 
-              // Filter out any existing scraped matches from cricketMatches
-              var nonScraped = self.cricketMatches.filter(function (m) {
-                return !m.id.startsWith('scraped-live-');
+              var realMatches = res.data.matches.map(function (m, idx) {
+                if (m.teamA && m.teamB) {
+                  // Ensure fallbacks for any missing subfields
+                  if (!m.id) m.id = 'live-cricbuzz-' + (m.numericId || idx);
+                  if (!m.servers || !m.servers.length) {
+                    m.servers = [
+                      { id: 1, name: 'Server 1 • Willow Cricket HD (Live Stadium Stream)', quality: '1080p 60FPS', url: 'https://d36r8jifhgsk5j.cloudfront.net/Willow_TV.m3u8', type: 'hls' },
+                      { id: 2, name: 'Server 2 • Cricket Gold HD (Stadium Live Feed)', quality: '1080p HD', url: 'https://streams2.sofast.tv/ptnr-yupptv/title-cricketgold/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/b2048bb8-1686-4432-aa50-647245383e0c/manifest.m3u8', type: 'hls' },
+                      { id: 3, name: 'Server 3 • Global Cricket Broadcast', quality: '1080p HD', url: 'https://www.youtube.com/embed/ebkwnpV6aOc?autoplay=1&mute=0', type: 'iframe' }
+                    ];
+                  }
+                  if (!m.striker) {
+                    m.striker = { name: m.teamA.code + ' Batter', runs: m.teamA.runs || 0, balls: 0, fours: 0, sixes: 0, sr: '0' };
+                  }
+                  if (!m.nonStriker) {
+                    m.nonStriker = { name: m.teamA.code + ' Partner', runs: 0, balls: 0, fours: 0, sixes: 0, sr: '0' };
+                  }
+                  if (!m.currentBowler) {
+                    m.currentBowler = { name: m.teamB.code + ' Bowler', overs: m.teamA.overs || '0.0', maidens: 0, runs: 0, wickets: m.teamA.wickets || 0, econ: '0.00' };
+                  }
+                  if (!m.currentOver) {
+                    m.currentOver = { overNum: 0, balls: ['•', '•', '•', '•', '•', '•'] };
+                  }
+                  if (!m.innings) {
+                    m.innings = [
+                      {
+                        id: m.id + '-inn1',
+                        title: m.teamA.name + ' Innings',
+                        score: m.teamA.score || '0/0',
+                        overs: m.teamA.overs || '0.0',
+                        crr: '0.00',
+                        batting: [
+                          { name: m.teamA.name + ' Top Order', dismissal: 'Batting', runs: m.teamA.runs || 0, balls: 0, fours: 0, sixes: 0, sr: '0' }
+                        ],
+                        bowling: [
+                          { name: m.teamB.name + ' Attack', overs: m.teamA.overs || '0.0', maidens: 0, runs: 0, wickets: m.teamA.wickets || 0, econ: '0.00' }
+                        ]
+                      }
+                    ];
+                  }
+                  return m;
+                }
+                return m;
               });
 
-              var scrapedCards = res.data.matches.map(function (m, idx) {
-                var team1 = m.team1 || 'Team 1';
-                var team2 = m.team2 || 'Team 2';
-                var team1Code = team1.split(' ').map(function (w) { return w[0]; }).join('').slice(0, 4).toUpperCase();
-                var team2Code = team2.split(' ').map(function (w) { return w[0]; }).join('').slice(0, 4).toUpperCase();
-                var fmt = m.rawTitle.toLowerCase().includes('t20') ? 'T20' : (m.rawTitle.toLowerCase().includes('test') ? 'TEST' : 'ODI');
-
-                return {
-                  id: 'scraped-live-' + idx,
-                  sport: 'cricket',
-                  format: fmt,
-                  category: 'international',
-                  status: 'LIVE',
-                  statusTag: '🔴 SCRAPED LIVE • REAL TIME',
-                  badge: 'CRICINFO LIVE WEB SCRAPER 📡',
-                  tournament: m.rawTitle,
-                  venue: 'International Stadium • Live Scraper Wire',
-                  dateLabel: 'Live Scraped Now • Real World',
-                  streamTitle: m.rawTitle + ' • Live HD Broadcast',
-                  servers: [
-                    { id: 1, name: 'Server 1 • Willow Cricket HD (Live Stadium Stream)', quality: '1080p 60FPS', url: 'https://d36r8jifhgsk5j.cloudfront.net/Willow_TV.m3u8', type: 'hls' },
-                    { id: 2, name: 'Server 2 • Cricket Gold HD (Stadium Live Feed)', quality: '1080p HD', url: 'https://streams2.sofast.tv/ptnr-yupptv/title-cricketgold/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/b2048bb8-1686-4432-aa50-647245383e0c/manifest.m3u8', type: 'hls' },
-                    { id: 3, name: 'Server 3 • Global Cricket Broadcast', quality: '1080p HD', url: 'https://www.youtube.com/embed/ebkwnpV6aOc?autoplay=1&mute=0', type: 'iframe' }
-                  ],
-                  toss: 'Live match tracked in real time via backend web scraper (Cricinfo Live Wire)',
-                  pitchReport: 'Evenly balanced track with true bounce and consistent carry for batters and bowlers.',
-                  weather: 'Fair weather • Continuous scraper sync active',
-                  teamA: {
-                    name: team1,
-                    code: team1Code,
-                    flag: '🏏',
-                    score: 'Live',
-                    overs: 'In Play'
-                  },
-                  teamB: {
-                    name: team2,
-                    code: team2Code,
-                    flag: '⚡',
-                    score: 'Yet to bat',
-                    overs: ''
-                  },
-                  equation: m.description || m.rawTitle,
-                  situation: 'Live ongoing match tracked continuously by background web scraper with 60s memory cache',
-                  winPredictor: {
-                    teamACode: team1Code,
-                    teamAPct: 50,
-                    teamBCode: team2Code,
-                    teamBPct: 50,
-                    trend: 'Real-time scraper tracking active'
-                  },
-                  currentOver: {
-                    overNum: 16,
-                    balls: ['1', '0', '4', '1', '2', '0']
-                  },
-                  striker: { name: team1 + ' Batter', runs: 34, balls: 28, fours: 4, sixes: 1, sr: '121.4' },
-                  nonStriker: { name: team1 + ' Partner', runs: 22, balls: 19, fours: 2, sixes: 0, sr: '115.7' },
-                  currentBowler: { name: team2 + ' Bowler', overs: '3.4', maidens: 0, runs: 24, wickets: 1, econ: '6.54' },
-                  partnership: '46 runs (38 balls)',
-                  lastWicket: 'Top order bat c Keeper b Bowler 16',
-                  recentOversSummary: 'Last 5 ovs: 36 runs, 1 wkt (RR: 7.20)',
-                  scheduleRank: 0
-                };
-              });
-
-              self.cricketMatches = scrapedCards.concat(nonScraped);
+              // Replace mock pool with genuine live matches from Cricbuzz
+              self.cricketMatches = realMatches;
+              if (!self.activeMatch || !self.cricketMatches.some(function (m) { return m.id === self.activeMatch.id; })) {
+                self.activeMatch = self.cricketMatches[0];
+              }
               $rootScope.$applyAsync();
             }
           })
@@ -822,10 +802,10 @@
         }
       }, 30000);
 
-      // Periodically refresh live scraper every 60 seconds
+      // Periodically refresh real-time live scores every 20 seconds
       $interval(function () {
         self.fetchBackendScrapedMatches();
-      }, 60000);
+      }, 20000);
 
       // Periodically refresh news feed every 15 minutes
       $interval(function () {
