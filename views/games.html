@@ -1,0 +1,377 @@
+<!-- ============================================================
+     CinVerse - views/games.html
+     Authentic AAA Cloud & Web Gaming Station (GTA 5, Forza Horizon 5, Fortnite)
+     ============================================================ -->
+
+<div class="games-hub-wrapper" id="games-hub-root">
+
+  <!-- ================= MOBILE DEVICE NOTICE OVERLAY ================= -->
+  <div class="mobile-games-lock-banner" ng-if="gamesCtrl.isMobileDevice && !gamesCtrl.bypassMobileLock">
+    <div class="mobile-lock-card">
+      <div class="mobile-lock-icon">
+        <i class="fa-solid fa-desktop"></i>
+      </div>
+      <div class="mobile-lock-content">
+        <div class="mobile-badge-capsule">
+          <span class="badge-dot-amber"></span>
+          <span>PC / DESKTOP EXCLUSIVE GAMING</span>
+        </div>
+        <h2 class="mobile-lock-title">Best Experienced on PC / Laptop</h2>
+        <p class="mobile-lock-desc">
+          Original AAA blockbusters like <strong>GTA 5, Forza Horizon 5, and Cyberpunk 2077</strong> require a physical
+          <strong>Keyboard &amp; Mouse or Gamepad Controller</strong> for true 60-120 FPS cloud streaming.
+        </p>
+        <div class="mobile-lock-actions">
+          <button type="button" class="btn-unlock-mobile" ng-click="gamesCtrl.unlockMobileMode()">
+            <i class="fa-solid fa-gamepad"></i>
+            <span>Continue on Mobile (Desktop Mode)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= TOP HERO HEADER & HARDWARE STATUS ================= -->
+  <header class="games-hero-header">
+    <div class="games-header-container">
+      <div class="games-header-left">
+        <div class="games-tag-capsule">
+          <span class="gaming-dot-pulse"></span>
+          <span>CINVERSE OFFICIAL AAA CLOUD GAMING STATION</span>
+        </div>
+        <h1 class="games-main-title">Play Original AAA Games on PC (GTA 5, Forza Horizon 5, Fortnite)</h1>
+        <p class="games-subtitle">
+          Stream genuine blockbuster titles with zero local storage downloads, 4K ray tracing, and instant Xbox/PlayStation controller support directly in your web browser.
+        </p>
+      </div>
+
+      <!-- Hardware & Stream Telemetry Deck -->
+      <div class="games-telemetry-deck">
+        <div class="telemetry-pill" ng-class="{'pill-active-green': gamesCtrl.gamepadConnected, 'pill-neutral': !gamesCtrl.gamepadConnected}">
+          <i class="fa-solid fa-gamepad"></i>
+          <span ng-if="gamesCtrl.gamepadConnected">🎮 {{ gamesCtrl.gamepadName }} Ready</span>
+          <span ng-if="!gamesCtrl.gamepadConnected">🎮 Plug Xbox/PS Controller</span>
+        </div>
+
+        <div class="telemetry-pill pill-tech">
+          <i class="fa-solid fa-cloud"></i>
+          <span>WebRTC 60 FPS Cloud Stream</span>
+        </div>
+
+        <div class="telemetry-pill pill-guide" ng-click="gamesCtrl.openGuideModal()" role="button" tabindex="0">
+          <i class="fa-solid fa-circle-question"></i>
+          <span>How Free Play Works</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= CINEMA GAME THEATER VIEWPORT ================= -->
+  <section class="cinema-game-theater-section" id="cinema-game-station-viewport">
+    <div class="theater-outer-wrapper">
+
+      <!-- Theater Top Meta Bar -->
+      <div class="theater-top-bar">
+        <div class="theater-game-meta">
+          <span class="game-category-badge">{{ gamesCtrl.activeGame.badge }}</span>
+          <div class="meta-title-group">
+            <h2 class="theater-game-title">{{ gamesCtrl.activeGame.title }}</h2>
+            <span class="theater-publisher-tag"><i class="fa-solid fa-building"></i> {{ gamesCtrl.activeGame.publisher }}</span>
+          </div>
+          <span class="theater-engine-tag"><i class="fa-solid fa-gear"></i> {{ gamesCtrl.activeGame.engine }}</span>
+        </div>
+
+        <div class="theater-actions-bar">
+          <!-- Direct In-Browser toggle if game supports native WebGL -->
+          <button type="button"
+                  class="btn-theater-action btn-mode-toggle"
+                  ng-if="gamesCtrl.activeGame.isInBrowserPlayable"
+                  ng-click="gamesCtrl.setViewMode(gamesCtrl.viewMode === 'direct' ? 'trailer' : 'direct')">
+            <i class="fa-solid fa-cube"></i>
+            <span>{{ gamesCtrl.viewMode === 'direct' ? 'Showcase Trailer' : 'Play In-Browser' }}</span>
+          </button>
+
+          <button type="button" class="btn-theater-action" ng-click="gamesCtrl.toggleControlsHud()" title="Toggle Controls Guide">
+            <i class="fa-solid fa-keyboard"></i>
+            <span>{{ gamesCtrl.showControlsHud ? 'Hide Controls' : 'Show Controls' }}</span>
+          </button>
+
+          <button type="button" class="btn-theater-action" ng-click="gamesCtrl.reloadGame()" title="Restart Video/Canvas">
+            <i class="fa-solid fa-rotate-right"></i>
+            <span>Restart</span>
+          </button>
+
+          <button type="button" class="btn-theater-action btn-theater-fullscreen" ng-click="gamesCtrl.toggleFullscreen()" title="Fullscreen Mode">
+            <i class="fa-solid fa-expand"></i>
+            <span>Fullscreen</span>
+          </button>
+
+          <!-- Primary Play / Launch Button -->
+          <button type="button"
+                  class="btn-theater-action btn-launch-cloud-primary"
+                  ng-click="gamesCtrl.launchCloudStream(gamesCtrl.activeGame)"
+                  title="Launch Game Engine in Dedicated Window">
+            <i class="fa-solid fa-bolt"></i>
+            <span ng-if="gamesCtrl.activeGame.isInBrowserPlayable">PLAY FULLSCREEN WINDOW</span>
+            <span ng-if="!gamesCtrl.activeGame.isInBrowserPlayable">PLAY ON CLOUD</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Game Stage (WASM WebGPU Engine / Canvas or 4K Showcase) -->
+      <div class="theater-stage-container" id="cinema-game-theater-wrap">
+        <div class="theater-ambient-glow"></div>
+
+        <!-- 1. Native WebGL / WASM Canvas Mode (e.g. GTA 5 Fiveplay or Minecraft) -->
+        <div class="game-iframe-wrapper" ng-if="gamesCtrl.viewMode === 'direct' && gamesCtrl.trustedEmbedUrl">
+          <iframe ng-src="{{ gamesCtrl.trustedEmbedUrl }}"
+                  class="game-active-iframe"
+                  allowfullscreen="true"
+                  webkitallowfullscreen="true"
+                  mozallowfullscreen="true"
+                  allow="autoplay; fullscreen; gamepad; cross-origin-isolated"
+                  sandbox="allow-scripts allow-same-origin allow-pointer-lock allow-forms"
+                  title="{{ gamesCtrl.activeGame.title }}">
+          </iframe>
+        </div>
+
+        <!-- 2. 4K 60FPS Cinematic Showcase Video Stream Mode -->
+        <div class="game-iframe-wrapper" ng-if="gamesCtrl.viewMode === 'trailer' && gamesCtrl.trustedTrailerUrl">
+          <iframe ng-src="{{ gamesCtrl.trustedTrailerUrl }}"
+                  class="game-active-iframe video-showcase-frame"
+                  allowfullscreen="true"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  title="{{ gamesCtrl.activeGame.title }} 4K Showcase">
+          </iframe>
+        </div>
+
+        <!-- Floating Exit Fullscreen Button (Appears only in Fullscreen Mode) -->
+        <button type="button"
+                class="btn-exit-fullscreen-floating"
+                ng-if="gamesCtrl.isFullscreen"
+                ng-click="gamesCtrl.toggleFullscreen()"
+                title="Exit Fullscreen (Press Esc)">
+          <i class="fa-solid fa-compress"></i> <span>Exit Fullscreen (Esc)</span>
+        </button>
+
+        <!-- Floating Cloud / WASM Quick Launch Banner (Automatically hidden in Fullscreen) -->
+        <div class="theater-floating-launch-banner" ng-if="!gamesCtrl.isFullscreen">
+          <div class="floating-banner-left">
+            <span class="cloud-provider-pill">
+              <i class="fa-solid fa-microchip"></i> {{ gamesCtrl.activeGame.cloudPlatform }}
+            </span>
+            <span class="cloud-spec-pill">
+              <i class="fa-solid fa-tv"></i> {{ gamesCtrl.activeGame.cloudSpecs.resolution }}
+            </span>
+            <span class="cloud-spec-pill">
+              <i class="fa-solid fa-bolt"></i> {{ gamesCtrl.activeGame.cloudSpecs.targetFps }}
+            </span>
+          </div>
+          <div class="floating-banner-right">
+            <button type="button"
+                    class="btn-cloud-giant-play"
+                    ng-click="gamesCtrl.launchCloudStream(gamesCtrl.activeGame)">
+              <i class="fa-solid fa-gamepad"></i>
+              <span ng-if="gamesCtrl.activeGame.isInBrowserPlayable">LAUNCH {{ gamesCtrl.activeGame.originalTitle | uppercase }} (WASM ENGINE)</span>
+              <span ng-if="!gamesCtrl.activeGame.isInBrowserPlayable">START {{ gamesCtrl.activeGame.originalTitle | uppercase }} (CLOUD STREAM)</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Controls & Keybinds HUD Strip -->
+      <div class="theater-controls-hud" ng-if="gamesCtrl.showControlsHud && gamesCtrl.activeGame.controls.length">
+        <div class="controls-hud-header">
+          <div class="hud-header-left">
+            <i class="fa-solid fa-gamepad text-cyan"></i>
+            <span>Controller &amp; Keyboard Controls for {{ gamesCtrl.activeGame.title }}:</span>
+          </div>
+          <span class="hud-subtext">Plug any Xbox, DualSense, or USB controller for instant analog driving &amp; aiming.</span>
+        </div>
+        <div class="controls-keys-list">
+          <div class="keybind-card" ng-repeat="ctrl in gamesCtrl.activeGame.controls">
+            <span class="key-pill">{{ ctrl.key }}</span>
+            <span class="key-action">{{ ctrl.desc }}</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= CATEGORY RIBBON & SEARCH FILTER ================= -->
+  <section class="games-catalog-ribbon-section">
+    <div class="catalog-ribbon-container">
+
+      <!-- Category Filter Pills -->
+      <div class="gaming-categories-pills">
+        <button type="button"
+                class="category-pill-btn"
+                ng-class="{'active': gamesCtrl.activeCategory === 'all'}"
+                ng-click="gamesCtrl.setCategory('all')">
+          <i class="fa-solid fa-layer-group"></i>
+          <span>All AAA Titles</span>
+          <span class="category-count">{{ gamesCtrl.getCategoryCount('all') }}</span>
+        </button>
+
+        <button type="button"
+                class="category-pill-btn pill-aaa"
+                ng-class="{'active': gamesCtrl.activeCategory === 'aaa'}"
+                ng-click="gamesCtrl.setCategory('aaa')">
+          <i class="fa-solid fa-fire"></i>
+          <span>Rockstar &amp; Open World (GTA 5, RDR2)</span>
+          <span class="category-count count-amber">{{ gamesCtrl.getCategoryCount('aaa') }}</span>
+        </button>
+
+        <button type="button"
+                class="category-pill-btn pill-racing"
+                ng-class="{'active': gamesCtrl.activeCategory === 'racing'}"
+                ng-click="gamesCtrl.setCategory('racing')">
+          <i class="fa-solid fa-car-burst"></i>
+          <span>Hypercar Racing (Forza Horizon 5)</span>
+          <span class="category-count count-rose">{{ gamesCtrl.getCategoryCount('racing') }}</span>
+        </button>
+
+        <button type="button"
+                class="category-pill-btn pill-fps"
+                ng-class="{'active': gamesCtrl.activeCategory === 'fps'}"
+                ng-click="gamesCtrl.setCategory('fps')">
+          <i class="fa-solid fa-crosshairs"></i>
+          <span>Battle Royale &amp; FPS (Fortnite, Warzone)</span>
+          <span class="category-count count-violet">{{ gamesCtrl.getCategoryCount('fps') }}</span>
+        </button>
+
+        <button type="button"
+                class="category-pill-btn pill-retro"
+                ng-class="{'active': gamesCtrl.activeCategory === 'retro'}"
+                ng-click="gamesCtrl.setCategory('retro')">
+          <i class="fa-solid fa-cube"></i>
+          <span>In-Browser WebGL (Minecraft)</span>
+          <span class="category-count count-cyan">{{ gamesCtrl.getCategoryCount('retro') }}</span>
+        </button>
+      </div>
+
+      <!-- Live Search Box -->
+      <div class="gaming-search-bar-wrap">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text"
+               class="gaming-search-input"
+               placeholder="Search GTA 5, Forza, Fortnite, Cyberpunk, RDR2..."
+               ng-model="gamesCtrl.searchQuery" />
+        <button type="button"
+                class="btn-search-clear"
+                ng-if="gamesCtrl.searchQuery"
+                ng-click="gamesCtrl.searchQuery = ''">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= ORIGINAL AAA GAMES GALLERY GRID ================= -->
+  <section class="games-gallery-grid-section">
+    <div class="gallery-container">
+      <div class="gallery-header-row">
+        <h3 class="gallery-section-title">
+          <i class="fa-solid fa-gamepad text-violet"></i>
+          <span>Original AAA Blockbusters (Cloud &amp; Web Streaming)</span>
+        </h3>
+        <span class="gallery-match-count">Showing {{ gamesCtrl.getFilteredGames().length }} games</span>
+      </div>
+
+      <div class="games-cards-grid">
+        <div class="game-hologram-card"
+             ng-repeat="game in gamesCtrl.getFilteredGames() track by game.id"
+             ng-class="{'active-game-card': gamesCtrl.activeGame.id === game.id}"
+             ng-click="gamesCtrl.selectGame(game)">
+
+          <!-- Game Card Thumbnail -->
+          <div class="card-thumb-wrapper">
+            <img ng-src="{{ game.cover }}" alt="{{ game.title }}" class="card-thumb-img" loading="lazy" />
+            <div class="card-thumb-overlay"></div>
+            <span class="card-badge-pill">{{ game.badge }}</span>
+            <span class="card-fps-pill">{{ game.fps }}</span>
+
+            <!-- Play Button Overlay -->
+            <div class="card-play-hover-btn">
+              <i class="fa-solid fa-bolt"></i>
+              <span>PLAY CLOUD STREAM</span>
+            </div>
+          </div>
+
+          <!-- Game Card Details -->
+          <div class="card-details-box">
+            <div class="card-title-row">
+              <h4 class="card-game-title">{{ game.title }}</h4>
+              <span class="card-rating"><i class="fa-solid fa-star text-amber"></i> {{ game.rating }}</span>
+            </div>
+            <span class="card-publisher"><i class="fa-solid fa-building"></i> {{ game.publisher }}</span>
+            <p class="card-game-desc">{{ game.subtitle }}</p>
+            <div class="card-meta-chips">
+              <span class="meta-chip"><i class="fa-solid fa-cloud"></i> {{ game.cloudPlatform.split('/')[0] }}</span>
+              <span class="meta-chip"><i class="fa-solid fa-users"></i> {{ game.players }}</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= HOW FREE AAA PLAY WORKS MODAL ================= -->
+  <div class="games-modal-backdrop" ng-if="gamesCtrl.showGuideModal" ng-click="gamesCtrl.closeGuideModal()"></div>
+  <div class="games-guide-modal" ng-if="gamesCtrl.showGuideModal">
+    <div class="guide-modal-header">
+      <div class="guide-modal-title-row">
+        <i class="fa-solid fa-circle-info text-cyan"></i>
+        <h3>How to Play Original AAA Games in Your Browser</h3>
+      </div>
+      <button type="button" class="btn-close-guide" ng-click="gamesCtrl.closeGuideModal()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="guide-modal-body">
+      <div class="guide-step-card">
+        <div class="guide-step-num">1</div>
+        <div class="guide-step-text">
+          <h4>Play Fortnite 100% Free (No Subscription Required)</h4>
+          <p>
+            Microsoft and Epic Games offer official free cloud streaming for <strong>Fortnite</strong>.
+            Click <strong>PLAY ON CLOUD</strong>, log in with any free Microsoft account, and play directly in Chrome or Edge with 0GB downloaded.
+          </p>
+        </div>
+      </div>
+
+      <div class="guide-step-card">
+        <div class="guide-step-num">2</div>
+        <div class="guide-step-text">
+          <h4>Play GTA 5 &amp; Forza Horizon 5 via Cloud</h4>
+          <p>
+            Because original games like GTA 5 (120 GB) and Forza Horizon 5 (150 GB) require massive computing power, they stream over high-speed WebRTC from <strong>Xbox Cloud Gaming &amp; GeForce NOW</strong> servers directly into your browser at 60 FPS.
+          </p>
+        </div>
+      </div>
+
+      <div class="guide-step-card">
+        <div class="guide-step-num">3</div>
+        <div class="guide-step-text">
+          <h4>Instant Gamepad &amp; Controller Support</h4>
+          <p>
+            Plug in your <strong>Xbox Wireless Controller, PlayStation DualSense/DualShock, or USB Gamepad</strong>.
+            Modern browsers immediately detect your controller and provide vibration feedback, analog driving, and aim assist!
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-modal-footer">
+      <button type="button" class="btn-guide-got-it" ng-click="gamesCtrl.closeGuideModal()">
+        <span>Got it! Start Playing</span>
+      </button>
+    </div>
+  </div>
+
+</div>

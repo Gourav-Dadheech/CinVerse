@@ -106,6 +106,13 @@
           controllerAs: 'sportsCtrl'
         })
 
+        // ---------------- CINVERSE CLOUD & AAA GAMES (PC EXCLUSIVE) ----------------
+        .when('/games', {
+          templateUrl: 'views/games.html',
+          controller: 'GamesController',
+          controllerAs: 'gamesCtrl'
+        })
+
         // ---------------- MOVIE MATCH ----------------
         .when('/movie-match', {
           templateUrl: 'views/movie-match.html',

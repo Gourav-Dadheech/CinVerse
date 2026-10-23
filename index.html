@@ -100,6 +100,7 @@
   <link rel="stylesheet" href="css/movie-match.css?v=1.3.0">
   <link rel="stylesheet" href="css/music.css?v=1.3.0">
   <link rel="stylesheet" href="css/sports.css?v=1.3.5">
+  <link rel="stylesheet" href="css/games.css?v=1.4.0">
 
   <!-- High-Definition CinVerse Favicon & App Icons (No red icon) -->
   <link rel="icon" type="image/png" sizes="64x64" href="assets/icons/favicon.png?v=2" />
@@ -121,7 +122,7 @@
           return _origOpen.apply(window, arguments);
         }
         // Allow safe external partners/services
-        var allowed = ['google.com', 'themoviedb.org', 'youtube.com', 'tmdb.org', 'github.com', 'githubusercontent.com', 'vidsrc', 'superembed'];
+        var allowed = ['google.com', 'themoviedb.org', 'youtube.com', 'tmdb.org', 'github.com', 'githubusercontent.com', 'vidsrc', 'superembed', 'xbox.com', 'geforcenow.com', 'boosteroid.com', 'epicgames.com', 'fiveplay.lol', 'playgta5.com', 'crazygames.com', 'minecraft.net', 'froggi.es', 'xproger.info'];
         var isAllowed = allowed.some(function (d) { return u.indexOf(d) !== -1; });
         if (isAllowed) {
           return _origOpen.apply(window, arguments);
@@ -194,6 +195,9 @@
           <a href="#!/sports" class="nav-link nav-link-sports" ng-click="navCtrl.navTo('/sports')" ng-class="{'active': navCtrl.isActive('/sports')}" title="Live Sports & Matches">
             <i class="fa-solid fa-satellite-dish"></i> <span>Live Sports</span>
           </a>
+          <a href="#!/games" class="nav-link nav-link-games" ng-click="navCtrl.navTo('/games')" ng-class="{'active': navCtrl.isActive('/games')}" title="AAA Cloud & Web Games (PC)">
+            <i class="fa-solid fa-gamepad"></i> <span>Games</span>
+          </a>
 
           <!-- Desktop 'More' Dropdown Capsule -->
           <div class="nav-dropdown-wrapper" ng-class="{'open': navCtrl.moreDropdownOpen}">
@@ -226,6 +230,9 @@
           </div>
 
           <!-- Mobile-only secondary links (expanded directly in mobile drawer) -->
+          <a href="#!/games" class="nav-link mobile-only-link" ng-click="navCtrl.navTo('/games')" ng-class="{'active': navCtrl.isActive('/games')}">
+            <i class="fa-solid fa-gamepad"></i> <span>Games 🖥️</span>
+          </a>
           <a href="#!/kdrama" class="nav-link mobile-only-link" ng-click="navCtrl.navTo('/kdrama')" ng-class="{'active': navCtrl.isActive('/kdrama')}">
             <i class="fa-solid fa-heart-pulse"></i> <span>K-Drama</span>
           </a>
@@ -983,6 +990,7 @@
   <script src="js/services/streamBridgeService.js?v=1.3.1"></script>
   <script src="js/services/musicService.js?v=1.3.6"></script>
   <script src="js/services/sportsService.js?v=1.3.5"></script>
+  <script src="js/services/gamesService.js?v=1.4.0"></script>
 
   <!-- Directives -->
   <script src="js/directives/movieCard.js?v=1.3.1"></script>
@@ -999,6 +1007,7 @@
   <script src="js/controllers/musicController.js?v=1.3.6"></script>
   <script src="js/controllers/sportsController.js?v=1.3.5"></script>
   <script src="js/controllers/musicDockController.js?v=1.3.6"></script>
+  <script src="js/controllers/gamesController.js?v=1.4.0"></script>
 
 </body>
 
