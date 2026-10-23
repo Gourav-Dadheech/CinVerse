@@ -223,6 +223,44 @@
   box-shadow: 0 0 6px #ffffff;
 }
 
+/* India Priority Filter Pill & Badges */
+.status-pill-btn.pill-india {
+  background: rgba(255, 153, 51, 0.08);
+  border-color: rgba(255, 153, 51, 0.35);
+  color: #ffedd5;
+}
+
+.status-pill-btn.pill-india:hover {
+  background: rgba(255, 153, 51, 0.16);
+  border-color: rgba(255, 153, 51, 0.6);
+  color: #ffffff;
+}
+
+.status-pill-btn.pill-india.active {
+  background: linear-gradient(135deg, #ff9933 0%, #ffffff 50%, #138808 100%);
+  color: #0b1120;
+  border-color: #ff9933;
+  font-weight: 800;
+  box-shadow: 0 0 16px rgba(255, 153, 51, 0.4);
+}
+
+.status-pill-btn.pill-india.active .pill-count.count-india {
+  background: rgba(0, 0, 0, 0.7);
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.pill-count.count-india {
+  background: rgba(255, 153, 51, 0.25);
+  color: #fed7aa;
+  font-weight: 700;
+}
+
+.india-flag-badge {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
 .format-chips-wrap {
   display: flex;
   align-items: center;
@@ -251,6 +289,69 @@
   background: rgba(16, 185, 129, 0.15);
   border-color: rgba(16, 185, 129, 0.45);
   color: #34d399;
+}
+
+.format-chip-btn.chip-india-accent {
+  border-color: rgba(255, 153, 51, 0.3);
+  color: #fed7aa;
+}
+
+.format-chip-btn.chip-india-accent:hover {
+  background: rgba(255, 153, 51, 0.12);
+  color: #ffffff;
+}
+
+.format-chip-btn.chip-india-accent.active {
+  background: rgba(255, 153, 51, 0.2);
+  border-color: #ff9933;
+  color: #ffedd5;
+  font-weight: 700;
+}
+
+/* India Card & Badge Highlights */
+.crex-match-card.card-india {
+  border-color: rgba(255, 153, 51, 0.35);
+  background: linear-gradient(180deg, rgba(255, 153, 51, 0.05) 0%, rgba(15, 23, 42, 0.85) 45%);
+}
+
+.crex-match-card.card-india:hover {
+  border-color: rgba(255, 153, 51, 0.65);
+  box-shadow: 0 14px 30px rgba(255, 153, 51, 0.15);
+}
+
+.crex-match-card.card-india.active-card {
+  border-color: #ff9933;
+  background: linear-gradient(180deg, rgba(255, 153, 51, 0.12) 0%, rgba(15, 23, 42, 0.92) 50%);
+  box-shadow: 0 0 24px rgba(255, 153, 51, 0.3);
+}
+
+.card-india-badge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, rgba(255, 153, 51, 0.25), rgba(19, 136, 8, 0.25));
+  border: 1px solid rgba(255, 153, 51, 0.5);
+  color: #ffedd5;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.india-priority-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 13px;
+  background: rgba(255, 153, 51, 0.12);
+  border: 1px solid rgba(255, 153, 51, 0.4);
+  border-radius: 50px;
+  color: #fed7aa;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
 }
 
 /* ---------------- CREX HORIZONTAL MATCH CARDS STRIP ---------------- */

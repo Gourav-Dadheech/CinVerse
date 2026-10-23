@@ -89,6 +89,16 @@
           <span>Completed</span>
           <span class="pill-count">{{ sportsCtrl.getMatchCount('COMPLETED') }}</span>
         </button>
+
+        <button type="button"
+                class="status-pill-btn pill-india"
+                ng-class="{'active': sportsCtrl.statusFilter === 'INDIA'}"
+                ng-click="sportsCtrl.setStatusFilter('INDIA')"
+                title="Priority view: All Team India, IPL and Ranji Trophy matches">
+          <span class="india-flag-badge">🇮🇳</span>
+          <span>India Matches</span>
+          <span class="pill-count count-india">{{ sportsCtrl.getIndiaMatchCount() }}</span>
+        </button>
       </div>
 
       <!-- Format Filter Chips -->
@@ -98,6 +108,12 @@
                 ng-class="{'active': sportsCtrl.formatFilter === 'all' && sportsCtrl.categoryFilter === 'all'}"
                 ng-click="sportsCtrl.setFormatFilter('all'); sportsCtrl.setCategoryFilter('all')">
           All Formats
+        </button>
+        <button type="button"
+                class="format-chip-btn chip-india-accent"
+                ng-class="{'active': sportsCtrl.categoryFilter === 'india'}"
+                ng-click="sportsCtrl.setCategoryFilter('india')">
+          🇮🇳 India & Domestic
         </button>
         <button type="button"
                 class="format-chip-btn"
@@ -144,12 +160,13 @@
     <div class="crex-cards-carousel">
       <div class="crex-match-card"
            ng-repeat="match in sportsCtrl.getFilteredMatches() track by match.id"
-           ng-class="{'active-card': sportsCtrl.activeMatch.id === match.id, 'card-live': match.status === 'LIVE'}"
+           ng-class="{'active-card': sportsCtrl.activeMatch.id === match.id, 'card-live': match.status === 'LIVE', 'card-india': match.isIndia}"
            ng-click="sportsCtrl.selectMatch(match)">
 
         <!-- Card Header: Tournament & Status -->
         <div class="card-meta-header">
           <span class="card-format-tag">{{ match.format }}</span>
+          <span class="card-india-badge" ng-if="match.isIndia" title="India International / Domestic Priority Match">🇮🇳 INDIA</span>
           <span class="card-tournament-name" title="{{ match.tournament }}">{{ match.tournament }}</span>
           <span class="card-status-pill"
                 ng-class="{'pill-red': match.status === 'LIVE', 'pill-green': match.status === 'UPCOMING', 'pill-gray': match.status === 'COMPLETED'}">
@@ -227,6 +244,10 @@
         <div class="date-info-pill" ng-if="sportsCtrl.activeMatch.dateLabel">
           <i class="fa-regular fa-clock text-cyan"></i>
           <span>{{ sportsCtrl.activeMatch.dateLabel }}</span>
+        </div>
+        <div class="india-priority-pill" ng-if="sportsCtrl.activeMatch.isIndia">
+          <i class="fa-solid fa-flag-checkered text-amber"></i>
+          <span>🇮🇳 Team India & Domestic</span>
         </div>
         <div class="status-live-chip"
              ng-class="{'chip-live': sportsCtrl.activeMatch.status === 'LIVE', 'chip-upcoming': sportsCtrl.activeMatch.status === 'UPCOMING', 'chip-done': sportsCtrl.activeMatch.status === 'COMPLETED'}">

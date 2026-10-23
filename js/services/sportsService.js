@@ -603,6 +603,28 @@
         }
       ];
 
+      // ---------------- INDIA MATCH DETECTOR ----------------
+      function isIndiaMatch(m) {
+        if (!m) return false;
+        var t1 = (((m.teamA && (m.teamA.name + ' ' + (m.teamA.code || ''))) || m.team1 || '') + '');
+        var t2 = (((m.teamB && (m.teamB.name + ' ' + (m.teamB.code || ''))) || m.team2 || '') + '');
+        var tour = ((m.tournament || m.series || m.name || '') + '');
+
+        // Exclude West Indies false-positive match on 'ind' or 'india'
+        var t1Clean = t1.replace(/west\s*indies/gi, '');
+        var t2Clean = t2.replace(/west\s*indies/gi, '');
+
+        var isTeamIndia = /\b(india|ind|indw|inda|ind-w|ind-a|bcci|team india|men in blue)\b/i.test(t1Clean) ||
+                          /\b(india|ind|indw|inda|ind-w|ind-a|bcci|team india|men in blue)\b/i.test(t2Clean);
+
+        var isIndianSeries = /india|ipl|ranji|duleep|vijay hazare|syed mushtaq|deodhar|irani|wpl|women's premier league|trophy plate|trophy elite/i.test(tour);
+
+        var isIplOrDomestic = /\b(csk|rcb|mi|kkr|srh|gt|lsg|pbks|rr|dc|chennai super|mumbai indians|royal challengers|kolkata knight|sunrisers|gujarat titans|lucknow super|punjab kings|rajasthan royals|delhi capitals|mumbai|delhi|karnataka|tamil nadu|bengal|baroda|gujarat|saurashtra|vidarbha|hyderabad|punjab|rajasthan|uttar pradesh|kerala|odisha|assam|tripura|bihar|chhattisgarh|haryana|himachal|jharkhand|jammu|services|railways|andhra|goa|meghalaya|manipur|mizoram|nagaland|sikkim|arunachal|puducherry)\b/i.test(t1 + ' ' + t2);
+
+        return isTeamIndia || isIndianSeries || isIplOrDomestic;
+      }
+      self.isIndiaMatch = isIndiaMatch;
+
       // ---------------- DYNAMIC REAL-DATE SCHEDULE ENGINE ----------------
       self.cricketMatches = [];
       self.activeMatch = null;
@@ -627,6 +649,10 @@
 
         self.cricketMatches = masterMatchesPool.map(function (baseMatch, idx) {
           var m = angular.copy(baseMatch);
+          m.isIndia = isIndiaMatch(m);
+          if (m.isIndia && (!m.badge || m.badge.indexOf('CRICKET') === -1)) {
+            m.badge = '🇮🇳 TEAM INDIA & DOMESTIC';
+          }
 
           if (idx === todayPrimaryIdx) {
             m.status = 'LIVE';
@@ -662,8 +688,11 @@
           return m;
         });
 
-        // Sort: LIVE first, then UPCOMING, then COMPLETED
+        // Sort: 1. INDIA matches always top priority! 2. LIVE first, then UPCOMING, then COMPLETED
         self.cricketMatches.sort(function (a, b) {
+          var aInd = a.isIndia ? 1 : 0;
+          var bInd = b.isIndia ? 1 : 0;
+          if (aInd !== bInd) return bInd - aInd;
           return a.scheduleRank - b.scheduleRank;
         });
 
@@ -832,14 +861,22 @@
                   var statusTag = isLive ? '🔴 LIVE • IN PLAY' : (m.matchEnded ? '⚪ COMPLETED' : '🟢 UPCOMING');
                   var statusGroup = isLive ? 'LIVE' : (m.matchEnded ? 'COMPLETED' : 'UPCOMING');
 
+                  var checkObj = {
+                    teamA: { name: team1Name, code: team1Short },
+                    teamB: { name: team2Name, code: team2Short },
+                    tournament: m.name || (team1Short + ' vs ' + team2Short)
+                  };
+                  var isIndia = isIndiaMatch(checkObj);
+
                   return {
                     id: 'cricapi-' + (m.id || idx),
                     sport: 'cricket',
                     format: (m.matchType || 'T20').toUpperCase(),
-                    category: 'international',
+                    category: isIndia ? 'india' : (m.matchType === 't20' ? 'league' : 'international'),
+                    isIndia: isIndia,
                     status: statusGroup,
                     statusTag: statusTag,
-                    badge: 'CRICKETDATA LIVE ENGINE 📡',
+                    badge: isIndia ? '🇮🇳 TEAM INDIA & DOMESTIC' : 'CRICKETDATA LIVE ENGINE 📡',
                     tournament: m.name || (team1Short + ' vs ' + team2Short),
                     venue: m.venue || 'International Cricket Stadium',
                     dateLabel: m.date || 'Live Match',
@@ -871,17 +908,22 @@
                     situation: team1Short + ' vs ' + team2Short + ' • ' + (m.venue || 'Match Center'),
                     winPredictor: {
                       teamACode: team1Short,
-                      teamAPct: 50,
+                      teamAPct: isIndia ? (checkObj.teamA.code === 'IND' ? 65 : 50) : 50,
                       teamBCode: team2Short,
-                      teamBPct: 50,
+                      teamBPct: isIndia ? (checkObj.teamB.code === 'IND' ? 65 : 50) : 50,
                       trend: m.status || 'Match in progress'
                     }
                   };
                 });
 
-                // Sort: LIVE first, then UPCOMING, then COMPLETED
+                // Sort: 1. INDIA matches always top priority! 2. LIVE first, then UPCOMING, then COMPLETED
                 var order = { 'LIVE': 0, 'UPCOMING': 1, 'COMPLETED': 2 };
-                cards.sort(function (a, b) { return (order[a.status] || 99) - (order[b.status] || 99); });
+                cards.sort(function (a, b) {
+                  var aInd = a.isIndia ? 1 : 0;
+                  var bInd = b.isIndia ? 1 : 0;
+                  if (aInd !== bInd) return bInd - aInd;
+                  return (order[a.status] || 99) - (order[b.status] || 99);
+                });
 
                 self.cricketMatches = cards;
                 if (!self.activeMatch || !self.cricketMatches.some(function (m) { return m.id === self.activeMatch.id; })) {
@@ -921,6 +963,7 @@
               self.scrapedMatchesCount = res.data.matches.length;
 
               var realMatches = res.data.matches.map(function (m, idx) {
+                m.isIndia = isIndiaMatch(m);
                 if (m.teamA && m.teamB) {
                   if (!m.id) m.id = 'live-cricbuzz-' + (m.numericId || idx);
                   if (!m.servers || !m.servers.length) {
@@ -933,6 +976,15 @@
                   return m;
                 }
                 return m;
+              });
+
+              // Sort: 1. INDIA matches always top priority! 2. LIVE first, then UPCOMING, then COMPLETED
+              var order = { 'LIVE': 0, 'UPCOMING': 1, 'COMPLETED': 2 };
+              realMatches.sort(function (a, b) {
+                var aInd = a.isIndia ? 1 : 0;
+                var bInd = b.isIndia ? 1 : 0;
+                if (aInd !== bInd) return bInd - aInd;
+                return (order[a.status] || 99) - (order[b.status] || 99);
               });
 
               self.cricketMatches = realMatches;

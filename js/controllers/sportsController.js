@@ -128,20 +128,49 @@
         vm.categoryFilter = cat;
       };
 
-      // Filtered Matches for Cards Carousel/Grid
+      // Filtered Matches for Cards Carousel/Grid with India Priority Sorting
       vm.getFilteredMatches = function () {
-        return vm.matches.filter(function (m) {
-          var matchStatus = vm.statusFilter === 'all' || m.status === vm.statusFilter;
+        var list = (vm.matches || []).filter(function (m) {
+          var matchStatus = true;
+          if (vm.statusFilter === 'INDIA') {
+            matchStatus = m.isIndia === true;
+          } else if (vm.statusFilter !== 'all') {
+            matchStatus = m.status === vm.statusFilter;
+          }
+
           var matchFormat = vm.formatFilter === 'all' || m.format === vm.formatFilter;
-          var matchCat = vm.categoryFilter === 'all' || m.category === vm.categoryFilter;
+
+          var matchCat = true;
+          if (vm.categoryFilter === 'india') {
+            matchCat = m.isIndia === true;
+          } else if (vm.categoryFilter !== 'all') {
+            matchCat = m.category === vm.categoryFilter;
+          }
+
           return matchStatus && matchFormat && matchCat;
+        });
+
+        // Always prioritize India matches first, then LIVE, then UPCOMING, then COMPLETED
+        var order = { 'LIVE': 0, 'UPCOMING': 1, 'COMPLETED': 2 };
+        return list.sort(function (a, b) {
+          var aInd = a.isIndia ? 1 : 0;
+          var bInd = b.isIndia ? 1 : 0;
+          if (aInd !== bInd) return bInd - aInd;
+          return (order[a.status] || 99) - (order[b.status] || 99);
         });
       };
 
       // Match Counts for Filter Pills
       vm.getMatchCount = function (status) {
+        if (!vm.matches) return 0;
         if (status === 'all') return vm.matches.length;
+        if (status === 'INDIA') return vm.matches.filter(function (m) { return m.isIndia === true; }).length;
         return vm.matches.filter(function (m) { return m.status === status; }).length;
+      };
+
+      vm.getIndiaMatchCount = function () {
+        if (!vm.matches) return 0;
+        return vm.matches.filter(function (m) { return m.isIndia === true; }).length;
       };
 
       // Open CREX Match Center
