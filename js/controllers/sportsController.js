@@ -85,7 +85,22 @@
       vm.selectedArticle = null;
       vm.showNewsModal = false;
 
-      // Real-time API Key Configuration
+      // Real-time API Key Configuration & Quota Tracker
+      Object.defineProperty(vm, 'apiHitsToday', {
+        get: function () { return SportsService.apiHitsToday || 0; },
+        enumerable: true,
+        configurable: true
+      });
+      Object.defineProperty(vm, 'apiHitsLimit', {
+        get: function () { return SportsService.apiHitsLimit || 100; },
+        enumerable: true,
+        configurable: true
+      });
+
+      vm.refreshLiveScores = function () {
+        SportsService.fetchLiveCricketData(true);
+      };
+
       vm.hasApiKey = function () {
         var k = SportsService.getApiKey();
         return !!(k && k.trim().length > 10);

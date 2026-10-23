@@ -752,6 +752,10 @@
       // ---------------- DIRECT CRICKETDATA.ORG / CRICAPI ENGINE ----------------
       self.backendScraperActive = false;
       self.scrapedMatchesCount = 0;
+      self.apiHitsToday = 0;
+      self.apiHitsLimit = 100;
+      var CRIC_CACHE_KEY = 'cinverse_cric_cache_v1';
+      var CRIC_CACHE_TTL = 180 * 1000; // 3 minutes smart cache (protects 100 hits/day quota)
 
       self.getApiKey = function () {
         return (APP_CONFIG && APP_CONFIG.CRIC_API_KEY) || localStorage.getItem('cinverse_cric_api_key') || '';
@@ -760,19 +764,45 @@
       self.setApiKey = function (key) {
         if (key) {
           localStorage.setItem('cinverse_cric_api_key', key.trim());
-          self.fetchLiveCricketData();
+          self.fetchLiveCricketData(true);
         }
       };
 
-      self.fetchLiveCricketData = function () {
+      self.fetchLiveCricketData = function (force) {
         var apiKey = self.getApiKey();
         if (apiKey && apiKey.trim().length > 10) {
+          // Check local cache first unless forced
+          if (!force) {
+            try {
+              var cachedRaw = localStorage.getItem(CRIC_CACHE_KEY);
+              if (cachedRaw) {
+                var cached = JSON.parse(cachedRaw);
+                if (cached && cached.timestamp && (Date.now() - cached.timestamp < CRIC_CACHE_TTL) && cached.cards && cached.cards.length > 0) {
+                  self.backendScraperActive = true;
+                  self.scrapedMatchesCount = cached.cards.length;
+                  self.cricketMatches = cached.cards;
+                  if (cached.hitsToday !== undefined) self.apiHitsToday = cached.hitsToday;
+                  if (cached.hitsLimit !== undefined) self.apiHitsLimit = cached.hitsLimit;
+                  if (!self.activeMatch || !self.cricketMatches.some(function (m) { return m.id === self.activeMatch.id; })) {
+                    self.activeMatch = self.cricketMatches[0];
+                  }
+                  $rootScope.$applyAsync();
+                  return;
+                }
+              }
+            } catch (e) {}
+          }
+
           // Direct client-side fetch from CricketData.org (Works on static hosting, mobile & Android app with CORS: *)
           $http.get('https://api.cricapi.com/v1/currentMatches?apikey=' + encodeURIComponent(apiKey.trim()) + '&offset=0', { timeout: 8000 })
             .then(function (res) {
               if (res.data && res.data.status === 'success' && res.data.data && res.data.data.length > 0) {
                 self.backendScraperActive = true;
                 self.scrapedMatchesCount = res.data.data.length;
+                if (res.data.info) {
+                  self.apiHitsToday = res.data.info.hitsToday || self.apiHitsToday;
+                  self.apiHitsLimit = res.data.info.hitsLimit || 100;
+                }
 
                 var cards = res.data.data.map(function (m, idx) {
                   var teams = m.teams || [];
@@ -857,6 +887,17 @@
                 if (!self.activeMatch || !self.cricketMatches.some(function (m) { return m.id === self.activeMatch.id; })) {
                   self.activeMatch = self.cricketMatches[0];
                 }
+
+                // Cache to localStorage for 3 minutes
+                try {
+                  localStorage.setItem(CRIC_CACHE_KEY, JSON.stringify({
+                    timestamp: Date.now(),
+                    cards: cards,
+                    hitsToday: self.apiHitsToday,
+                    hitsLimit: self.apiHitsLimit
+                  }));
+                } catch (e) {}
+
                 $rootScope.$applyAsync();
                 return;
               }
@@ -909,7 +950,7 @@
       // Initialize schedule & scrapers immediately
       self.refreshDailySchedule(true);
       self.fetchLiveNewsBridge();
-      self.fetchLiveCricketData();
+      self.fetchLiveCricketData(false);
 
       // Check daily rollover every 30 seconds
       var lastCheckedDay = new Date().getDate();
@@ -919,15 +960,15 @@
           lastCheckedDay = currentDay;
           self.refreshDailySchedule(true);
           self.fetchLiveNewsBridge();
-          self.fetchBackendScrapedMatches();
+          self.fetchLiveCricketData(true);
           $rootScope.$broadcast('sports:dayRollover');
         }
       }, 30000);
 
-      // Periodically refresh real-time live scores every 20 seconds
+      // Periodically refresh real-time live scores every 3 minutes (protects 100 hits/day)
       $interval(function () {
-        self.fetchBackendScrapedMatches();
-      }, 20000);
+        self.fetchLiveCricketData(false);
+      }, 180000);
 
       // Periodically refresh news feed every 15 minutes
       $interval(function () {

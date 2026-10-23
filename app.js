@@ -36,7 +36,7 @@
     BACKDROP_SIZE: 'original',
     DEFAULT_LANGUAGE: 'en-US',
     // Free CricketData.org / CricAPI key for 100% genuine live scores
-    CRIC_API_KEY: ''
+    CRIC_API_KEY: 'c20fb93e-4884-471d-a7f4-916477f1fe45'
   });
 
   /* ------------------------------------------------------------
