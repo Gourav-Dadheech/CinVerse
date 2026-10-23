@@ -17,7 +17,8 @@
     '$http',
     '$interval',
     '$rootScope',
-    function ($http, $interval, $rootScope) {
+    'APP_CONFIG',
+    function ($http, $interval, $rootScope, APP_CONFIG) {
       var self = this;
 
       function formatDate(d) {
@@ -715,9 +716,161 @@
           });
       };
 
-      // ---------------- BACKEND REAL-TIME CRICKET API BRIDGE ----------------
+      // ---------------- TEAM FLAG HELPER ----------------
+      function getTeamFlag(name, shortCode) {
+        var n = ((name || '') + ' ' + (shortCode || '')).toLowerCase();
+        if (n.indexOf('india') !== -1 || n.indexOf('ind') !== -1) return '🇮🇳';
+        if (n.indexOf('australia') !== -1 || n.indexOf('aus') !== -1) return '🇦🇺';
+        if (n.indexOf('england') !== -1 || n.indexOf('eng') !== -1) return '🏴󠁧󠁢󠁥󠁮󠁧󠁿';
+        if (n.indexOf('south africa') !== -1 || n.indexOf('rsa') !== -1 || n.indexOf('sa') !== -1) return '🇿🇦';
+        if (n.indexOf('new zealand') !== -1 || n.indexOf('nz') !== -1) return '🇳🇿';
+        if (n.indexOf('pakistan') !== -1 || n.indexOf('pak') !== -1) return '🇵🇰';
+        if (n.indexOf('sri lanka') !== -1 || n.indexOf('sl') !== -1) return '🇱🇰';
+        if (n.indexOf('bangladesh') !== -1 || n.indexOf('ban') !== -1 || n.indexOf('bcb') !== -1) return '🇧🇩';
+        if (n.indexOf('afghanistan') !== -1 || n.indexOf('afg') !== -1) return '🇦🇫';
+        if (n.indexOf('west indies') !== -1 || n.indexOf('wi') !== -1) return '🌴';
+        if (n.indexOf('zimbabwe') !== -1 || n.indexOf('zim') !== -1) return '🇿🇼';
+        if (n.indexOf('ireland') !== -1 || n.indexOf('ire') !== -1) return '🇮🇪';
+        if (n.indexOf('netherlands') !== -1 || n.indexOf('ned') !== -1) return '🇳🇱';
+        if (n.indexOf('scotland') !== -1 || n.indexOf('sco') !== -1) return '🏴󠁧󠁢󠁳󠁣󠁴󠁿';
+        if (n.indexOf('namibia') !== -1 || n.indexOf('nam') !== -1) return '🇳🇦';
+        if (n.indexOf('nepal') !== -1 || n.indexOf('nep') !== -1) return '🇳🇵';
+        if (n.indexOf('usa') !== -1) return '🇺🇸';
+        if (n.indexOf('csk') !== -1 || n.indexOf('chennai') !== -1) return '💛';
+        if (n.indexOf('mi') !== -1 || n.indexOf('mumbai') !== -1) return '💙';
+        if (n.indexOf('rcb') !== -1 || n.indexOf('bangalore') !== -1) return '❤️';
+        if (n.indexOf('kkr') !== -1 || n.indexOf('kolkata') !== -1) return '💜';
+        if (n.indexOf('dc') !== -1 || n.indexOf('delhi') !== -1) return '💙';
+        if (n.indexOf('rr') !== -1 || n.indexOf('rajasthan') !== -1) return '💖';
+        if (n.indexOf('srh') !== -1 || n.indexOf('hyderabad') !== -1) return '🧡';
+        if (n.indexOf('gt') !== -1 || n.indexOf('gujarat') !== -1) return '⚡';
+        if (n.indexOf('lsg') !== -1 || n.indexOf('lucknow') !== -1) return '🩵';
+        if (n.indexOf('pbks') !== -1 || n.indexOf('punjab') !== -1) return '🔴';
+        return '🏏';
+      }
+
+      // ---------------- DIRECT CRICKETDATA.ORG / CRICAPI ENGINE ----------------
       self.backendScraperActive = false;
       self.scrapedMatchesCount = 0;
+
+      self.getApiKey = function () {
+        return (APP_CONFIG && APP_CONFIG.CRIC_API_KEY) || localStorage.getItem('cinverse_cric_api_key') || '';
+      };
+
+      self.setApiKey = function (key) {
+        if (key) {
+          localStorage.setItem('cinverse_cric_api_key', key.trim());
+          self.fetchLiveCricketData();
+        }
+      };
+
+      self.fetchLiveCricketData = function () {
+        var apiKey = self.getApiKey();
+        if (apiKey && apiKey.trim().length > 10) {
+          // Direct client-side fetch from CricketData.org (Works on static hosting, mobile & Android app with CORS: *)
+          $http.get('https://api.cricapi.com/v1/currentMatches?apikey=' + encodeURIComponent(apiKey.trim()) + '&offset=0', { timeout: 8000 })
+            .then(function (res) {
+              if (res.data && res.data.status === 'success' && res.data.data && res.data.data.length > 0) {
+                self.backendScraperActive = true;
+                self.scrapedMatchesCount = res.data.data.length;
+
+                var cards = res.data.data.map(function (m, idx) {
+                  var teams = m.teams || [];
+                  var team1Name = teams[0] || (m.teamInfo && m.teamInfo[0] && m.teamInfo[0].name) || 'Team 1';
+                  var team2Name = teams[1] || (m.teamInfo && m.teamInfo[1] && m.teamInfo[1].name) || 'Team 2';
+                  var team1Short = (m.teamInfo && m.teamInfo[0] && m.teamInfo[0].shortname) || team1Name.slice(0, 4).toUpperCase();
+                  var team2Short = (m.teamInfo && m.teamInfo[1] && m.teamInfo[1].shortname) || team2Name.slice(0, 4).toUpperCase();
+
+                  var s1 = '', s2 = '', o1 = '', o2 = '';
+                  var r1 = 0, r2 = 0, w1 = 0, w2 = 0;
+                  if (m.score && m.score.length > 0) {
+                    m.score.forEach(function (sc) {
+                      var inn = (sc.inning || '').toLowerCase();
+                      if (inn.indexOf(team1Name.toLowerCase()) !== -1 || inn.indexOf(team1Short.toLowerCase()) !== -1 || inn.indexOf('inning 1') !== -1) {
+                        s1 = sc.r + '/' + (sc.w !== undefined ? sc.w : 0);
+                        o1 = sc.o ? sc.o + ' ov' : '';
+                        r1 = sc.r || 0; w1 = sc.w || 0;
+                      } else {
+                        s2 = sc.r + '/' + (sc.w !== undefined ? sc.w : 0);
+                        o2 = sc.o ? sc.o + ' ov' : '';
+                        r2 = sc.r || 0; w2 = sc.w || 0;
+                      }
+                    });
+                  }
+
+                  var isLive = !m.matchEnded && m.matchStarted;
+                  var statusTag = isLive ? '🔴 LIVE • IN PLAY' : (m.matchEnded ? '⚪ COMPLETED' : '🟢 UPCOMING');
+                  var statusGroup = isLive ? 'LIVE' : (m.matchEnded ? 'COMPLETED' : 'UPCOMING');
+
+                  return {
+                    id: 'cricapi-' + (m.id || idx),
+                    sport: 'cricket',
+                    format: (m.matchType || 'T20').toUpperCase(),
+                    category: 'international',
+                    status: statusGroup,
+                    statusTag: statusTag,
+                    badge: 'CRICKETDATA LIVE ENGINE 📡',
+                    tournament: m.name || (team1Short + ' vs ' + team2Short),
+                    venue: m.venue || 'International Cricket Stadium',
+                    dateLabel: m.date || 'Live Match',
+                    streamTitle: team1Short + ' vs ' + team2Short + ' • Live Broadcast',
+                    servers: [
+                      { id: 1, name: 'Server 1 • Willow Cricket HD (Live Stadium Stream)', quality: '1080p 60FPS', url: 'https://d36r8jifhgsk5j.cloudfront.net/Willow_TV.m3u8', type: 'hls' },
+                      { id: 2, name: 'Server 2 • Cricket Gold HD (Stadium Live Feed)', quality: '1080p HD', url: 'https://streams2.sofast.tv/ptnr-yupptv/title-cricketgold/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/b2048bb8-1686-4432-aa50-647245383e0c/manifest.m3u8', type: 'hls' },
+                      { id: 3, name: 'Server 3 • Global Cricket Broadcast', quality: '1080p HD', url: 'https://www.youtube.com/embed/ebkwnpV6aOc?autoplay=1&mute=0', type: 'iframe' }
+                    ],
+                    teamA: {
+                      name: team1Name,
+                      code: team1Short,
+                      flag: getTeamFlag(team1Name, team1Short),
+                      score: s1 || (isLive ? '0/0' : (m.matchEnded ? 'Completed' : 'Yet to bat')),
+                      overs: o1,
+                      runs: r1,
+                      wickets: w1
+                    },
+                    teamB: {
+                      name: team2Name,
+                      code: team2Short,
+                      flag: getTeamFlag(team2Name, team2Short),
+                      score: s2 || (isLive ? '0/0' : (m.matchEnded ? 'Completed' : 'Yet to bat')),
+                      overs: o2,
+                      runs: r2,
+                      wickets: w2
+                    },
+                    equation: m.status || (isLive ? 'Match in progress' : (m.matchEnded ? 'Match Completed' : 'Scheduled')),
+                    situation: team1Short + ' vs ' + team2Short + ' • ' + (m.venue || 'Match Center'),
+                    winPredictor: {
+                      teamACode: team1Short,
+                      teamAPct: 50,
+                      teamBCode: team2Short,
+                      teamBPct: 50,
+                      trend: m.status || 'Match in progress'
+                    }
+                  };
+                });
+
+                // Sort: LIVE first, then UPCOMING, then COMPLETED
+                var order = { 'LIVE': 0, 'UPCOMING': 1, 'COMPLETED': 2 };
+                cards.sort(function (a, b) { return (order[a.status] || 99) - (order[b.status] || 99); });
+
+                self.cricketMatches = cards;
+                if (!self.activeMatch || !self.cricketMatches.some(function (m) { return m.id === self.activeMatch.id; })) {
+                  self.activeMatch = self.cricketMatches[0];
+                }
+                $rootScope.$applyAsync();
+                return;
+              }
+              self.fetchBackendScrapedMatches();
+            })
+            .catch(function () {
+              self.fetchBackendScrapedMatches();
+            });
+          return;
+        }
+
+        // Fallback: Check backend scraper
+        self.fetchBackendScrapedMatches();
+      };
 
       self.fetchBackendScrapedMatches = function () {
         $http.get('/api/cricket-live', { timeout: 8000 })
@@ -728,7 +881,6 @@
 
               var realMatches = res.data.matches.map(function (m, idx) {
                 if (m.teamA && m.teamB) {
-                  // Ensure fallbacks for any missing subfields
                   if (!m.id) m.id = 'live-cricbuzz-' + (m.numericId || idx);
                   if (!m.servers || !m.servers.length) {
                     m.servers = [
@@ -737,41 +889,11 @@
                       { id: 3, name: 'Server 3 • Global Cricket Broadcast', quality: '1080p HD', url: 'https://www.youtube.com/embed/ebkwnpV6aOc?autoplay=1&mute=0', type: 'iframe' }
                     ];
                   }
-                  if (!m.striker) {
-                    m.striker = { name: m.teamA.code + ' Batter', runs: m.teamA.runs || 0, balls: 0, fours: 0, sixes: 0, sr: '0' };
-                  }
-                  if (!m.nonStriker) {
-                    m.nonStriker = { name: m.teamA.code + ' Partner', runs: 0, balls: 0, fours: 0, sixes: 0, sr: '0' };
-                  }
-                  if (!m.currentBowler) {
-                    m.currentBowler = { name: m.teamB.code + ' Bowler', overs: m.teamA.overs || '0.0', maidens: 0, runs: 0, wickets: m.teamA.wickets || 0, econ: '0.00' };
-                  }
-                  if (!m.currentOver) {
-                    m.currentOver = { overNum: 0, balls: ['•', '•', '•', '•', '•', '•'] };
-                  }
-                  if (!m.innings) {
-                    m.innings = [
-                      {
-                        id: m.id + '-inn1',
-                        title: m.teamA.name + ' Innings',
-                        score: m.teamA.score || '0/0',
-                        overs: m.teamA.overs || '0.0',
-                        crr: '0.00',
-                        batting: [
-                          { name: m.teamA.name + ' Top Order', dismissal: 'Batting', runs: m.teamA.runs || 0, balls: 0, fours: 0, sixes: 0, sr: '0' }
-                        ],
-                        bowling: [
-                          { name: m.teamB.name + ' Attack', overs: m.teamA.overs || '0.0', maidens: 0, runs: 0, wickets: m.teamA.wickets || 0, econ: '0.00' }
-                        ]
-                      }
-                    ];
-                  }
                   return m;
                 }
                 return m;
               });
 
-              // Replace mock pool with genuine live matches from Cricbuzz
               self.cricketMatches = realMatches;
               if (!self.activeMatch || !self.cricketMatches.some(function (m) { return m.id === self.activeMatch.id; })) {
                 self.activeMatch = self.cricketMatches[0];
@@ -787,7 +909,7 @@
       // Initialize schedule & scrapers immediately
       self.refreshDailySchedule(true);
       self.fetchLiveNewsBridge();
-      self.fetchBackendScrapedMatches();
+      self.fetchLiveCricketData();
 
       // Check daily rollover every 30 seconds
       var lastCheckedDay = new Date().getDate();

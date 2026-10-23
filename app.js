@@ -34,7 +34,9 @@
     TMDB_IMAGE_BASE: 'https://image.tmdb.org/t/p',
     POSTER_SIZE: 'w500',
     BACKDROP_SIZE: 'original',
-    DEFAULT_LANGUAGE: 'en-US'
+    DEFAULT_LANGUAGE: 'en-US',
+    // Free CricketData.org / CricAPI key for 100% genuine live scores
+    CRIC_API_KEY: ''
   });
 
   /* ------------------------------------------------------------

@@ -33,10 +33,14 @@
           <i class="fa-regular fa-calendar-check text-cyan"></i>
           <span>{{ sportsCtrl.todayFormatted }}</span>
         </div>
-        <div class="crex-scraper-pill" ng-if="sportsCtrl.backendScraperActive">
-          <span class="scraper-dot"></span>
-          <span>LIVE WEB SCRAPER ACTIVE</span>
-        </div>
+        <button type="button"
+                class="crex-scraper-pill"
+                style="cursor: pointer; border: 1px solid rgba(255,255,255,0.15); background: rgba(30, 41, 59, 0.7); color: #fff; padding: 6px 14px; border-radius: 9999px; display: inline-flex; align-items: center; gap: 8px; font-size: 0.75rem; font-weight: 700; transition: all 0.2s ease;"
+                ng-click="sportsCtrl.promptApiKey()"
+                title="Click to Connect Free CricketData API Key for 100% Genuine Live Scores">
+          <span class="scraper-dot" style="width: 8px; height: 8px; border-radius: 50%;" ng-style="{'background-color': sportsCtrl.hasApiKey() ? '#10B981' : '#F59E0B'}"></span>
+          <span>{{ sportsCtrl.hasApiKey() ? 'LIVE CRICKET API CONNECTED' : '🔑 CONNECT FREE CRICKET API' }}</span>
+        </button>
         <div class="crex-live-badge-glow">
           <span class="pulse-indicator-dot"></span>
           <span>AUTO-CALENDAR SYNC</span>

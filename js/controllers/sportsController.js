@@ -85,6 +85,21 @@
       vm.selectedArticle = null;
       vm.showNewsModal = false;
 
+      // Real-time API Key Configuration
+      vm.hasApiKey = function () {
+        var k = SportsService.getApiKey();
+        return !!(k && k.trim().length > 10);
+      };
+
+      vm.promptApiKey = function () {
+        var current = SportsService.getApiKey();
+        var key = window.prompt('Enter your free CricketData.org / CricAPI key for 100% genuine live scores:\n(Get one free in 30s at https://cricketdata.org - no credit card needed)', current || '');
+        if (key !== null && key.trim().length > 10) {
+          SportsService.setApiKey(key.trim());
+          alert('Cricket API Connected! Real-time live scores syncing now.');
+        }
+      };
+
       // Filter Handlers
       vm.setStatusFilter = function (status) {
         vm.statusFilter = status;
