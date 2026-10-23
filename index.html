@@ -63,30 +63,6 @@
   }
   </script>
 
-  <!-- Monetag Multitag Official Ad Tag (Zone: 296919) -->
-  <script src="https://quge5.com/88/tag.min.js" data-zone="296919" async data-cfasync="false"></script>
-
-  <!-- CinVerse Ad-Shield: Neutralizes rogue popups, redirect attacks, and spam ads while allowing Monetag -->
-  <script>
-    (function () {
-      var _origOpen = window.open;
-      window.open = function (url, target, features) {
-        if (!url) return null;
-        var u = String(url).toLowerCase();
-        // Allow legitimate blob downloads, local links, 1DM links, and Monetag ad network
-        if (u.indexOf('blob:') === 0 || u.indexOf('data:') === 0 || u.indexOf('localhost') !== -1 || u.indexOf('127.0.0.1') !== -1 || u.indexOf('1dm') !== -1 || u.indexOf('quge5.com') !== -1 || u.indexOf('3nbf4.com') !== -1 || u.indexOf('5gvci.com') !== -1) {
-          return _origOpen.apply(window, arguments);
-        }
-        // Block known unauthorized redirect and rogue spam domains
-        if (u.indexOf('bet') !== -1 || u.indexOf('casino') !== -1 || u.indexOf('ad') !== -1 || u.indexOf('click') !== -1 || u.indexOf('pop') !== -1 || u.indexOf('banner') !== -1 || u.indexOf('track') !== -1) {
-          console.warn('[CinVerse Ad-Shield] Neutralized rogue popup ad:', url);
-          return null;
-        }
-        return _origOpen.apply(window, arguments);
-      };
-    })();
-  </script>
-
   <!-- Critical Anti-FOUC (Prevents uncompiled AngularJS templates & modal popups flashing on initial paint) -->
   <style>
     [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
@@ -131,20 +107,37 @@
   <link rel="shortcut icon" href="favicon.ico?v=2" />
   <link rel="apple-touch-icon" href="assets/icons/favicon.png?v=2" />
 
-  <!-- Global Ad-Free Shield Interceptor (Stops unwanted popups & redirect tabs) -->
+  <!-- Global Ad-Free Shield Interceptor (Stops unwanted popups & redirect tabs from streaming iframes) -->
   <script>
     (function () {
       var _origOpen = window.open;
       window.open = function (url, name, specs) {
         if (!url) return null;
-        var allowed = ['google.com', 'themoviedb.org', 'youtube.com', 'tmdb.org', 'github.com', 'githubusercontent.com'];
-        var isAllowed = allowed.some(function (d) { return url.indexOf(d) !== -1; });
+        var u = String(url).toLowerCase();
+        // Allow legitimate blob downloads, data URIs, local links, magnet links, and 1DM app links
+        if (u.indexOf('blob:') === 0 || u.indexOf('data:') === 0 || u.indexOf('magnet:') === 0 ||
+            u.indexOf('localhost') !== -1 || u.indexOf('127.0.0.1') !== -1 || u.indexOf('1dm') !== -1 ||
+            u.indexOf('cinverse') !== -1 || u.indexOf('vexr.dev') !== -1) {
+          return _origOpen.apply(window, arguments);
+        }
+        // Allow safe external partners/services
+        var allowed = ['google.com', 'themoviedb.org', 'youtube.com', 'tmdb.org', 'github.com', 'githubusercontent.com', 'vidsrc', 'superembed'];
+        var isAllowed = allowed.some(function (d) { return u.indexOf(d) !== -1; });
         if (isAllowed) {
-          return _origOpen.call(window, url, name, specs);
+          return _origOpen.apply(window, arguments);
         }
         console.warn('[CinVerse Ad-Shield] Prevented unwanted popup window to:', url);
         return null;
       };
+
+      // Unregister any legacy Monetag ad service workers on visitors' browsers
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function (registrations) {
+          for (var i = 0; i < registrations.length; i++) {
+            registrations[i].unregister();
+          }
+        }).catch(function () {});
+      }
     })();
   </script>
 </head>

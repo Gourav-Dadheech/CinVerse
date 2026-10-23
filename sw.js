@@ -1,6 +1,13 @@
-self.options = {
-    "domain": "5gvci.com",
-    "zoneId": 12050588
-}
-self.lary = ""
-importScripts('https://5gvci.com/act/files/service-worker.min.js?r=sw')
+// CinVerse Service Worker
+// Automatically unregisters legacy Monetag ad push notification worker to ensure clean browsing
+self.addEventListener('install', function () {
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', function (event) {
+  event.waitUntil(
+    self.registration.unregister().then(function () {
+      return self.clients.claim();
+    })
+  );
+});
