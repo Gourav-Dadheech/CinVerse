@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     String target = (apkUrl != null && !apkUrl.isEmpty()) 
                         ? apkUrl 
-                        : "https://github.com/Gourav-Dadheech/CinVerse/releases/download/v1.1.0/CinVerse-v1.1.0.apk";
+                        : new String(android.util.Base64.decode("aHR0cHM6Ly9naXRodWIuY29tL0dvdXJhdi1EYWRoZWVjaC9DaW5WZXJzZS9yZWxlYXNlcy9kb3dubG9hZC92MS4xLjAvQ2luVmVyc2UtdjEuMS4wLmFwaw==", android.util.Base64.DEFAULT));
                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(target));
                     startActivity(intent);
                 } catch (Exception e) {

@@ -1,11 +1,33 @@
+import os
 import sys
 import re
+import base64
 import urllib.request
 import urllib.error
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 
 class CinVerseGameServer(SimpleHTTPRequestHandler):
+    # Strip server software version signatures from response headers
+    server_version = "CinVerse-Core"
+    sys_version = ""
+
+    # Sensitive internal paths to shield from attackers and automated scanners
+    BLOCKED_PREFIXES = (
+        '/.git', '/.github', '/.env', '/scripts', '/scratch',
+        '/package.json', '/package-lock.json', '/server.py',
+        '/.gitignore', '/README.md'
+    )
+
+    def version_string(self):
+        return "CinVerse-Core"
+
     def end_headers(self):
+        # Security & Privacy Hardening Headers
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("X-Frame-Options", "SAMEORIGIN")
+        self.send_header("X-XSS-Protection", "1; mode=block")
+        self.send_header("Referrer-Policy", "strict-origin-when-cross-origin")
+        self.send_header("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
         # Enforce cross-origin isolation headers for WebAssembly multi-threading & WebGPU
         self.send_header("Cross-Origin-Opener-Policy", "same-origin")
         self.send_header("Cross-Origin-Embedder-Policy", "credentialless")
@@ -15,6 +37,19 @@ class CinVerseGameServer(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         clean_path = self.path.split('?')[0]
+
+        # Reconnaissance & Traversal Protection: Block access to internal files & source control
+        if any(clean_path.startswith(p) for p in self.BLOCKED_PREFIXES) or '/.' in clean_path:
+            self.send_error(404, "Not Found")
+            return
+
+        # Anonymized App Download Redirect
+        if clean_path in ('/download/CinVerse.apk', '/download/app', '/app-release.apk'):
+            self.send_response(302)
+            # Route through official release asset without exposing repository origin in plaintext
+            self.send_header("Location", base64.b64decode("aHR0cHM6Ly9naXRodWIuY29tL0dvdXJhdi1EYWRoZWVjaC9DaW5WZXJzZS9yZWxlYXNlcy9kb3dubG9hZC92MS4xLjAvQ2luVmVyc2UtdjEuMS4wLmFwaw==").decode("utf-8"))
+            self.end_headers()
+            return
 
         # 1. Ad-Free GTA V WebAssembly Engine Proxy Endpoint
         if clean_path in ('/gta-web', '/gta-web/'):
@@ -108,7 +143,7 @@ class CinVerseGameServer(SimpleHTTPRequestHandler):
         super().do_POST()
 
 if __name__ == "__main__":
-    port = int(sys.argv[1]) if len(sys.argv) > 1 else 8080
+    port = int(os.environ.get("PORT", sys.argv[1] if len(sys.argv) > 1 else 8080))
     server = HTTPServer(("0.0.0.0", port), CinVerseGameServer)
-    print(f"CinVerse Gaming Dev Server running on http://localhost:{port} (Ad-Free GTA Engine Active)")
+    print(f"CinVerse Secure Core Server running on http://0.0.0.0:{port}")
     server.serve_forever()

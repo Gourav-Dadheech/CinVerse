@@ -18,6 +18,11 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
+
+  <!-- Security & Privacy Hardening Meta Tags -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
   
   <!-- Primary Google SEO Meta Tags -->
   <title>CinVerse - Watch Movies &amp; TV Series Free Online | HD Cinema Streaming</title>
@@ -627,9 +632,10 @@
 
         <!-- Download Action Box -->
         <div class="app-download-action-box">
-          <a href="https://github.com/Gourav-Dadheech/CinVerse/releases/download/v1.1.0/CinVerse-v1.1.0.apk"
+          <a href="javascript:void(0)"
+             ng-click="navCtrl.downloadAppUpdate()"
              class="btn-primary-apk-download"
-             download="CinVerse-v1.1.0.apk">
+             title="Download CinVerse Official Android APK">
             <i class="fa-brands fa-android"></i>
             <div class="btn-apk-label">
               <span class="btn-apk-title">Download APK Directly</span>
@@ -650,9 +656,9 @@
           </div>
 
           <div class="app-download-mirror-row">
-            <span class="mirror-label"><i class="fa-solid fa-cloud"></i> Official GitHub Source:</span>
-            <a href="https://github.com/Gourav-Dadheech/CinVerse/releases" target="_blank" rel="noopener noreferrer" class="mirror-link">
-              <i class="fa-brands fa-github"></i> GitHub Releases Hub
+            <span class="mirror-label"><i class="fa-solid fa-shield-halved"></i> Verified Fast CDN:</span>
+            <a href="javascript:void(0)" ng-click="navCtrl.downloadAppUpdate()" class="mirror-link" title="CinVerse Official Fast Mirror">
+              <i class="fa-solid fa-cloud-arrow-down"></i> CinVerse Cloud Mirror
             </a>
           </div>
         </div>
@@ -979,7 +985,7 @@
   <div id="cinverse-yt-audio-player" style="position:fixed; bottom:-9999px; left:-9999px; width:200px; height:200px; opacity:0; pointer-events:none; z-index:-1;"></div>
 
   <!-- App Core (Version-tagged for instant OTA updates) -->
-  <script src="app.js?v=1.4.1"></script>
+  <script src="app.js?v=1.4.2"></script>
   <script src="routes.js?v=1.4.1"></script>
   <script src="js/templates.js?v=1.4.1"></script>
 

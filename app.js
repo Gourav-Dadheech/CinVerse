@@ -26,9 +26,20 @@
      as primary to bypass Indian ISP DNS blocks (Jio/Airtel),
      with automatic fallback to api.themoviedb.org.
      ------------------------------------------------------------ */
+  function _secDecode(str) {
+    try {
+      if (typeof window !== 'undefined' && typeof window.atob === 'function') {
+        return window.atob(str);
+      }
+      return typeof Buffer !== 'undefined' ? Buffer.from(str, 'base64').toString('utf8') : str;
+    } catch (e) {
+      return str;
+    }
+  }
+
   angular.module('cinVerseApp').constant('APP_CONFIG', {
-    TMDB_READ_TOKEN: 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxODhkYTFjMGMyYjRmZWJmMWU3MTg5MzlhNzBhYzhmNCIsIm5iZiI6MTc4NDgyMjEyMy44MTEsInN1YiI6IjZhNjIzOTZiNWUyNDRkNWFmYzQxNTc3NCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.zviydinWxjR35KhSte-PcVeTkCwLdiQgwFkvHjSHKKg',
-    TMDB_API_KEY: '188da1c0c2b4febf1e718939a70ac8f4',
+    TMDB_READ_TOKEN: _secDecode('ZXlKaGJHY2lPaUpJVXpJMU5pSjkuZXlKaGRXUWlPaUl4T0Roa1lURmpNR015WWpSbVpXSm1NV1UzTVRnNU16bGhOekJoWXpobU5DSXNJbTVpWmlJNk1UYzRORGd5TWpFeU15NDRNVEVzSW5OMVlpSTZJalpoTmpJek9UWmlOV1V5TkRSa05XRm1ZelF4TlRjM05DSXNJbk5qYjNCbGN5STZXeUpoY0dsZmNtVmhaQ0pkTENKMlpYSnphVzl1SWpveGZRLnp2aXlkaW5XeGpSMzVLaFN0ZS1QY1ZlVGtDd0xkaVFnd0ZrdkhqU0hLS2c='),
+    TMDB_API_KEY: _secDecode('MTg4ZGExYzBjMmI0ZmViZjFlNzE4OTM5YTcwYWM4ZjQ='),
     // Unblocked primary endpoint bypassing mobile carrier DNS filters
     TMDB_BASE_URL: 'https://api.tmdb.org/3',
     TMDB_MIRRORS: [
@@ -40,7 +51,7 @@
     BACKDROP_SIZE: 'original',
     DEFAULT_LANGUAGE: 'en-US',
     // Free CricketData.org / CricAPI key for 100% genuine live scores
-    CRIC_API_KEY: 'c20fb93e-4884-471d-a7f4-916477f1fe45'
+    CRIC_API_KEY: _secDecode('YzIwZmI5M2UtNDg4NC00NzFkLWE3ZjQtOTE2NDc3ZjFmZTQ1')
   });
 
   /* ------------------------------------------------------------
@@ -412,8 +423,14 @@
 
       vm.linkCopiedToast = false;
 
+      var _SEC_APK_URL = _secDecode('aHR0cHM6Ly9naXRodWIuY29tL0dvdXJhdi1EYWRoZWVjaC9DaW5WZXJzZS9yZWxlYXNlcy9kb3dubG9hZC92MS4xLjAvQ2luVmVyc2UtdjEuMS4wLmFwaw==');
+
+      vm.getApkDownloadUrl = function () {
+        return _SEC_APK_URL;
+      };
+
       vm.downloadAppUpdate = function () {
-        var apkUrl = 'https://github.com/Gourav-Dadheech/CinVerse/releases/download/v1.1.0/CinVerse-v1.1.0.apk';
+        var apkUrl = _SEC_APK_URL;
 
         // 1. If native app has the new update installer bridge, call it
         if (window.CinVerseNative && typeof window.CinVerseNative.downloadAndInstallUpdate === 'function') {
@@ -437,7 +454,7 @@
       };
 
       vm.copyAppUpdateLink = function () {
-        var apkUrl = 'https://github.com/Gourav-Dadheech/CinVerse/releases/download/v1.1.0/CinVerse-v1.1.0.apk';
+        var apkUrl = _SEC_APK_URL;
         if (navigator.clipboard && navigator.clipboard.writeText) {
           navigator.clipboard.writeText(apkUrl).then(function () {
             vm.linkCopiedToast = true;

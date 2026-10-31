@@ -6,5 +6,16 @@ Allow: /css/
 Allow: /js/
 Allow: /views/
 
+# Shield internal structures and source control from automated reconnaissance
+Disallow: /.git/
+Disallow: /.github/
+Disallow: /android/
+Disallow: /scripts/
+Disallow: /scratch/
+Disallow: /api/
+Disallow: /package.json
+Disallow: /package-lock.json
+Disallow: /server.py
+
 # Sitemap location for Googlebot
 Sitemap: https://cinverse.vexr.dev/sitemap.xml
