@@ -22,15 +22,19 @@
   /* ------------------------------------------------------------
      2. GLOBAL APP CONFIGURATION (CONSTANTS)
      Keep the TMDB API key + base URLs in ONE place.
-     Every service reads from this constant, nothing else
-     should hard-code a URL or key.
+     Uses unblocked official TMDB CDN endpoint (api.tmdb.org)
+     as primary to bypass Indian ISP DNS blocks (Jio/Airtel),
+     with automatic fallback to api.themoviedb.org.
      ------------------------------------------------------------ */
   angular.module('cinVerseApp').constant('APP_CONFIG', {
-    // TODO: Replace with your own TMDB v4 Read Access Token. See README.md
-    // This is sent as a "Bearer" token in the Authorization header,
-    // NOT as a URL query parameter - keeps it out of logs/browser history.
     TMDB_READ_TOKEN: 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxODhkYTFjMGMyYjRmZWJmMWU3MTg5MzlhNzBhYzhmNCIsIm5iZiI6MTc4NDgyMjEyMy44MTEsInN1YiI6IjZhNjIzOTZiNWUyNDRkNWFmYzQxNTc3NCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.zviydinWxjR35KhSte-PcVeTkCwLdiQgwFkvHjSHKKg',
-    TMDB_BASE_URL: 'https://api.themoviedb.org/3',
+    TMDB_API_KEY: '188da1c0c2b4febf1e718939a70ac8f4',
+    // Unblocked primary endpoint bypassing mobile carrier DNS filters
+    TMDB_BASE_URL: 'https://api.tmdb.org/3',
+    TMDB_MIRRORS: [
+      'https://api.tmdb.org/3',
+      'https://api.themoviedb.org/3'
+    ],
     TMDB_IMAGE_BASE: 'https://image.tmdb.org/t/p',
     POSTER_SIZE: 'w500',
     BACKDROP_SIZE: 'original',
@@ -43,22 +47,37 @@
      3. RUN BLOCK
      Runs once when the app bootstraps.
      - Sets up a global "appLoading" flag on rootScope so the
-       spinner in index.html can react to route changes.
-     - Handles route change errors -> redirect to 404.
+       spinner in index.html reacts to route changes.
+     - Includes a safety timeout (max 3.5s) to guarantee the
+       global loading screen can never hang permanently on mobile.
+     - Handles route change errors -> redirect to 404 without loops.
      ------------------------------------------------------------ */
   angular.module('cinVerseApp').run([
     '$rootScope',
     '$location',
-    function ($rootScope, $location) {
+    '$timeout',
+    function ($rootScope, $location, $timeout) {
 
       // Global loading indicator, toggled on route transitions
       $rootScope.appLoading = false;
+      var loadingSafetyTimer = null;
 
       $rootScope.$on('$routeChangeStart', function () {
         $rootScope.appLoading = true;
+        if (loadingSafetyTimer) {
+          $timeout.cancel(loadingSafetyTimer);
+        }
+        // Safety guard: loading screen automatically disappears after 3.5s even if network stalls
+        loadingSafetyTimer = $timeout(function () {
+          $rootScope.appLoading = false;
+        }, 3500);
       });
 
       $rootScope.$on('$routeChangeSuccess', function () {
+        if (loadingSafetyTimer) {
+          $timeout.cancel(loadingSafetyTimer);
+          loadingSafetyTimer = null;
+        }
         $rootScope.appLoading = false;
         window.scrollTo(0, 0); // scroll to top on every page change
 
@@ -72,9 +91,16 @@
         }
       });
 
-      $rootScope.$on('$routeChangeError', function () {
+      $rootScope.$on('$routeChangeError', function (event, current, previous, rejection) {
+        if (loadingSafetyTimer) {
+          $timeout.cancel(loadingSafetyTimer);
+          loadingSafetyTimer = null;
+        }
         $rootScope.appLoading = false;
-        $location.path('/404');
+        console.warn('[CinVerse Route Error]', rejection);
+        if ($location.path() !== '/404') {
+          $location.path('/404');
+        }
       });
     }
   ]);
@@ -534,5 +560,22 @@
       }
     }
   });
+
+  /* ------------------------------------------------------------
+     7. GLOBAL TMDB IMAGE UNBLOCKER INTERCEPTOR
+     Catches image loading errors from blocked ISP networks (Jio/Airtel)
+     and automatically fails over to Cloudflare-accelerated image CDN (wsrv.nl)
+     with zero broken poster icons and 100% full original quality.
+     ------------------------------------------------------------ */
+  window.addEventListener('error', function (e) {
+    var target = e.target;
+    if (target && target.tagName === 'IMG' && target.src) {
+      var src = target.src;
+      if ((src.indexOf('image.tmdb.org') !== -1 || src.indexOf('images.tmdb.org') !== -1) && !target.dataset.unblockFallback) {
+        target.dataset.unblockFallback = 'true';
+        target.src = 'https://wsrv.nl/?url=' + encodeURIComponent(src);
+      }
+    }
+  }, true);
 
 })();

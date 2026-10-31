@@ -13,11 +13,12 @@
 
   angular.module('cinVerseApp').controller('HomeController', [
     '$interval',
+    '$timeout',
     '$scope',
     '$location',
     'MovieService',
     'StorageService',
-    function ($interval, $scope, $location, MovieService, StorageService) {
+    function ($interval, $timeout, $scope, $location, MovieService, StorageService) {
       var vm = this;
 
       // ---------------- WATCH HISTORY / CONTINUE WATCHING ----------------
@@ -265,7 +266,7 @@
         }
       ];
 
-      vm.selectedFranchise = null;
+      vm.selectedFranchise = vm.franchises[0];
       vm.franchiseMovies = [];
       vm.isLoadingFranchise = false;
 
@@ -275,13 +276,18 @@
         vm.isLoadingFranchise = true;
         MovieService.getFranchiseMovies(franchise.id)
           .then(function (data) {
-            vm.franchiseMovies = (data.results || []).slice(0, 12);
+            var list = (data.results || []).slice(0, 12);
+            if (!list.length && vm.trending && vm.trending.length) {
+              list = vm.trending.slice(0, 8);
+            }
+            vm.franchiseMovies = list;
           })
           .catch(function () {
-            vm.franchiseMovies = [];
+            vm.franchiseMovies = (vm.trending && vm.trending.length ? vm.trending : (vm.popular || [])).slice(0, 8);
           })
           .finally(function () {
             vm.isLoadingFranchise = false;
+            $scope.$applyAsync();
           });
       };
 
@@ -448,10 +454,13 @@
           buildHeroCarousel();
         })
         .catch(function (err) {
-          vm.errorMessage = err.message;
+          vm.errorMessage = err ? err.message : null;
         })
         .finally(function () {
           vm.isLoadingTrending = false;
+          if (!vm.currentHero) {
+            buildHeroCarousel();
+          }
         });
 
       // Pre-load initial OTT and Franchise rows
@@ -465,10 +474,13 @@
           buildHeroCarousel();
         })
         .catch(function (err) {
-          vm.errorMessage = err.message;
+          vm.errorMessage = err ? err.message : null;
         })
         .finally(function () {
           vm.isLoadingPopular = false;
+          if (!vm.currentHero) {
+            buildHeroCarousel();
+          }
         });
 
       // 3. Top rated movies
@@ -477,7 +489,7 @@
           vm.topRated = data.results || [];
         })
         .catch(function (err) {
-          vm.errorMessage = err.message;
+          vm.errorMessage = err ? err.message : null;
         })
         .finally(function () {
           vm.isLoadingTopRated = false;
@@ -490,10 +502,13 @@
           buildHeroCarousel();
         })
         .catch(function (err) {
-          vm.errorMessage = err.message;
+          vm.errorMessage = err ? err.message : null;
         })
         .finally(function () {
           vm.isLoadingUpcoming = false;
+          if (!vm.currentHero) {
+            buildHeroCarousel();
+          }
         });
 
       // 5. Popular Indian movies (Bollywood + Tollywood)
@@ -503,10 +518,13 @@
           buildHeroCarousel();
         })
         .catch(function (err) {
-          vm.errorMessage = err.message;
+          vm.errorMessage = err ? err.message : null;
         })
         .finally(function () {
           vm.isLoadingIndian = false;
+          if (!vm.currentHero) {
+            buildHeroCarousel();
+          }
         });
 
       // 6. Genre badges
@@ -517,6 +535,22 @@
         .catch(function () {
           vm.genres = [];
         });
+
+      // 7. Safety timeout: guarantees no skeleton tile hangs indefinitely on mobile/carrier connections
+      $timeout(function () {
+        if (!vm.currentHero || vm.isLoadingHero) {
+          buildHeroCarousel();
+          vm.isLoadingHero = false;
+        }
+        vm.isLoadingTrending = false;
+        vm.isLoadingPopular = false;
+        vm.isLoadingTopRated = false;
+        vm.isLoadingUpcoming = false;
+        vm.isLoadingIndian = false;
+        vm.isLoadingOtt = false;
+        vm.isLoadingFranchise = false;
+        $scope.$applyAsync();
+      }, 3500);
 
     }
   ]);

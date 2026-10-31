@@ -85,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         }
+        settings.setCacheMode(WebSettings.LOAD_DEFAULT);
 
         // Hardware Acceleration
         webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
@@ -243,6 +244,22 @@ public class MainActivity extends AppCompatActivity {
             super.onPageFinished(view, url);
             progressBar.setVisibility(View.GONE);
             swipeRefresh.setRefreshing(false);
+        }
+
+        @Override
+        public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+            super.onReceivedError(view, errorCode, description, failingUrl);
+            progressBar.setVisibility(View.GONE);
+            swipeRefresh.setRefreshing(false);
+        }
+
+        @Override
+        public void onReceivedError(WebView view, WebResourceRequest request, android.webkit.WebResourceError error) {
+            super.onReceivedError(view, request, error);
+            if (request != null && request.isForMainFrame()) {
+                progressBar.setVisibility(View.GONE);
+                swipeRefresh.setRefreshing(false);
+            }
         }
 
         @Override

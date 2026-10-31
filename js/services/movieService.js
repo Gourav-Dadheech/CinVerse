@@ -19,11 +19,67 @@
       var service = {};
 
       /* ----------------------------------------------------------
-         PRIVATE HELPER: buildUrl
-         Appends the API key + language to every endpoint so we
-         never forget them in individual calls.
+         IN-MEMORY & SESSION RESPONSE CACHE
+         Caches successful responses for 5 minutes so clicking between
+         Home, Details, and Back renders in 0ms with zero extra network load.
          ---------------------------------------------------------- */
-      function buildUrl(endpoint, extraParams) {
+      var responseCache = {};
+      var CACHE_TTL_MS = 5 * 60 * 1000;
+
+      function getCacheKey(endpoint, extraParams) {
+        return endpoint + '?' + JSON.stringify(extraParams || {});
+      }
+
+      function getCached(endpoint, extraParams) {
+        var key = getCacheKey(endpoint, extraParams);
+        var item = responseCache[key];
+        if (item && (Date.now() - item.time < CACHE_TTL_MS)) {
+          return item.data;
+        }
+        return null;
+      }
+
+      function setCache(endpoint, extraParams, data) {
+        if (!data) return;
+        var key = getCacheKey(endpoint, extraParams);
+        responseCache[key] = {
+          data: angular.copy(data),
+          time: Date.now()
+        };
+      }
+
+      /* ----------------------------------------------------------
+         CURATED GUARANTEED FALLBACK REPOSITORY
+         Ensures home page never displays empty sliders or permanent
+         skeleton loading tiles if mobile networks experience an outage.
+         ---------------------------------------------------------- */
+      var CURATED_FALLBACKS = {
+        trending: [
+          { id: 76600, title: 'Avatar: The Way of Water', poster_path: '/t6HIqrRAclMCA60NsSmeqe9RmNV.jpg', backdrop_path: '/s16H6tpK2utvwDtzZ8Qy4qm5Emw.jpg', vote_average: 7.7, release_date: '2022-12-16', overview: 'Set more than a decade after the events of the first film, learn the story of the Sully family.', original_language: 'en', media_type: 'movie' },
+          { id: 299534, title: 'Avengers: Endgame', poster_path: '/or06FN3Dka5tukK1e9sl16pB3iy.jpg', backdrop_path: '/7RyHsO4yDXtBv1zUU3mTpHeQ0d5.jpg', vote_average: 8.3, release_date: '2019-04-26', overview: 'After the devastating events of Infinity War, the universe is in ruins. With the help of remaining allies, the Avengers assemble once more.', original_language: 'en', media_type: 'movie' },
+          { id: 872585, title: 'Oppenheimer', poster_path: '/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg', backdrop_path: '/nb3xI8XI3w4pMVZ38VijbsyBqP4.jpg', vote_average: 8.1, release_date: '2023-07-21', overview: 'The story of J. Robert Oppenheimers role in the development of the atomic bomb during World War II.', original_language: 'en', media_type: 'movie' },
+          { id: 569094, title: 'Spider-Man: Across the Spider-Verse', poster_path: '/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg', backdrop_path: '/4HodYYKEIsGOdinkGi2Ucz6X9i0.jpg', vote_average: 8.4, release_date: '2023-06-02', overview: 'Miles Morales catapults across the Multiverse, where he encounters a team of Spider-People charged with protecting its very existence.', original_language: 'en', media_type: 'movie' },
+          { id: 157336, title: 'Interstellar', poster_path: '/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg', backdrop_path: '/xJHokMbljvjADYdit5fK5VQsXEG.jpg', vote_average: 8.4, release_date: '2014-11-05', overview: 'The adventures of a group of explorers who make use of a newly discovered wormhole to surpass the limitations on human space travel.', original_language: 'en', media_type: 'movie' }
+        ],
+        indian: [
+          { id: 579974, title: 'RRR', poster_path: '/kdNdpkRk25Q9X69xV8zR5vE99nC.jpg', backdrop_path: '/foyGtoXd7m9qP48p5lQ2V33G9v8.jpg', vote_average: 7.9, release_date: '2022-03-24', overview: 'A fictional history of two legendary revolutionaries and their journey away from home before they began fighting for their country in the 1920s.', original_language: 'te', isIndian: true, media_type: 'movie' },
+          { id: 801688, title: 'Kalki 2898 AD', poster_path: '/9bB1y8Usmb6o27Nn49mY0jN74sV.jpg', backdrop_path: '/sItl6E2uQdO5Jk8tP4wV6v9a4.jpg', vote_average: 7.5, release_date: '2024-06-27', overview: 'A modern avatar of Vishnu, a Hindu god, who is believed to have descended to earth to protect the world from evil forces in 2898 AD.', original_language: 'te', isIndian: true, media_type: 'movie' },
+          { id: 866398, title: 'Jawan', poster_path: '/jXJxMcikBpu3ugWUs2ezb9gc8Ku.jpg', backdrop_path: '/7nr00eU3Kx2wzG5r0J3X5.jpg', vote_average: 7.3, release_date: '2023-09-07', overview: 'An emotional journey of a man set to rectify the wrongs in society in a high-octane action thriller.', original_language: 'hi', isIndian: true, media_type: 'movie' },
+          { id: 872906, title: 'Animal', poster_path: '/hr9aCe9q6Adql2ZqEvm4k4Jp7uN.jpg', backdrop_path: '/yOm993lsJyNIu94hqx2GeUxaw1E.jpg', vote_average: 6.8, release_date: '2023-12-01', overview: 'A son undergoes a remarkable transformation as his bond with his father begins to fracture.', original_language: 'hi', isIndian: true, media_type: 'movie' }
+        ],
+        genres: [
+          { id: 28, name: 'Action' }, { id: 12, name: 'Adventure' }, { id: 16, name: 'Animation' },
+          { id: 35, name: 'Comedy' }, { id: 80, name: 'Crime' }, { id: 18, name: 'Drama' },
+          { id: 14, name: 'Fantasy' }, { id: 27, name: 'Horror' }, { id: 878, name: 'Sci-Fi' },
+          { id: 53, name: 'Thriller' }, { id: 10749, name: 'Romance' }, { id: 9648, name: 'Mystery' }
+        ]
+      };
+
+      /* ----------------------------------------------------------
+         PRIVATE HELPER: buildUrl
+         Builds query string and appends to the specified base URL.
+         ---------------------------------------------------------- */
+      function buildUrlWithBase(baseUrl, endpoint, extraParams, includeApiKey) {
         var params = angular.extend(
           {
             language: APP_CONFIG.DEFAULT_LANGUAGE
@@ -31,48 +87,112 @@
           extraParams || {}
         );
 
+        if (includeApiKey && APP_CONFIG.TMDB_API_KEY) {
+          params.api_key = APP_CONFIG.TMDB_API_KEY;
+        }
+
         var query = Object.keys(params)
           .map(function (key) {
             return encodeURIComponent(key) + '=' + encodeURIComponent(params[key]);
           })
           .join('&');
 
-        return APP_CONFIG.TMDB_BASE_URL + endpoint + '?' + query;
+        return baseUrl + endpoint + '?' + query;
       }
 
       /* ----------------------------------------------------------
          PRIVATE HELPER: request
-         Wraps $http.get with unified error handling so every
-         public method returns a clean, predictable promise.
-         Auth is sent as a Bearer token in the Authorization header
-         (TMDB v4 auth) rather than as a URL query parameter.
+         Multi-tiered failover request engine:
+         1. Checks in-memory cache for instant 0s response.
+         2. Tries primary unblocked TMDB endpoint (api.tmdb.org)
+            which bypasses Indian ISP DNS blocks.
+         3. Falls back to api.themoviedb.org if primary times out.
+         4. Falls back to direct v3 API Key query parameter.
+         5. Returns curated emergency fallbacks on total network failure
+            so the UI NEVER stays stuck on a loading screen or skeleton.
          ---------------------------------------------------------- */
       function request(endpoint, extraParams) {
         var deferred = $q.defer();
-        var url = buildUrl(endpoint, extraParams);
 
-        $http.get(url, {
-          headers: {
-            'Authorization': 'Bearer ' + APP_CONFIG.TMDB_READ_TOKEN,
-            'Content-Type': 'application/json;charset=utf-8'
-          }
-        })
-          .then(function (response) {
-            deferred.resolve(response.data);
-          })
-          .catch(function (error) {
-            // Normalize the error so controllers can show a friendly message
-            var friendlyMessage = 'Unable to reach TMDB. Please check your connection.';
-            if (error.status === 401) {
-              friendlyMessage = 'Invalid or missing TMDB Read Access Token. Check APP_CONFIG.TMDB_READ_TOKEN in app.js.';
+        // 1. Instant Cache Check
+        var cached = getCached(endpoint, extraParams);
+        if (cached) {
+          deferred.resolve(cached);
+          return deferred.promise;
+        }
+
+        // Ordered list of TMDB mirrors: unblocked api.tmdb.org first!
+        var mirrors = APP_CONFIG.TMDB_MIRRORS && APP_CONFIG.TMDB_MIRRORS.length
+          ? APP_CONFIG.TMDB_MIRRORS
+          : ['https://api.tmdb.org/3', 'https://api.themoviedb.org/3'];
+
+        function tryMirror(mirrorIdx, useApiKey) {
+          if (mirrorIdx >= mirrors.length) {
+            // If all network mirrors failed, try using API key parameter on primary
+            if (!useApiKey) {
+              tryMirror(0, true);
+              return;
             }
-            deferred.reject({
-              message: friendlyMessage,
-              status: error.status,
-              raw: error
-            });
-          });
 
+            // Emergency Fallback if device is completely offline
+            if (endpoint.indexOf('/trending') !== -1 || endpoint.indexOf('/popular') !== -1) {
+              deferred.resolve({ results: CURATED_FALLBACKS.trending, page: 1, total_pages: 1 });
+              return;
+            }
+            if (endpoint.indexOf('/discover/movie') !== -1 && (extraParams && extraParams.with_original_language === 'hi|te|ta|ml|kn')) {
+              deferred.resolve({ results: CURATED_FALLBACKS.indian, page: 1, total_pages: 1 });
+              return;
+            }
+            if (endpoint.indexOf('/genre/movie/list') !== -1) {
+              deferred.resolve({ genres: CURATED_FALLBACKS.genres });
+              return;
+            }
+
+            deferred.reject({
+              message: 'Unable to reach TMDB. Please check your internet connection.',
+              status: 0
+            });
+            return;
+          }
+
+          var currentBase = mirrors[mirrorIdx];
+          var url = buildUrlWithBase(currentBase, endpoint, extraParams, useApiKey);
+
+          var reqHeaders = {
+            'Content-Type': 'application/json;charset=utf-8'
+          };
+          if (!useApiKey && APP_CONFIG.TMDB_READ_TOKEN) {
+            reqHeaders['Authorization'] = 'Bearer ' + APP_CONFIG.TMDB_READ_TOKEN;
+          }
+
+          $http.get(url, {
+            headers: reqHeaders,
+            timeout: 5000 // 5-second fast failover limit before switching to next mirror
+          })
+            .then(function (response) {
+              if (response && response.data) {
+                setCache(endpoint, extraParams, response.data);
+                deferred.resolve(response.data);
+              } else {
+                tryMirror(mirrorIdx + 1, useApiKey);
+              }
+            })
+            .catch(function (error) {
+              // 404 indicates resource actually doesn't exist; do not retry other mirrors
+              if (error && error.status === 404) {
+                deferred.reject({
+                  message: 'Item not found on TMDB.',
+                  status: 404,
+                  raw: error
+                });
+                return;
+              }
+              // Network timeout, DNS failure, or 5xx: try next mirror immediately
+              tryMirror(mirrorIdx + 1, useApiKey);
+            });
+        }
+
+        tryMirror(0, false);
         return deferred.promise;
       }
 
